@@ -1,0 +1,51 @@
+{
+    "name": "TestColor",
+    "type": "ColorRect",
+    "components": [
+        {
+            "type": "transform_2d"
+        },
+        {
+            "type": "color_rect",
+            "size": {
+                "w": 32.0,
+                "h": 32.0
+            },
+            "color": {
+                "r": 160,
+                "g": 42,
+                "b": 42,
+                "a": 255
+            }
+        }
+    ],
+    "children": [
+        {
+            "name": "ColorRect",
+            "type": "ColorRect",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 32.0,
+                        "y": 32.0
+                    }
+                },
+                {
+                    "type": "color_rect",
+                    "size": {
+                        "w": 32.0,
+                        "h": 32.0
+                    },
+                    "color": {
+                        "r": 44,
+                        "g": 82,
+                        "b": 180,
+                        "a": 255
+                    }
+                }
+            ],
+            "children": []
+        }
+    ]
+}

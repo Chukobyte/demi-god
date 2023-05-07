@@ -1,0 +1,142 @@
+{
+    "name": "TitleScreen",
+    "type": "Node2D",
+    "components": [
+        {
+            "type": "transform_2d"
+        },
+        {
+            "type": "script",
+            "class_path": "src.title_screen",
+            "class_name": "TitleScreen"
+        }
+    ],
+    "children": [
+        {
+            "name": "Background",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d"
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/title_screen/title_screen_background.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "Title",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d"
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/title_screen/title_screen_title.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "Press Start",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "z_index": 2
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/title_screen/title_screen_press_start.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "Copyright",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d"
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/title_screen/title_screen_copyright.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "Buildings",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "z_index": 1
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/title_screen/title_screen_buildings.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "WhiteRect",
+            "type": "ColorRect",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "z_index": 20
+                },
+                {
+                    "type": "color_rect",
+                    "size": {
+                        "w": 160.0,
+                        "h": 144.0
+                    },
+                    "color": {
+                        "r": 240,
+                        "g": 247,
+                        "b": 243,
+                        "a": 0
+                    }
+                }
+            ],
+            "children": []
+        }
+    ]
+}

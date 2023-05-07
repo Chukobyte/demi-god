@@ -1,0 +1,208 @@
+{
+    "name": "Main",
+    "type": "Node2D",
+    "components": [
+        {
+            "type": "transform_2d"
+        },
+        {
+            "type": "script",
+            "class_path": "src.main",
+            "class_name": "Main"
+        }
+    ],
+    "children": [
+        {
+            "name": "Player",
+            "type": "Node2D",
+            "external_node_source": "scenes/characters/player.cscn",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 20.0,
+                        "y": 78.0
+                    },
+                    "z_index": 3
+                },
+                {
+                    "type": "script",
+                    "class_path": "src.characters.player",
+                    "class_name": "Player"
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "ColorRect",
+            "type": "ColorRect",
+            "components": [
+                {
+                    "type": "transform_2d"
+                },
+                {
+                    "type": "color_rect",
+                    "size": {
+                        "w": 800.0,
+                        "h": 450.0
+                    },
+                    "color": {
+                        "r": 163,
+                        "g": 163,
+                        "b": 163,
+                        "a": 163
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "BridgeGround",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 0.0,
+                        "y": 65.0
+                    },
+                    "z_index": 2
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/environment/bridge_ground.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 640.0,
+                        "h": 48.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "BottomUI",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 0.0,
+                        "y": 112.0
+                    },
+                    "z_index": 10,
+                    "ignore_camera": true
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/ui/bottom_ui.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 32.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "HealthUI",
+            "type": "ColorRect",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 34.0,
+                        "y": 123.0
+                    },
+                    "z_index": 11,
+                    "ignore_camera": true
+                },
+                {
+                    "type": "color_rect",
+                    "size": {
+                        "w": 52.0,
+                        "h": 9.0
+                    },
+                    "color": {
+                        "r": 80,
+                        "g": 80,
+                        "b": 80,
+                        "a": 255
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "EnergyUI",
+            "type": "ColorRect",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 98.0,
+                        "y": 123.0
+                    },
+                    "z_index": 11,
+                    "ignore_camera": true
+                },
+                {
+                    "type": "color_rect",
+                    "size": {
+                        "w": 52.0,
+                        "h": 9.0
+                    },
+                    "color": {
+                        "r": 163,
+                        "g": 163,
+                        "b": 163,
+                        "a": 255
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "Parallax",
+            "type": "Parallax",
+            "components": [
+                {
+                    "type": "transform_2d"
+                },
+                {
+                    "type": "parallax",
+                    "scroll_speed": {
+                        "x": -0.3,
+                        "y": 0.0
+                    }
+                }
+            ],
+            "children": [
+                {
+                    "name": "Buildings",
+                    "type": "Sprite",
+                    "components": [
+                        {
+                            "type": "transform_2d",
+                            "z_index": 1
+                        },
+                        {
+                            "type": "sprite",
+                            "texture_path": "assets/images/environment/buildings_background.png",
+                            "draw_source": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "w": 320.0,
+                                "h": 144.0
+                            }
+                        }
+                    ],
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

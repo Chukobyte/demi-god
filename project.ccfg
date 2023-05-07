@@ -1,0 +1,266 @@
+{
+    "name": "Demi God",
+    "window_width": 640,
+    "window_height": 576,
+    "resolution_width": 160,
+    "resolution_height": 144,
+    "maintain_aspect_ratio": true,
+    "target_fps": 66,
+    "initial_node_path": "scenes/title_screen.cscn",
+    "colliders_visible": false,
+    "version": "0.0.1",
+    "assets": {
+        "audio_sources": [
+            {
+                "file_path": "assets/audio/music/main_theme.wav"
+            },
+            {
+                "file_path": "assets/audio/sfx/start_game.wav"
+            },
+            {
+                "file_path": "assets/audio/sfx/attack_slash.wav"
+            }
+        ],
+        "textures": [
+            {
+                "file_path": "assets/images/demi/demi_idle.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/environment/bridge_ground.png",
+                "wrap_s": "repeat",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_crouch.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/enemy_rabbit/enemy_rabbit_walk.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/enemy_jester/enemy_jester_idle.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/enemy_jester/enemy_jester_ball_attack.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/enemy_crow/enemy_crow_fly.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/enemy_boss/enemy_boss_idle.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_crouch_attack.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_stand_attack.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/ui/bottom_ui.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/ui/health_bar_ui.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/ui/magic_bar_ui.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/environment/buildings_background.png",
+                "wrap_s": "repeat",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/environment/cloud_variation1.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/environment/cloud_variation2.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/environment/cloud_variation3.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/environment/cloud_variation4.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_transformed_crouch.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_transformed_crouch_attack.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_transformed_idle.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_transformed_stand_attack.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/title_screen/title_screen_background.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/title_screen/title_screen_buildings.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/title_screen/title_screen_copyright.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/title_screen/title_screen_press_start.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/title_screen/title_screen_title.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_transformed_walk.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_walk.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            }
+        ],
+        "fonts": []
+    },
+    "inputs": [
+        {
+            "name": "exit",
+            "values": [
+                "esc",
+                "joystick_back"
+            ]
+        },
+        {
+            "name": "move_left",
+            "values": [
+                "left",
+                "a",
+                "joystick_left_analog_left"
+            ]
+        },
+        {
+            "name": "move_right",
+            "values": [
+                "right",
+                "d",
+                "joystick_left_analog_right"
+            ]
+        },
+        {
+            "name": "crouch",
+            "values": [
+                "down",
+                "s",
+                "joystick_left_analog_down"
+            ]
+        },
+        {
+            "name": "jump",
+            "values": [
+                "up",
+                "w",
+                "joystick_left_analog_up",
+                "joystick_button_a"
+            ]
+        },
+        {
+            "name": "attack",
+            "values": [
+                "space",
+                "q",
+                "joystick_button_x"
+            ]
+        },
+        {
+            "name": "special",
+            "values": [
+                "e",
+                "joystick_button_b"
+            ]
+        },
+        {
+            "name": "start",
+            "values": [
+                "return"
+            ]
+        }
+    ],
+    "crescent_core_version": "0.12.0"
+}

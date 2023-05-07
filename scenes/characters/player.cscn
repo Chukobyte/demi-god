@@ -1,0 +1,254 @@
+{
+    "name": "Player",
+    "type": "Node2D",
+    "components": [
+        {
+            "type": "transform_2d"
+        },
+        {
+            "type": "script",
+            "class_path": "src.characters.player",
+            "class_name": "Player"
+        }
+    ],
+    "children": [
+        {
+            "name": "AnimatedSprite",
+            "type": "AnimatedSprite",
+            "components": [
+                {
+                    "type": "transform_2d"
+                },
+                {
+                    "type": "animated_sprite",
+                    "current_animation_name": "idle",
+                    "is_playing": false,
+                    "origin": {
+                        "x": 23.0,
+                        "y": 26.0
+                    },
+                    "animations": [
+                        {
+                            "name": "idle",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_idle.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "idle_t",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_transformed_idle.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "walk",
+                            "speed": 200,
+                            "loops": true,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_walk.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                },
+                                {
+                                    "frame": 1,
+                                    "texture_path": "assets/images/demi/demi_walk.png",
+                                    "draw_source": {
+                                        "x": 48.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "walk_t",
+                            "speed": 200,
+                            "loops": true,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_transformed_walk.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                },
+                                {
+                                    "frame": 1,
+                                    "texture_path": "assets/images/demi/demi_transformed_walk.png",
+                                    "draw_source": {
+                                        "x": 48.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "crouch",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_crouch.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "crouch_t",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_transformed_crouch.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "stand_attack",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_stand_attack.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "stand_attack_t",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_transformed_stand_attack.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "crouch_attack",
+                            "speed": 100,
+                            "loops": true,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_crouch_attack.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "crouch_attack_t",
+                            "speed": 100,
+                            "loops": true,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_transformed_crouch_attack.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "Collider2D",
+            "type": "Collider2D",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": -6.0,
+                        "y": -12.0
+                    }
+                },
+                {
+                    "type": "collider_2d",
+                    "extents": {
+                        "w": 12.0,
+                        "h": 16.0
+                    },
+                    "color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 204,
+                        "a": 204
+                    }
+                }
+            ],
+            "children": []
+        }
+    ]
+}

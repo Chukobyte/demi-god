@@ -1,0 +1,91 @@
+{
+    "name": "EnemyRabbit",
+    "type": "Node2D",
+    "components": [
+        {
+            "type": "transform_2d"
+        },
+        {
+            "type": "script",
+            "class_path": "src.characters.enemy_rabbit",
+            "class_name": "EnemyRabbit"
+        }
+    ],
+    "children": [
+        {
+            "name": "AnimatedSprite",
+            "type": "AnimatedSprite",
+            "components": [
+                {
+                    "type": "transform_2d"
+                },
+                {
+                    "type": "animated_sprite",
+                    "current_animation_name": "walk",
+                    "is_playing": true,
+                    "origin": {
+                        "x": 14.0,
+                        "y": 23.0
+                    },
+                    "animations": [
+                        {
+                            "name": "walk",
+                            "speed": 300,
+                            "loops": true,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/enemy_rabbit/enemy_rabbit_walk.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 32.0,
+                                        "h": 32.0
+                                    }
+                                },
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/enemy_rabbit/enemy_rabbit_walk.png",
+                                    "draw_source": {
+                                        "x": 32.0,
+                                        "y": 0.0,
+                                        "w": 32.0,
+                                        "h": 32.0
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "Collider2D",
+            "type": "Collider2D",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": -5.0,
+                        "y": -14.0
+                    }
+                },
+                {
+                    "type": "collider_2d",
+                    "extents": {
+                        "w": 12.0,
+                        "h": 24.0
+                    },
+                    "color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 204,
+                        "a": 204
+                    }
+                }
+            ],
+            "children": []
+        }
+    ]
+}
