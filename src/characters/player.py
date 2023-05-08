@@ -576,6 +576,7 @@ class Player(Node2D):
         self._play_animation("idle")
         attack_task: Optional[Task] = None
         try:
+            level_state = LevelState()
             jump_speed = 30
             jump_time = 1.0
             ascend_timer = Timer(jump_time / 2.0)
@@ -594,17 +595,31 @@ class Player(Node2D):
                         self._play_animation("idle")
                 if Input.is_action_pressed("move_left"):
                     if not self._are_enemies_attached():
-                        self.position += Vector2.LEFT() * Vector2(
-                            delta_time * self.move_speed, delta_time * self.move_speed
+                        new_position = self.position + Vector2.LEFT() * Vector2(
+                            delta_time * self.move_speed,
+                            delta_time * self.move_speed,
                         )
+                        new_position.x = clamp(
+                            new_position.x,
+                            level_state.boundary.x,
+                            level_state.boundary.w,
+                        )
+                        self.position = new_position
                     else:
                         self._handle_attached_shake(Vector2.LEFT())
                     self.anim_sprite.flip_h = True
                 elif Input.is_action_pressed("move_right"):
                     if not self._are_enemies_attached():
-                        self.position += Vector2.RIGHT() * Vector2(
-                            delta_time * self.move_speed, delta_time * self.move_speed
+                        new_position = self.position + Vector2.RIGHT() * Vector2(
+                            delta_time * self.move_speed,
+                            delta_time * self.move_speed,
                         )
+                        new_position.x = clamp(
+                            new_position.x,
+                            level_state.boundary.x,
+                            level_state.boundary.w,
+                        )
+                        self.position = new_position
                     else:
                         self._handle_attached_shake(Vector2.RIGHT())
                     self.anim_sprite.flip_h = False
