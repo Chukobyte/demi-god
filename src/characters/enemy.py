@@ -131,7 +131,7 @@ class Enemy(Node2D):
             await co_suspend()
             self.anim_sprite.modulate = Color(255, 255, 255, 200)
             shader_instance.set_float_param("flash_amount", 0.5)
-            await co_wait_seconds(0.33)
+            await co_wait_seconds(1.0)
             self.queue_deletion()
         except GeneratorExit:
             pass

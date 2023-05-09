@@ -6,24 +6,10 @@ from crescent_api import *
 from src.characters.enemy_jester import EnemyJester
 from src.characters.wandering_soul import WanderingSoul
 from src.level_state import LevelState
+from src.environment.bridge_gate import BridgeGate
 from src.utils.game_math import Ease
 from src.utils.task import *
 from src.utils.timer import Timer
-
-
-class BridgeGate(Sprite):
-    def __init__(self, entity_id: int):
-        super().__init__(entity_id)
-
-    def _start(self) -> None:
-        self.texture = Texture(file_path="assets/images/environment/bridge_gate.png")
-        self.set_closed()
-
-    def set_opened(self) -> None:
-        self.draw_source = Rect2(10, 0, 10, 52)
-
-    def set_closed(self) -> None:
-        self.draw_source = Rect2(0, 0, 10, 52)
 
 
 class EnemyScenePaths:
@@ -188,12 +174,15 @@ class EnemyManager:
             # Temp spawn wandering soul, will spawn after beating the boss and enemies
             while len(self._spawned_enemies) > 0:
                 await co_suspend()
-            wandering_soul = WanderingSoul.new()
-            wandering_soul.position = Vector2(
-                level_state.boundary.w - 32, level_state.floor_y
-            )
-            wandering_soul.z_index = 10
-            self.main.add_child(wandering_soul)
+            # wandering_soul = WanderingSoul.new()
+            # wandering_soul.position = Vector2(
+            #     level_state.boundary.w - 32, level_state.floor_y
+            # )
+            # wandering_soul.z_index = 10
+            # self.main.add_child(wandering_soul)
+            bridge_gate: BridgeGate = self.main.get_child("Sprite")  # temp
+            if bridge_gate:
+                bridge_gate.set_opened()
             while True:
                 await co_suspend()
         except GeneratorExit:

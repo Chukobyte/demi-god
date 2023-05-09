@@ -2,6 +2,7 @@ from crescent_api import *
 from src.characters.enemy import Enemy, EnemyAttack
 from src.characters.wandering_soul import WanderingSoul
 from src.level_state import LevelState
+from src.environment.bridge_gate import BridgeGate
 from src.utils.game_math import map_to_range, clamp, map_to_unit_range
 from src.utils.task import *
 from src.utils.timer import Timer
@@ -420,6 +421,16 @@ class Player(Node2D):
                         SceneTree.change_scene("scenes/title_screen.cscn")
                         await co_return()
                         break
+                    elif issubclass(collider_parent_type, BridgeGate):
+                        bridge_gate: BridgeGate = collider_parent
+                        if (
+                            bridge_gate.is_opened
+                            and not bridge_gate.has_player_ever_stepped_through
+                        ):
+                            bridge_gate.has_player_ever_stepped_through = True
+                            SceneTree.change_scene("scenes/title_screen.cscn")
+                            await co_return()
+                            break
                 if damage_cooldown_task:
                     if damage_cooldown_task.valid:
                         damage_cooldown_task.resume()

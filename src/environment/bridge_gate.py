@@ -1,0 +1,25 @@
+from crescent_api import *
+
+
+class BridgeGate(Sprite):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self._collider: Optional[Collider2D] = None
+        self.size = Size2D(10, 52)
+        self.is_opened = False
+        self.has_player_ever_stepped_through = False
+
+    def _start(self) -> None:
+        self._collider = Collider2D.new()
+        self._collider.extents = Size2D(10, 52)
+        self.add_child(self._collider)
+        self.texture = Texture(file_path="assets/images/environment/bridge_gate.png")
+        self.set_closed()
+
+    def set_opened(self) -> None:
+        self.draw_source = Rect2(10, 0, self.size.w, self.size.h)
+        self.is_opened = True
+
+    def set_closed(self) -> None:
+        self.draw_source = Rect2(0, 0, self.size.w, self.size.h)
+        self.is_opened = False
