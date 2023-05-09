@@ -11,6 +11,21 @@ from src.utils.task import *
 from src.utils.timer import Timer
 
 
+class BridgeGate(Sprite):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+
+    def _start(self) -> None:
+        self.texture = Texture(file_path="assets/images/environment/bridge_gate.png")
+        self.set_closed()
+
+    def set_opened(self) -> None:
+        self.draw_source = Rect2(10, 0, 10, 52)
+
+    def set_closed(self) -> None:
+        self.draw_source = Rect2(0, 0, 10, 52)
+
+
 class EnemyScenePaths:
     RABBIT = "scenes/characters/enemy_rabbit.cscn"
     JESTER = "scenes/characters/enemy_jester.cscn"
@@ -227,6 +242,13 @@ class GameMaster:
         try:
             level_state = LevelState()
             level_state.floor_y = self.player.position.y
+            # Spawn bridge gate
+            bridge_gate = BridgeGate.new()
+            bridge_gate.position = Vector2(
+                level_state.boundary.w - 10, level_state.floor_y - 31
+            )
+            bridge_gate.z_index = 2
+            self.main.add_child(bridge_gate)
             # TODO: put in main.py
             await Task(coroutine=LevelState.fade_transition(time=1.0, fade_out=False))
 
