@@ -7,7 +7,7 @@ from src.characters.enemy_jester import EnemyJester
 from src.characters.wandering_soul import WanderingSoul
 from src.level_state import LevelState
 from src.environment.bridge_gate import BridgeGate
-from src.utils.game_math import Ease
+from src.utils.game_math import Ease, Easer
 from src.utils.task import *
 from src.utils.timer import Timer
 
@@ -218,6 +218,7 @@ class GameMaster:
         self.main = main_node
         self.player: Optional[Node2D] = None
         self.main_task = Task(coroutine=self._update_task())
+        self.bridge_transition_task: Optional[Task] = None
 
     def update(self) -> None:
         self.main_task.resume()
@@ -242,12 +243,60 @@ class GameMaster:
             await Task(coroutine=LevelState.fade_transition(time=1.0, fade_out=False))
 
             while True:
+                if level_state.is_gate_transition_queued:
+                    if self.bridge_transition_task:
+                        self.bridge_transition_task.close()
+                    self.bridge_transition_task = Task(
+                        coroutine=self._manage_bridge_transition_task()
+                    )
+                    level_state.is_gate_transition_queued = False
+                if self.bridge_transition_task:
+                    self.bridge_transition_task.resume()
                 enemy_waves_task.resume()
                 manage_clouds_task.resume()
                 await co_suspend()
         except GeneratorExit:
             enemy_waves_task.close()
             manage_clouds_task.close()
+
+    async def _manage_bridge_transition_task(self):
+        try:
+            level_state = LevelState()
+            prev_player_time_dilation = self.player.time_dilation
+            self.player.time_dilation = 0.0
+            level_state.boundary.w += 160
+            Camera2D.unfollow_node(self.player)
+            Camera2D.set_boundary(level_state.boundary)
+            level_state.is_currently_transitioning_within_level = False
+            transition_timer = Timer(5.0)
+            initial_camera_pos = Camera2D.get_position()
+            dest_camera_pos = Vector2(
+                level_state.boundary.w - 160, initial_camera_pos.y
+            )
+            camera_pos_easer = Easer(
+                initial_camera_pos,
+                dest_camera_pos,
+                transition_timer.time,
+                Ease.Cubic.ease_out_vec2,
+            )
+            while True:
+                delta_time = (
+                    Engine.get_global_physics_delta_time() * World.get_time_dilation()
+                )
+                transition_timer.tick(delta_time)
+                if transition_timer.time_remaining <= 0.0:
+                    Camera2D.set_position(dest_camera_pos)
+                    break
+                else:
+                    new_camera_pos = camera_pos_easer.ease(delta_time)
+                    Camera2D.set_position(new_camera_pos)
+                await co_suspend()
+            self.player.time_dilation = prev_player_time_dilation
+            level_state.boundary.x = level_state.boundary.w - 160
+            Camera2D.set_boundary(level_state.boundary)
+            Camera2D.follow_node(self.player)
+        except GeneratorExit:
+            pass
 
     async def _manage_clouds_task(self):
         try:

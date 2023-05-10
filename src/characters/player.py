@@ -181,7 +181,7 @@ class Player(Node2D):
                 World.set_time_dilation(1.0)
             level_state.is_paused = not level_state.is_paused
 
-        if not self._are_enemies_attached() and not level_state.is_paused:
+        if not self._are_enemies_attached() and not level_state.is_game_state_paused():
             if Input.is_action_just_pressed("attack"):
                 self.attack_requested = True
             elif Input.is_action_just_pressed("special"):
@@ -305,7 +305,7 @@ class Player(Node2D):
                     current_stance_task = get_new_stance_task()
                 prev_stance = self.stance
                 # Now run current stance task
-                if current_stance_task and not level_state.is_paused:
+                if current_stance_task and not level_state.is_game_state_paused():
                     current_stance_task.resume()
                 await co_suspend()
         except GeneratorExit:
@@ -358,6 +358,7 @@ class Player(Node2D):
         try:
             damage_cooldown_task: Optional[Task] = None
             attached_damage_cooldown_task: Optional[Task] = None
+            level_state = LevelState()
             while True:
                 collisions = CollisionHandler.process_collisions(self.collider)
                 for collider in collisions:
@@ -428,8 +429,9 @@ class Player(Node2D):
                             and not bridge_gate.has_player_ever_stepped_through
                         ):
                             bridge_gate.has_player_ever_stepped_through = True
-                            SceneTree.change_scene("scenes/title_screen.cscn")
-                            await co_return()
+                            level_state.queue_gate_transition()
+                            # SceneTree.change_scene("scenes/title_screen.cscn")
+                            # await co_return()
                             break
                 if damage_cooldown_task:
                     if damage_cooldown_task.valid:
