@@ -238,7 +238,7 @@ class GameMaster:
             self.main.add_child(player_beam_color_rect)
             player_beam_timer = Timer(3.0)
             player_beam_easer = Easer(
-                Vector2(player_start_pos.x, 0),
+                Vector2(player_start_pos.x, -8),
                 player_start_pos,
                 player_beam_timer.time,
                 Ease.Cubic.ease_in_vec2,
