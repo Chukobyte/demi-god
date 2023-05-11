@@ -205,7 +205,7 @@ class Player(Node2D):
     def _fixed_update(self, delta_time: float) -> None:
         self.physics_update_task.resume()
 
-    def _play_animation(self, anim_name: str) -> None:
+    def play_animation(self, anim_name: str) -> None:
         self._current_animation_name = anim_name
         if self.is_transformed:
             self.anim_sprite.play(f"{anim_name}_t")
@@ -489,27 +489,27 @@ class Player(Node2D):
             transformation_tick_rate = 0.25
             energy_drain_per_tick = 1
             # Update animation to transformed
-            self._play_animation(self._current_animation_name)
+            self.play_animation(self._current_animation_name)
             while True:
                 await co_wait_seconds(transformation_tick_rate)
                 self.stats.energy -= energy_drain_per_tick
                 await co_suspend()
         except GeneratorExit:
-            self._play_animation(self._current_animation_name)
+            self.play_animation(self._current_animation_name)
 
     async def _stand_stance_task(self):
         try:
-            self._play_animation("idle")
+            self.play_animation("idle")
             self.collider.position = Vector2(-6, -10)
             self.collider.extents = Size2D(12, 16)
             level_state = LevelState()
             while True:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 if self.attack_requested:
-                    self._play_animation("stand_attack")
+                    self.play_animation("stand_attack")
                     await self._attack_task()
                     self.attack_requested = False
-                    self._play_animation("idle")
+                    self.play_animation("idle")
                 else:
                     if Input.is_action_pressed("move_left"):
                         if not self._are_enemies_attached():
@@ -522,7 +522,7 @@ class Player(Node2D):
                                 level_state.boundary.x,
                                 level_state.boundary.w,
                             )
-                            self._play_animation("walk")
+                            self.play_animation("walk")
                             self.position = new_position
                         else:
                             self._handle_attached_shake(Vector2.LEFT())
@@ -538,13 +538,13 @@ class Player(Node2D):
                                 level_state.boundary.x,
                                 level_state.boundary.w,
                             )
-                            self._play_animation("walk")
+                            self.play_animation("walk")
                             self.position = new_position
                         else:
                             self._handle_attached_shake(Vector2.RIGHT())
                         self.anim_sprite.flip_h = False
                     else:
-                        self._play_animation("idle")
+                        self.play_animation("idle")
                     if Input.is_action_pressed("jump"):
                         self.stance = PlayerStance.IN_AIR
                         await co_return()
@@ -557,15 +557,15 @@ class Player(Node2D):
 
     async def _crouch_stance_task(self):
         try:
-            self._play_animation("crouch")
+            self.play_animation("crouch")
             self.collider.position = Vector2(-6, -4)
             self.collider.extents = Size2D(12, 10)
             while True:
                 if self.attack_requested:
-                    self._play_animation("crouch_attack")
+                    self.play_animation("crouch_attack")
                     await self._attack_task()
                     self.attack_requested = False
-                    self._play_animation("crouch")
+                    self.play_animation("crouch")
                 else:
                     if Input.is_action_pressed("move_left"):
                         if self._are_enemies_attached():
@@ -586,7 +586,7 @@ class Player(Node2D):
             pass
 
     async def _in_air_stance_task(self):
-        self._play_animation("idle")
+        self.play_animation("idle")
         attack_task: Optional[Task] = None
         try:
             level_state = LevelState()
@@ -599,13 +599,13 @@ class Player(Node2D):
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 if self.attack_requested and not attack_task:
                     attack_task = Task(coroutine=self._attack_task())
-                    self._play_animation("stand_attack")
+                    self.play_animation("stand_attack")
                     self.attack_requested = False
                 if attack_task:
                     attack_task.resume()
                     if not attack_task.valid:
                         attack_task = None
-                        self._play_animation("idle")
+                        self.play_animation("idle")
                 if Input.is_action_pressed("move_left"):
                     if not self._are_enemies_attached():
                         new_position = self.position + Vector2.LEFT() * Vector2(

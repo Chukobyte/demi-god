@@ -3,6 +3,7 @@ from typing import Type
 
 from crescent_api import *
 
+from src.characters.player import Player
 from src.characters.enemy_jester import EnemyJester
 from src.characters.wandering_soul import WanderingSoul
 from src.level_state import LevelState
@@ -28,7 +29,7 @@ class EnemyScenePaths:
 
 
 class EnemyManager:
-    def __init__(self, main: Node2D, player: Node2D):
+    def __init__(self, main: Node2D, player: Player):
         self.main = main
         self.player = player
         self._spawned_enemies = []
@@ -216,7 +217,7 @@ class GameMaster:
     # Manages game state such as enemy spawning
     def __init__(self, main_node):
         self.main = main_node
-        self.player: Optional[Node2D] = None
+        self.player: Optional[Player] = None
         self.main_task = Task(coroutine=self._update_task())
         self.bridge_transition_task: Optional[Task] = None
 
@@ -225,7 +226,7 @@ class GameMaster:
 
     # --- TASKS --- #
     async def _update_task(self):
-        self.player = self.main.get_child("Player")
+        self.player: Player = self.main.get_child("Player")
         enemy_manager = EnemyManager(main=self.main, player=self.player)
         enemy_waves_task = Task(coroutine=enemy_manager.enemy_waves_task())
         manage_clouds_task = Task(coroutine=self._manage_clouds_task())
@@ -267,7 +268,6 @@ class GameMaster:
             level_state.boundary.w += 160
             Camera2D.unfollow_node(self.player)
             Camera2D.set_boundary(level_state.boundary)
-            level_state.is_currently_transitioning_within_level = False
             transition_timer = Timer(5.0)
             initial_camera_pos = Camera2D.get_position()
             dest_camera_pos = Vector2(
@@ -279,6 +279,20 @@ class GameMaster:
                 transition_timer.time,
                 Ease.Cubic.ease_out_vec2,
             )
+
+            initial_player_pos = self.player.position
+            player_dest_pos = initial_player_pos + Vector2(30, 0)
+            player_pos_easer = Easer(
+                initial_player_pos,
+                player_dest_pos,
+                transition_timer.time,
+                Ease.Cubic.ease_out_vec2,
+            )
+
+            await co_wait_seconds(1.0)
+            self.player.time_dilation = prev_player_time_dilation
+            self.player.play_animation("walk")
+
             while True:
                 delta_time = (
                     Engine.get_global_physics_delta_time() * World.get_time_dilation()
@@ -286,15 +300,21 @@ class GameMaster:
                 transition_timer.tick(delta_time)
                 if transition_timer.time_remaining <= 0.0:
                     Camera2D.set_position(dest_camera_pos)
+                    self.player.position = player_dest_pos
                     break
                 else:
                     new_camera_pos = camera_pos_easer.ease(delta_time)
                     Camera2D.set_position(new_camera_pos)
+                    new_player_pos = player_pos_easer.ease(delta_time)
+                    self.player.position = new_player_pos
                 await co_suspend()
-            self.player.time_dilation = prev_player_time_dilation
             level_state.boundary.x = level_state.boundary.w - 160
             Camera2D.set_boundary(level_state.boundary)
             Camera2D.follow_node(self.player)
+            bridge_gate: BridgeGate = self.main.get_child("Sprite")  # temp
+            if bridge_gate:
+                bridge_gate.set_closed()
+            level_state.is_currently_transitioning_within_level = False
         except GeneratorExit:
             pass
 
