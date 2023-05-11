@@ -227,12 +227,12 @@ class Player(Node2D):
                 enemy.current_attached_shakes += 1
                 if enemy.current_attached_shakes >= enemy.shakes_required_for_detach:
                     self.enemies_attached_to_left.remove(enemy)
-                    enemy.queue_deletion()
+                    enemy.destroy()
             for enemy in self.enemies_attached_to_right[:]:
                 enemy.current_attached_shakes += 1
                 if enemy.current_attached_shakes >= enemy.shakes_required_for_detach:
                     self.enemies_attached_to_right.remove(enemy)
-                    enemy.queue_deletion()
+                    enemy.destroy()
             if self._are_enemies_attached():
                 self.last_shake_dir = new_shake_dir
             else:
@@ -401,7 +401,7 @@ class Player(Node2D):
                             and not self.in_attack_damage_cooldown
                         ):
                             if collider_parent.destroy_on_touch:
-                                collider_parent.queue_deletion()
+                                collider_parent.destroy()
                             self.in_attack_damage_cooldown = True
                             damage_cooldown_task = Task(
                                 coroutine=self._damage_cooldown_task(1.0)

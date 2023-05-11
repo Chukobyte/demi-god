@@ -60,7 +60,8 @@ class Enemy(Node2D):
             if self.destroyed_task:
                 self.destroyed_task.resume()
             else:
-                print(f"ERROR: Should be destroyed task for {self}")
+                if not self.is_queued_for_deletion:
+                    print(f"ERROR: Should be destroyed task for {self}")
             if self.destroyed_split_task:
                 self.destroyed_split_task.resume()
         if self.take_damage_task:
@@ -80,6 +81,12 @@ class Enemy(Node2D):
         else:
             self.take_damage_task = Task(coroutine=self._take_damage_task())
         self.anim_sprite.shader_instance.set_float_param("flash_amount", 0.5)
+
+    def destroy(self) -> None:
+        if not self.is_destroyed:
+            self.is_destroyed = True
+            self.broadcast_event("destroyed", self)
+            self.queue_deletion()
 
     def _set_base_hp(self, hp: int) -> None:
         self.base_hp = hp
