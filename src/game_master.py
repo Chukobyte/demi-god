@@ -212,6 +212,7 @@ class GameMaster:
     def __init__(self, main_node):
         self.main = main_node
         self.player: Optional[Player] = None
+        self.spawned_clouds: List[SpawnedCloud] = []
         self.main_task = Task(coroutine=self._update_task())
         self.bridge_transition_task: Optional[Task] = None
 
@@ -259,6 +260,8 @@ class GameMaster:
             level_state = LevelState()
             prev_player_time_dilation = self.player.time_dilation
             self.player.time_dilation = 0.0
+            for cloud in self.spawned_clouds:
+                cloud.time_dilation = 0.0
             level_state.boundary.w += 160
             Camera2D.unfollow_node(self.player)
             Camera2D.set_boundary(level_state.boundary)
@@ -286,6 +289,8 @@ class GameMaster:
             await co_wait_seconds(1.0)
             self.player.time_dilation = prev_player_time_dilation
             self.player.play_animation("walk")
+            for cloud in self.spawned_clouds:
+                cloud.time_dilation = 1.0
 
             while True:
                 delta_time = (
@@ -329,9 +334,9 @@ class GameMaster:
                 Texture(file_path="assets/images/environment/cloud_variation4.png"),
             ]
             cloud_texture_draw_source = Rect2(0, 0, 32, 18)
-            spawned_clouds = []
+            self.spawned_clouds.clear()
             # Spawn initial clouds
-            clouds_to_spawn = max_clouds - len(spawned_clouds)
+            clouds_to_spawn = max_clouds - len(self.spawned_clouds)
             camera_pos = Camera2D.get_position()
             for i in range(clouds_to_spawn):
                 cloud = SpawnedCloud.new()
@@ -341,10 +346,10 @@ class GameMaster:
                     i * random.randint(5, 40), random.randint(0, 40)
                 )
                 cloud.z_index = 2
-                spawned_clouds.append(cloud)
+                self.spawned_clouds.append(cloud)
                 self.main.add_child(cloud)
             while True:
-                clouds_to_spawn = max_clouds - len(spawned_clouds)
+                clouds_to_spawn = max_clouds - len(self.spawned_clouds)
                 camera_pos = Camera2D.get_position()
                 for i in range(clouds_to_spawn):
                     cloud = SpawnedCloud.new()
@@ -354,9 +359,8 @@ class GameMaster:
                         i * random.randint(5, 40), random.randint(0, 40)
                     )
                     cloud.z_index = 2
-                    spawned_clouds.append(cloud)
+                    self.spawned_clouds.append(cloud)
                     self.main.add_child(cloud)
                 await co_wait_seconds(10.0)
-                await co_suspend()
         except GeneratorExit:
             pass
