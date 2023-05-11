@@ -175,12 +175,6 @@ class EnemyManager:
             # Temp spawn wandering soul, will spawn after beating the boss and enemies
             while len(self._spawned_enemies) > 0:
                 await co_suspend()
-            # wandering_soul = WanderingSoul.new()
-            # wandering_soul.position = Vector2(
-            #     level_state.boundary.w - 32, level_state.floor_y
-            # )
-            # wandering_soul.z_index = 10
-            # self.main.add_child(wandering_soul)
             bridge_gate: BridgeGate = self.main.get_child("Sprite")  # temp
             if bridge_gate:
                 bridge_gate.set_opened()
@@ -315,6 +309,13 @@ class GameMaster:
             if bridge_gate:
                 bridge_gate.set_closed()
             level_state.is_currently_transitioning_within_level = False
+            # Temp wandering soul spawn
+            wandering_soul = WanderingSoul.new()
+            wandering_soul.position = Vector2(
+                level_state.boundary.w - 32, level_state.floor_y
+            )
+            wandering_soul.z_index = 10
+            self.main.add_child(wandering_soul)
         except GeneratorExit:
             pass
 
