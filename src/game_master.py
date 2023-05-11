@@ -221,11 +221,54 @@ class GameMaster:
 
     # --- TASKS --- #
     async def _update_task(self):
-        self.player: Player = self.main.get_child("Player")
-        enemy_manager = EnemyManager(main=self.main, player=self.player)
-        enemy_waves_task = Task(coroutine=enemy_manager.enemy_waves_task())
-        manage_clouds_task = Task(coroutine=self._manage_clouds_task())
+        player_start_pos = Vector2(20, 78)
+        enemy_waves_task: Optional[Task] = None
+        manage_clouds_task: Optional[Task] = None
         try:
+            # TODO: put in main.py
+            await Task(coroutine=LevelState.fade_transition(time=1.0, fade_out=False))
+
+            manage_clouds_task = Task(coroutine=self._manage_clouds_task())
+
+            # Shoot down player beam first
+            player_beam_color_rect = ColorRect.new()
+            player_beam_color_rect.color = Color(240, 247, 243)
+            player_beam_color_rect.size = Size2D(4, 8)
+            player_beam_color_rect.z_index = 3
+            self.main.add_child(player_beam_color_rect)
+            player_beam_timer = Timer(3.0)
+            player_beam_easer = Easer(
+                Vector2(player_start_pos.x, 0),
+                player_start_pos,
+                player_beam_timer.time,
+                Ease.Cubic.ease_in_vec2,
+            )
+            while True:
+                delta_time = (
+                    Engine.get_global_physics_delta_time() * World.get_time_dilation()
+                )
+                player_beam_timer.tick(delta_time)
+                manage_clouds_task.resume()
+                if player_beam_timer.time_remaining > 0.0:
+                    new_beam_pos = player_beam_easer.ease(delta_time)
+                    player_beam_color_rect.position = new_beam_pos
+                    await co_suspend()
+                else:
+                    player_beam_color_rect.queue_deletion()
+                    break
+
+            main_theme_audio_source = AudioManager.get_audio_source(
+                "assets/audio/music/main_theme.wav"
+            )
+            AudioManager.play_sound(source=main_theme_audio_source, loops=True)
+
+            player_scene = SceneUtil.load_scene("scenes/characters/player.cscn")
+            self.player: Player = player_scene.create_instance()
+            self.player.position = player_start_pos
+            self.main.add_child(self.player)
+
+            enemy_manager = EnemyManager(main=self.main, player=self.player)
+            enemy_waves_task = Task(coroutine=enemy_manager.enemy_waves_task())
             level_state = LevelState()
             level_state.floor_y = self.player.position.y
             # Spawn bridge gate
@@ -235,8 +278,6 @@ class GameMaster:
             )
             bridge_gate.z_index = 2
             self.main.add_child(bridge_gate)
-            # TODO: put in main.py
-            await Task(coroutine=LevelState.fade_transition(time=1.0, fade_out=False))
 
             while True:
                 if level_state.is_gate_transition_queued:
@@ -252,8 +293,10 @@ class GameMaster:
                 manage_clouds_task.resume()
                 await co_suspend()
         except GeneratorExit:
-            enemy_waves_task.close()
-            manage_clouds_task.close()
+            if enemy_waves_task:
+                enemy_waves_task.close()
+            if manage_clouds_task:
+                manage_clouds_task.close()
 
     async def _manage_bridge_transition_task(self):
         try:

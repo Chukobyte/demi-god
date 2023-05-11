@@ -11,10 +11,6 @@ class Main(Node2D):
         self.main_theme_audio_source: Optional[AudioSource] = None
 
     def _start(self) -> None:
-        self.main_theme_audio_source = AudioManager.get_audio_source(
-            "assets/audio/music/main_theme.wav"
-        )
-        AudioManager.play_sound(source=self.main_theme_audio_source, loops=True)
         # Set up stuff based on level boundaries
         level_state = LevelState()
         bg_color_rect: ColorRect = self.get_child("ColorRect")
@@ -29,6 +25,9 @@ class Main(Node2D):
         buildings.draw_source = buildings_draw_source
 
     def _end(self) -> None:
+        self.main_theme_audio_source = AudioManager.get_audio_source(
+            "assets/audio/music/main_theme.wav"
+        )
         AudioManager.stop_sound(source=self.main_theme_audio_source)
 
     def _update(self, delta_time: float) -> None:

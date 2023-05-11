@@ -3,7 +3,8 @@
     "type": "Node2D",
     "components": [
         {
-            "type": "transform_2d"
+            "type": "transform_2d",
+            "z_index": 3
         },
         {
             "type": "script",

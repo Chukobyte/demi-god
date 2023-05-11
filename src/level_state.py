@@ -12,7 +12,7 @@ class LevelState:
         if not cls._instance:
             cls._instance = object.__new__(cls)
             cls.boundary = Rect2(0, 0, 896, 144)
-            cls.floor_y = 0.0
+            cls.floor_y = 78.0
             cls.is_paused = False
             cls.is_gate_transition_queued = False
             cls.is_currently_transitioning_within_level = False
