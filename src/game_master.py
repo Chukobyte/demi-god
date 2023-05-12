@@ -69,14 +69,17 @@ class GameMaster:
             self.main.add_child(bridge_gate)
 
             # Shoot down player beam first
-            player_beam_color_rect = ColorRect.new()
-            player_beam_color_rect.color = Color(240, 247, 243)
-            player_beam_color_rect.size = Size2D(4, 8)
-            player_beam_color_rect.z_index = 3
-            self.main.add_child(player_beam_color_rect)
+            player_teleport_beam = Sprite.new()
+            player_teleport_beam.texture = Texture(
+                file_path="assets/images/demi/demi_teleport.png"
+            )
+            player_teleport_beam.draw_source = Rect2(0, 0, 48, 48)
+            player_teleport_beam.origin = Vector2(25, 18)
+            player_teleport_beam.z_index = 3
+            self.main.add_child(player_teleport_beam)
             player_beam_timer = Timer(3.0)
             player_beam_easer = Easer(
-                Vector2(player_start_pos.x, -8),
+                Vector2(player_start_pos.x, -20),
                 player_start_pos,
                 player_beam_timer.time,
                 Ease.Cubic.ease_in_vec2,
@@ -89,10 +92,10 @@ class GameMaster:
                 manage_clouds_task.resume()
                 if player_beam_timer.time_remaining > 0.0:
                     new_beam_pos = player_beam_easer.ease(delta_time)
-                    player_beam_color_rect.position = new_beam_pos
+                    player_teleport_beam.position = new_beam_pos
                     await co_suspend()
                 else:
-                    player_beam_color_rect.queue_deletion()
+                    player_teleport_beam.queue_deletion()
                     break
 
             main_theme_audio_source = AudioManager.get_audio_source(
