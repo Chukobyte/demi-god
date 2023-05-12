@@ -59,6 +59,7 @@ class GameMaster:
             manage_clouds_task = Task(coroutine=self._manage_clouds_task())
 
             level_state = LevelState()
+            Camera2D.set_boundary(level_state.boundary)
 
             # Spawn bridge gate TODO: Move another place
             bridge_gate = BridgeGate.new()

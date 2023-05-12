@@ -164,7 +164,6 @@ class Player(Node2D):
         self.collider = self.get_child("Collider2D")
         self.stats.refresh_bar_nodes()
         level_state = LevelState()
-        Camera2D.set_boundary(level_state.boundary)
         Camera2D.follow_node(self)
         # Start with 0 energy
         self.stats.energy = 0
