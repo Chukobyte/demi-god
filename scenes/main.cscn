@@ -131,7 +131,7 @@
                 {
                     "type": "color_rect",
                     "size": {
-                        "w": 52.0,
+                        "w": 0.0,
                         "h": 9.0
                     },
                     "color": {
