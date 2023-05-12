@@ -3,6 +3,7 @@ from typing import Type
 
 from crescent_api import *
 
+from src.characters.enemy_definitions import EnemyScenePaths
 from src.characters.enemy_jester import EnemyJester
 from src.characters.player import Player
 from src.environment.bridge_gate import BridgeGate
@@ -10,20 +11,13 @@ from src.level_state import LevelState
 from src.utils.task import co_wait_seconds, co_suspend
 from src.utils.timer import Timer
 
-
-class EnemyScenePaths:
-    RABBIT = "scenes/characters/enemy_rabbit.cscn"
-    JESTER = "scenes/characters/enemy_jester.cscn"
-    CROW = "scenes/characters/enemy_crow.cscn"
-    BOSS = "scenes/characters/enemy_boss.cscn"
-
-    SECTION_MAP = {
-        1: [RABBIT],
-        2: [RABBIT, JESTER],
-        3: [RABBIT, JESTER],
-        4: [RABBIT, JESTER, CROW],
-        5: [RABBIT, JESTER, CROW],
-    }
+ENEMY_SECTION_MAP = {
+    1: [EnemyScenePaths.RABBIT],
+    2: [EnemyScenePaths.RABBIT, EnemyScenePaths.JESTER],
+    3: [EnemyScenePaths.RABBIT, EnemyScenePaths.JESTER],
+    4: [EnemyScenePaths.RABBIT, EnemyScenePaths.JESTER, EnemyScenePaths.CROW],
+    5: [EnemyScenePaths.RABBIT, EnemyScenePaths.JESTER, EnemyScenePaths.CROW],
+}
 
 
 class EnemyManager:
@@ -54,7 +48,7 @@ class EnemyManager:
             enemy_arrays.append(right_side_enemies)
             enemy_arrays.append(left_side_enemies)
         # Main
-        scene_paths = EnemyScenePaths.SECTION_MAP.get(section, [EnemyScenePaths.RABBIT])
+        scene_paths = ENEMY_SECTION_MAP.get(section, [EnemyScenePaths.RABBIT])
         scene_path = random.choice(scene_paths)
         # Determine enemy stuff
         if scene_path == EnemyScenePaths.RABBIT:
