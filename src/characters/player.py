@@ -79,15 +79,13 @@ class PlayerStats:
         self._base_energy = base_energy
         self.health_bar_ui: Optional[ColorRect] = None
         self.energy_bar_ui: Optional[ColorRect] = None
-        self.base_health_bar_ui_size = Size2D()
-        self.base_energy_bar_ui_size = Size2D()
+        self.base_health_bar_ui_size = Size2D(52, 9)
+        self.base_energy_bar_ui_size = Size2D(52, 9)
 
     def refresh_bar_nodes(self) -> None:
         main_node = SceneTree.get_root()
         self.health_bar_ui: ColorRect = main_node.get_child("HealthUI")
         self.energy_bar_ui: ColorRect = main_node.get_child("EnergyUI")
-        self.base_health_bar_ui_size = self.health_bar_ui.size
-        self.base_energy_bar_ui_size = self.energy_bar_ui.size
 
     @property
     def base_hp(self) -> float:
