@@ -95,6 +95,22 @@ class GameMaster:
                     player_teleport_beam.position = new_beam_pos
                     await co_suspend()
                 else:
+                    # Hard code animation that delays 2 frames each
+                    player_teleport_beam.draw_source = Rect2(48, 0, 48, 48)
+                    await co_suspend()
+                    await co_suspend()
+                    player_teleport_beam.draw_source = Rect2(0, 0, 48, 48)
+                    await co_suspend()
+                    await co_suspend()
+                    player_teleport_beam.draw_source = Rect2(48, 0, 48, 48)
+                    await co_suspend()
+                    await co_suspend()
+                    player_teleport_beam.draw_source = Rect2(0, 0, 48, 48)
+                    await co_suspend()
+                    await co_suspend()
+                    player_teleport_beam.draw_source = Rect2(48, 0, 48, 48)
+                    await co_suspend()
+                    await co_suspend()
                     player_teleport_beam.queue_deletion()
                     break
 
