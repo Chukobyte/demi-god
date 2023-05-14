@@ -5,6 +5,7 @@ from crescent_api import *
 from src.characters.player import Player
 from src.characters.wandering_soul import WanderingSoul
 from src.enemy_manager import EnemyManager
+from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
 from src.environment.bridge_gate import BridgeGate
 from src.utils.game_math import Ease, Easer
@@ -51,13 +52,13 @@ class GameMaster:
     async def _update_task(self):
         player_start_pos = Vector2(20, 78)
         enemy_waves_task: Optional[Task] = None
-        manage_clouds_task: Optional[Task] = None
+        level_cloud_manager = LevelCloudManager()
         try:
             # TODO: put in main.py
             await Task(coroutine=LevelState.fade_transition(time=1.0, fade_out=False))
 
-            manage_clouds_task = Task(coroutine=self._manage_clouds_task())
-
+            # TODO: Place in a place when the game ends instead
+            LevelState.reset_instance()
             level_state = LevelState()
             Camera2D.set_boundary(level_state.boundary)
 
@@ -90,7 +91,7 @@ class GameMaster:
                     Engine.get_global_physics_delta_time() * World.get_time_dilation()
                 )
                 player_beam_timer.tick(delta_time)
-                manage_clouds_task.resume()
+                level_cloud_manager.update()
                 if player_beam_timer.time_remaining > 0.0:
                     new_beam_pos = player_beam_easer.ease(delta_time)
                     player_teleport_beam.position = new_beam_pos
@@ -133,27 +134,28 @@ class GameMaster:
                     if self.bridge_transition_task:
                         self.bridge_transition_task.close()
                     self.bridge_transition_task = Task(
-                        coroutine=self._manage_bridge_transition_task()
+                        coroutine=self._manage_bridge_transition_task(
+                            level_cloud_manager
+                        )
                     )
                     level_state.is_gate_transition_queued = False
                 if self.bridge_transition_task:
                     self.bridge_transition_task.resume()
                 enemy_waves_task.resume()
-                manage_clouds_task.resume()
+                level_cloud_manager.update()
                 await co_suspend()
         except GeneratorExit:
             if enemy_waves_task:
                 enemy_waves_task.close()
-            if manage_clouds_task:
-                manage_clouds_task.close()
 
-    async def _manage_bridge_transition_task(self):
+    async def _manage_bridge_transition_task(
+        self, level_cloud_manager: LevelCloudManager
+    ):
         try:
             level_state = LevelState()
             prev_player_time_dilation = self.player.time_dilation
             self.player.time_dilation = 0.0
-            for cloud in self.spawned_clouds:
-                cloud.time_dilation = 0.0
+            level_cloud_manager.set_clouds_time_dilation(0.0)
             level_state.boundary.w += 160
             Camera2D.unfollow_node(self.player)
             Camera2D.set_boundary(level_state.boundary)
@@ -181,8 +183,7 @@ class GameMaster:
             await co_wait_seconds(1.0)
             self.player.time_dilation = prev_player_time_dilation
             self.player.play_animation("walk")
-            for cloud in self.spawned_clouds:
-                cloud.time_dilation = 1.0
+            level_cloud_manager.set_clouds_time_dilation(1.0)
 
             while True:
                 delta_time = (

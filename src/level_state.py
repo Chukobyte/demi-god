@@ -6,6 +6,10 @@ from src.utils.task import co_suspend
 
 
 class LevelState:
+    """
+    Singleton state data needed for the game to run.
+    """
+
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -21,6 +25,11 @@ class LevelState:
 
     def is_game_state_paused(self) -> bool:
         return self.is_paused or self.is_currently_transitioning_within_level
+
+    @classmethod
+    def reset_instance(cls) -> None:
+        if cls._instance:
+            cls._instance = None
 
     @staticmethod
     def queue_gate_transition() -> None:
