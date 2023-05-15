@@ -73,14 +73,12 @@ class LevelAreaManager:
             self._current_area = LevelAreaDefinitions.get_def(self.current_area_index)
             level_state.boundary.w += self._current_area.width
             Camera2D.set_boundary(level_state.boundary)
-            # Bridge gates
-            bridge_gate = BridgeGate.new()
+            # Set initial bridge gate
+            level_state.bridge_gate_helper.spawn_bridge_gates()
+            bridge_gate = level_state.bridge_gate_helper.get_next_bridge_gate()
             bridge_gate.position = Vector2(
                 level_state.boundary.w - 10, level_state.floor_y - 31
             )
-            bridge_gate.z_index = 2
-            SceneTree.get_root().add_child(bridge_gate)
-            level_state.bridge_gates.append(bridge_gate)
 
             while True:
                 # Need to handle waves for an area
@@ -164,6 +162,7 @@ class LevelAreaManager:
                 self.current_area_index + 1
             )
             level_state = LevelState()
+
             prev_player_time_dilation = player.time_dilation
             player.time_dilation = 0.0
             level_cloud_manager.set_clouds_time_dilation(0.0)
@@ -196,6 +195,12 @@ class LevelAreaManager:
             player.play_animation("walk")
             level_cloud_manager.set_clouds_time_dilation(1.0)
 
+            # Setup next bridge gate
+            bridge_gate = level_state.bridge_gate_helper.get_next_bridge_gate()
+            bridge_gate.position = Vector2(
+                level_state.boundary.w - 10, level_state.floor_y - 31
+            )
+
             while True:
                 delta_time = (
                     Engine.get_global_physics_delta_time() * World.get_time_dilation()
@@ -214,9 +219,7 @@ class LevelAreaManager:
             level_state.boundary.x = level_state.boundary.w - next_level_area.width
             Camera2D.set_boundary(level_state.boundary)
             Camera2D.follow_node(player)
-            bridge_gate = level_state.bridge_gates[0]
-            if bridge_gate:
-                bridge_gate.set_closed()
+            level_state.bridge_gate_helper.close_gates()
             level_state.is_currently_transitioning_within_level = False
             # Temp wandering soul spawn
             if next_level_area.area_type == LevelAreaType.POWER_UP:
