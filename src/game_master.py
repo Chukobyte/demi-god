@@ -99,8 +99,8 @@ class GameMaster:
                     level_state.is_gate_transition_queued = False
                 if self.bridge_transition_task:
                     self.bridge_transition_task.resume()
+                level_area_manager.update()
                 enemy_waves_task.resume()
-                level_cloud_manager.update()
                 await co_suspend()
         except GeneratorExit:
             if enemy_waves_task:

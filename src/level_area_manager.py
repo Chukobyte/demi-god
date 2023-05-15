@@ -53,17 +53,16 @@ class LevelAreaManager:
     def __init__(self):
         self.current_area_index = 0
         self.level_cloud_manager = LevelCloudManager()
+        self._manage_level_areas_task = Task(coroutine=self.manage_level_areas())
+
+    def update(self) -> None:
+        self._manage_level_areas_task.resume()
 
     def setup_level_area(self, area: LevelArea) -> None:
         level_state = LevelState()
         level_state.boundary.w += area.width
         level_state.boundary.x = level_state.boundary.w - area.width
         Camera2D.set_boundary(level_state.boundary)
-
-    def queue_next_area_transition(self) -> None:
-        level_state = LevelState()
-        level_state.is_gate_transition_queued = True
-        level_state.is_currently_transitioning_within_level = True
 
     # --- TASKS --- #
     async def manage_level_areas(self):
@@ -74,17 +73,17 @@ class LevelAreaManager:
                 # Need to handle waves for an area
 
                 # Manage bridge transition
-                if level_state.is_gate_transition_queued:
-                    level_state.is_gate_transition_queued = False
-                    if manage_bridge_transition_task:
-                        manage_bridge_transition_task.close()
-                    manage_bridge_transition_task = Task(
-                        coroutine=self._manage_bridge_transition_task(
-                            self.level_cloud_manager
-                        )
-                    )
-                if manage_bridge_transition_task:
-                    manage_bridge_transition_task.resume()
+                # if level_state.is_gate_transition_queued:
+                #     level_state.is_gate_transition_queued = False
+                #     if manage_bridge_transition_task:
+                #         manage_bridge_transition_task.close()
+                #     manage_bridge_transition_task = Task(
+                #         coroutine=self._manage_bridge_transition_task(
+                #             self.level_cloud_manager
+                #         )
+                #     )
+                # if manage_bridge_transition_task:
+                #     manage_bridge_transition_task.resume()
 
                 self.level_cloud_manager.update()
                 await co_suspend()
@@ -93,7 +92,6 @@ class LevelAreaManager:
 
     async def beam_player_down(self, player_start_pos: Vector2):
         try:
-            # Shoot down player beam first
             player_teleport_beam = Sprite.new()
             player_teleport_beam.texture = Texture(
                 file_path="assets/images/demi/demi_teleport.png"
