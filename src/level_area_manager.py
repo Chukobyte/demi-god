@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from crescent_api import *
 
 from src.characters.enemy_definitions import EnemyDefinition
@@ -31,11 +29,17 @@ class LevelArea:
 
 
 class LevelAreaDefinitions:
+    # Temp def map until we implement new enemy wave mechanics
     DEF_MAP = {
         1: LevelArea(
             area_type=LevelAreaType.NORMAL,
-            width=448,
-            enemy_defs=[EnemyDefinition.RABBIT()],
+            width=896,
+            enemy_defs=[
+                EnemyDefinition.RABBIT(),
+                EnemyDefinition.JESTER(),
+                EnemyDefinition.CROW(),
+                EnemyDefinition.BOSS(),
+            ],
         ),
         2: LevelArea(area_type=LevelAreaType.POWER_UP, width=160),
     }
@@ -51,39 +55,48 @@ class LevelAreaDefinitions:
 
 class LevelAreaManager:
     def __init__(self):
-        self.current_area_index = 0
+        self.current_area_index = 1
         self.level_cloud_manager = LevelCloudManager()
         self._manage_level_areas_task = Task(coroutine=self.manage_level_areas())
+        self._current_area: Optional[LevelArea] = None
 
     def update(self) -> None:
         self._manage_level_areas_task.resume()
-
-    def setup_level_area(self, area: LevelArea) -> None:
-        level_state = LevelState()
-        level_state.boundary.w += area.width
-        level_state.boundary.x = level_state.boundary.w - area.width
-        Camera2D.set_boundary(level_state.boundary)
 
     # --- TASKS --- #
     async def manage_level_areas(self):
         try:
             level_state = LevelState()
-            manage_bridge_transition_task = Optional[Task]
+            manage_bridge_transition_task: Optional[Task] = None
+
+            # Set initial area
+            self._current_area = LevelAreaDefinitions.get_def(self.current_area_index)
+            level_state.boundary.w += self._current_area.width
+            Camera2D.set_boundary(level_state.boundary)
+            # Bridge gates
+            bridge_gate = BridgeGate.new()
+            bridge_gate.position = Vector2(
+                level_state.boundary.w - 10, level_state.floor_y - 31
+            )
+            bridge_gate.z_index = 2
+            SceneTree.get_root().add_child(bridge_gate)
+            level_state.bridge_gates.append(bridge_gate)
+
             while True:
                 # Need to handle waves for an area
 
                 # Manage bridge transition
-                # if level_state.is_gate_transition_queued:
-                #     level_state.is_gate_transition_queued = False
-                #     if manage_bridge_transition_task:
-                #         manage_bridge_transition_task.close()
-                #     manage_bridge_transition_task = Task(
-                #         coroutine=self._manage_bridge_transition_task(
-                #             self.level_cloud_manager
-                #         )
-                #     )
-                # if manage_bridge_transition_task:
-                #     manage_bridge_transition_task.resume()
+                if level_state.is_gate_transition_queued:
+                    level_state.is_gate_transition_queued = False
+                    if manage_bridge_transition_task:
+                        manage_bridge_transition_task.close()
+                    manage_bridge_transition_task = Task(
+                        coroutine=self._manage_bridge_transition_task(
+                            self.level_cloud_manager
+                        )
+                    )
+                if manage_bridge_transition_task:
+                    manage_bridge_transition_task.resume()
 
                 self.level_cloud_manager.update()
                 await co_suspend()
@@ -143,7 +156,8 @@ class LevelAreaManager:
         self, level_cloud_manager: LevelCloudManager
     ):
         try:
-            player: Player = SceneTree.get_root().get_child("Player")
+            main_node: Node2D = SceneTree.get_root()
+            player: Player = main_node.get_child("Player")
             self.current_area_index += 1
             next_level_area = LevelAreaDefinitions.get_def(self.current_area_index)
             is_last_area = LevelAreaDefinitions.is_valid_area_index(
@@ -200,16 +214,17 @@ class LevelAreaManager:
             level_state.boundary.x = level_state.boundary.w - next_level_area.width
             Camera2D.set_boundary(level_state.boundary)
             Camera2D.follow_node(player)
-            bridge_gate: BridgeGate = SceneTree.get_root().get_child("Sprite")  # temp
+            bridge_gate = level_state.bridge_gates[0]
             if bridge_gate:
                 bridge_gate.set_closed()
             level_state.is_currently_transitioning_within_level = False
             # Temp wandering soul spawn
-            # wandering_soul = WanderingSoul.new()
-            # wandering_soul.position = Vector2(
-            #     level_state.boundary.w - 32, level_state.floor_y
-            # )
-            # wandering_soul.z_index = 10
-            # self.main.add_child(wandering_soul)
+            if next_level_area.area_type == LevelAreaType.POWER_UP:
+                wandering_soul = WanderingSoul.new()
+                wandering_soul.position = Vector2(
+                    level_state.boundary.w - 32, level_state.floor_y
+                )
+                wandering_soul.z_index = 10
+                main_node.add_child(wandering_soul)
         except GeneratorExit:
             pass

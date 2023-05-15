@@ -167,7 +167,7 @@ class EnemyManager:
             # Temp spawn wandering soul, will spawn after beating the boss and enemies
             while len(self._spawned_enemies) > 0:
                 await co_suspend()
-            bridge_gate: BridgeGate = self.main.get_child("Sprite")  # temp
+            bridge_gate = level_state.bridge_gates[0]
             if bridge_gate:
                 bridge_gate.set_opened()
             while True:
