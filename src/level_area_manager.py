@@ -159,7 +159,7 @@ class LevelAreaManager:
             player: Player = main_node.get_child("Player")
             self.current_area_index += 1
             next_level_area = LevelAreaDefinitions.get_def(self.current_area_index)
-            is_last_area = LevelAreaDefinitions.is_valid_area_index(
+            is_last_area = not LevelAreaDefinitions.is_valid_area_index(
                 self.current_area_index + 1
             )
             level_state = LevelState()
