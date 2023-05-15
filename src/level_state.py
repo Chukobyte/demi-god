@@ -21,11 +21,17 @@ class BridgeGateHelper:
             SceneTree.get_root().add_child(bridge_gate)
             self._bridge_gates.append(bridge_gate)
 
-    def get_next_bridge_gate(self) -> BridgeGate:
+    def next_bridge_gate(self) -> BridgeGate:
         self._current_gate_index += 1
         if self._current_gate_index > self.max_bridges - 1:
             self._current_gate_index = 0
         return self._bridge_gates[self._current_gate_index]
+
+    def get_previous_bridge_gate(self) -> BridgeGate:
+        prev_gate_index = self._current_gate_index - 1
+        if prev_gate_index < 0:
+            prev_gate_index = self.max_bridges - 1
+        return self._bridge_gates[prev_gate_index]
 
     def open_gates(self) -> None:
         for gate in self._bridge_gates:
