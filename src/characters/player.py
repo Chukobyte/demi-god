@@ -542,10 +542,16 @@ class Player(Node2D):
                         self.anim_sprite.flip_h = False
                     else:
                         self.play_animation("idle")
-                    if Input.is_action_pressed("jump"):
+                    if (
+                        Input.is_action_pressed("jump")
+                        and not self._are_enemies_attached()
+                    ):
                         self.stance = PlayerStance.IN_AIR
                         await co_return()
-                    elif Input.is_action_pressed("crouch"):
+                    elif (
+                        Input.is_action_pressed("crouch")
+                        and not self._are_enemies_attached()
+                    ):
                         self.stance = PlayerStance.CROUCHING
                         await co_return()
                     await co_suspend()
