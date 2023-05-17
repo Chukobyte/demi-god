@@ -3,7 +3,9 @@ from crescent_api import *
 from src.characters.enemy_definitions import EnemyDefinition
 from src.characters.player import Player
 from src.characters.wandering_soul import WanderingSoul
+from src.enemy_area_manager import EnemyAreaManager
 from src.environment.bridge_gate import BridgeGate
+from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
 from src.utils.game_math import Easer, Ease
@@ -11,54 +13,13 @@ from src.utils.task import co_suspend, co_wait_seconds, Task
 from src.utils.timer import Timer
 
 
-class LevelAreaType:
-    NORMAL = "normal"
-    POWER_UP = "power_up"
-    BOSS = "boss"
-
-
-class LevelArea:
-    def __init__(
-        self, area_type: str, width: int, enemy_defs: List[EnemyDefinition] = None
-    ):
-        self.area_type = area_type
-        self.width = width
-        if not enemy_defs:
-            enemy_defs = []
-        self.enemy_defs = enemy_defs
-
-
-class LevelAreaDefinitions:
-    # Temp def map until we implement new enemy wave mechanics
-    DEF_MAP = {
-        1: LevelArea(
-            area_type=LevelAreaType.NORMAL,
-            width=896,
-            enemy_defs=[
-                EnemyDefinition.RABBIT(),
-                EnemyDefinition.JESTER(),
-                EnemyDefinition.CROW(),
-                EnemyDefinition.BOSS(),
-            ],
-        ),
-        2: LevelArea(area_type=LevelAreaType.BOSS, width=160),
-        3: LevelArea(area_type=LevelAreaType.POWER_UP, width=160),
-    }
-
-    @staticmethod
-    def get_def(area_num: int) -> Optional[LevelArea]:
-        return LevelAreaDefinitions.DEF_MAP.get(area_num, None)
-
-    @staticmethod
-    def is_valid_area_index(index: int) -> bool:
-        return index in LevelAreaDefinitions.DEF_MAP.keys()
-
-
 class LevelAreaManager:
     def __init__(self):
         self.current_area_index = 1
         self.level_cloud_manager = LevelCloudManager()
+        self.enemy_area_manager = EnemyAreaManager()
         self._manage_level_areas_task = Task(coroutine=self.manage_level_areas())
+        self._manage_enemy_area_task: Optional[Task] = None
         self._current_area: Optional[LevelArea] = None
 
     def update(self) -> None:
@@ -81,8 +42,14 @@ class LevelAreaManager:
                 level_state.boundary.w - 10, level_state.floor_y - 31
             )
 
+            self._manage_enemy_area_task = Task(
+                coroutine=self.enemy_area_manager.manage_area(self._current_area)
+            )
+
             while True:
                 # Need to handle waves for an area
+                if self._manage_enemy_area_task:
+                    self._manage_enemy_area_task.resume()
 
                 # Manage bridge transition
                 if level_state.is_gate_transition_queued:
@@ -155,6 +122,7 @@ class LevelAreaManager:
         self, level_cloud_manager: LevelCloudManager
     ):
         try:
+            self._manage_enemy_area_task = None
             main_node: Node2D = SceneTree.get_root()
             player: Player = main_node.get_child("Player")
             self.current_area_index += 1
@@ -240,5 +208,9 @@ class LevelAreaManager:
                 )
                 wandering_soul.z_index = 10
                 main_node.add_child(wandering_soul)
+
+            self._manage_enemy_area_task = Task(
+                coroutine=self.enemy_area_manager.manage_area(next_level_area)
+            )
         except GeneratorExit:
             pass

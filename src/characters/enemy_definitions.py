@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, List
 
 from src.characters.enemy_rabbit import EnemyRabbit
 from src.characters.enemy_jester import EnemyJester
