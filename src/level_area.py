@@ -11,7 +11,7 @@ class LevelAreaType:
 
 class LevelSection:
     def __init__(self, enemy_defs: List[EnemyDefinition]):
-        pass
+        self.enemy_defs = enemy_defs
 
 
 class LevelArea:

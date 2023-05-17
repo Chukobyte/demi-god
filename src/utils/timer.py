@@ -9,3 +9,6 @@ class Timer:
 
     def reset(self) -> None:
         self.time_remaining = self.time
+
+    def has_stopped(self) -> bool:
+        return self.time_remaining <= 0.0

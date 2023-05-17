@@ -87,9 +87,7 @@ class LevelAreaManager:
                 Ease.Cubic.ease_in_vec2,
             )
             while True:
-                delta_time = (
-                    Engine.get_global_physics_delta_time() * World.get_time_dilation()
-                )
+                delta_time = World.get_delta_time()
                 player_beam_timer.tick(delta_time)
                 self.level_cloud_manager.update()
                 if player_beam_timer.time_remaining > 0.0:
@@ -123,8 +121,7 @@ class LevelAreaManager:
     ):
         try:
             self._manage_enemy_area_task = None
-            main_node: Node2D = SceneTree.get_root()
-            player: Player = main_node.get_child("Player")
+            player = Player.find_player()
             self.current_area_index += 1
             next_level_area = LevelAreaDefinitions.get_def(self.current_area_index)
             is_last_area = not LevelAreaDefinitions.is_valid_area_index(
@@ -172,9 +169,7 @@ class LevelAreaManager:
                 )
 
             while True:
-                delta_time = (
-                    Engine.get_global_physics_delta_time() * World.get_time_dilation()
-                )
+                delta_time = World.get_delta_time()
                 transition_timer.tick(delta_time)
                 if transition_timer.time_remaining <= 0.0:
                     Camera2D.set_position(dest_camera_pos)
@@ -207,7 +202,7 @@ class LevelAreaManager:
                     level_state.boundary.w - 32, level_state.floor_y
                 )
                 wandering_soul.z_index = 10
-                main_node.add_child(wandering_soul)
+                SceneTree.get_root().add_child(wandering_soul)
 
             self._manage_enemy_area_task = Task(
                 coroutine=self.enemy_area_manager.manage_area(next_level_area)

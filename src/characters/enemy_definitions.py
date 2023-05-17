@@ -41,3 +41,12 @@ class EnemyDefinition:
     @staticmethod
     def BOSS() -> "EnemyDefinition":
         return EnemyDefinition(scene_path=EnemyScenePaths.BOSS, enemy_type=EnemyBoss)
+
+    @staticmethod
+    def ALL() -> List["EnemyDefinition"]:
+        return [
+            EnemyDefinition.RABBIT(),
+            EnemyDefinition.JESTER(),
+            EnemyDefinition.CROW(),
+            EnemyDefinition.BOSS(),
+        ]

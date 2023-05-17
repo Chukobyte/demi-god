@@ -163,10 +163,14 @@ class Player(Node2D):
         self.anim_sprite = self.get_child("AnimatedSprite")
         self.collider = self.get_child("Collider2D")
         self.stats.refresh_bar_nodes()
-        level_state = LevelState()
         Camera2D.follow_node(self)
         # Start with 0 energy
         self.stats.energy = 0
+
+    @staticmethod
+    def find_player() -> Optional["Player"]:
+        player: Player = SceneTree.get_root().get_child("Player")
+        return player
 
     def _update(self, delta_time: float) -> None:
         # Pause game

@@ -1,21 +1,26 @@
 import random
-from typing import Type
+from typing import Type, Dict
 
 from crescent_api import *
 
 from src.characters.enemy import Enemy
-from src.characters.enemy_definitions import EnemyScenePaths
+from src.characters.enemy_definitions import EnemyScenePaths, EnemyDefinition
 from src.characters.enemy_jester import EnemyJester
 from src.characters.player import Player
-from src.level_area import LevelArea
+from src.level_area import LevelArea, LevelSection
 from src.level_state import LevelState
-from src.utils.task import co_wait_seconds, co_suspend
+from src.utils.task import co_wait_seconds, co_suspend, co_return
 from src.utils.timer import Timer
 
 
 class EnemyAreaManager:
     def __init__(self):
         self._spawned_enemies: List[Enemy] = []
+        self._enemy_scene_cache: Dict[str, PackedScene] = {}
+        for enemy_def in EnemyDefinition.ALL():
+            self._enemy_scene_cache[enemy_def.scene_path] = SceneUtil.load_scene(
+                enemy_def.scene_path
+            )
 
     def get_spawned_enemies_by_type(self, enemy_type: Type) -> list:
         enemies = []
@@ -27,14 +32,41 @@ class EnemyAreaManager:
     def _on_enemy_destroyed(self, enemy: Enemy) -> None:
         self._spawned_enemies.remove(enemy)
 
+    def _get_section_by_position(
+        self, position: Vector2, area: LevelArea
+    ) -> Optional[LevelSection]:
+        section_count = len(area.sections)
+        if section_count == 0:
+            return None
+        elif section_count == 1:
+            return area.sections[0]
+        section_width = area.width / section_count
+        local_position_x = position.x - LevelState().boundary.x
+        section_index = int(local_position_x / section_width)
+        return area.sections[section_index]
+
     async def manage_area(self, area: LevelArea):
         try:
+            sections: List[LevelSection] = area.sections
+            if not sections:
+                await co_return()
+            section_count = len(sections)
+            player = Player.find_player()
+            update_timer = Timer(5.0)
+
             while True:
+                delta_time = World.get_delta_time()
+                if update_timer.tick(delta_time).has_stopped():
+                    update_timer.reset()
+                    current_section = self._get_section_by_position(
+                        player.position, area
+                    )
                 await co_suspend()
         except GeneratorExit:
             self._spawned_enemies.clear()
 
 
+# --- OLD STUFF --- #
 # ENEMY_SECTION_MAP = {
 #     1: [EnemyScenePaths.RABBIT],
 #     2: [EnemyScenePaths.RABBIT, EnemyScenePaths.JESTER],
