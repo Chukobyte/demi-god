@@ -1,9 +1,7 @@
-import random
-
 from crescent_api import *
 
 from src.characters.player import Player
-from src.enemy_manager import EnemyManager
+# from src.enemy_manager import EnemyManager
 from src.level_area_manager import LevelAreaManager
 from src.level_state import LevelState
 from src.utils.task import *
@@ -23,7 +21,7 @@ class GameMaster:
     # --- TASKS --- #
     async def _update_task(self):
         player_start_pos = Vector2(20, 78)
-        enemy_waves_task: Optional[Task] = None
+        # enemy_waves_task: Optional[Task] = None
         level_area_manager = LevelAreaManager()
         try:
             # TODO: put in main.py
@@ -45,13 +43,14 @@ class GameMaster:
             self.player.position = player_start_pos
             self.main.add_child(self.player)
 
-            enemy_manager = EnemyManager(main=self.main, player=self.player)
-            enemy_waves_task = Task(coroutine=enemy_manager.enemy_waves_task())
+            # enemy_manager = EnemyManager(main=self.main, player=self.player)
+            # enemy_waves_task = Task(coroutine=enemy_manager.enemy_waves_task())
 
             while True:
                 level_area_manager.update()
-                enemy_waves_task.resume()
+                # enemy_waves_task.resume()
                 await co_suspend()
         except GeneratorExit:
-            if enemy_waves_task:
-                enemy_waves_task.close()
+            pass
+            # if enemy_waves_task:
+            #     enemy_waves_task.close()

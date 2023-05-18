@@ -4,8 +4,11 @@ from typing import Type, Dict
 from crescent_api import *
 
 from src.characters.enemy import Enemy
+from src.characters.enemy_boss import EnemyBoss
+from src.characters.enemy_crow import EnemyCrow
 from src.characters.enemy_definitions import EnemyScenePaths, EnemyDefinition
 from src.characters.enemy_jester import EnemyJester
+from src.characters.enemy_rabbit import EnemyRabbit
 from src.characters.player import Player
 from src.level_area import LevelArea, LevelSection
 from src.level_state import LevelState
@@ -22,7 +25,7 @@ class EnemyAreaManager:
                 enemy_def.scene_path
             )
 
-    def get_spawned_enemies_by_type(self, enemy_type: Type) -> list:
+    def _get_spawned_enemies_by_type(self, enemy_type: Type) -> list:
         enemies = []
         for enemy in self._spawned_enemies:
             if isinstance(enemy, enemy_type):
@@ -45,12 +48,68 @@ class EnemyAreaManager:
         section_index = int(local_position_x / section_width)
         return area.sections[section_index]
 
+    def _attempt_spawn_enemies(
+        self, section: LevelSection, base_spawn_pos: Vector2
+    ) -> None:
+        enemy_defs = section.enemy_defs[:]
+        x_range = MinMax(-96, 96)
+        spawn_attempt_finished = False
+        player = Player.find_player()
+        main_node = SceneTree.get_root()
+        while not spawn_attempt_finished:
+            random_enemy_def: EnemyDefinition = random.choice(enemy_defs)
+            enemy_defs.remove(random_enemy_def)
+            enemies_of_type_in_level = self._get_spawned_enemies_by_type(
+                random_enemy_def.enemy_type
+            )
+            enemy_count = len(enemies_of_type_in_level)
+            if enemy_count < random_enemy_def.max_total_count:
+                num_of_enemies_to_spawn = random.randint(
+                    1, random_enemy_def.max_spawn_count - enemy_count
+                )
+                # Adjust base spawn position to fall either on the left or right
+                if not random_enemy_def.balance_spawn_sides or enemy_count == 0:
+                    x_modifier = random.choice([x_range.min, x_range.max])
+                else:
+                    left_side_count = 0
+                    right_side_count = 0
+                    player_pos = Player.find_player().position
+                    for enemy in enemies_of_type_in_level:
+                        if enemy.position.x > player_pos.x:
+                            left_side_count += 1
+                        else:
+                            right_side_count += 1
+                    if left_side_count > right_side_count:
+                        x_modifier = x_range.max
+                    elif right_side_count > left_side_count:
+                        x_modifier = x_range.min
+                    else:
+                        x_modifier = random.choice([x_range.min, x_range.max])
+                base_spawn_pos.x += x_modifier
+                for i in range(num_of_enemies_to_spawn):
+                    spawned_enemy: Enemy = self._enemy_scene_cache[
+                        random_enemy_def.scene_path
+                    ].create_instance()
+                    spawned_enemy.position = base_spawn_pos + Vector2(
+                        i * (x_modifier / 4), 0.0
+                    )
+                    spawned_enemy.z_index = player.z_index
+                    main_node.add_child(spawned_enemy)
+                    spawned_enemy.subscribe_to_event(
+                        "destroyed", main_node, self._on_enemy_destroyed
+                    )
+                    self._spawned_enemies.append(spawned_enemy)
+                spawn_attempt_finished = True
+            if not enemy_defs:
+                break
+
     async def manage_area(self, area: LevelArea):
         try:
             sections: List[LevelSection] = area.sections
             if not sections:
                 await co_return()
             section_count = len(sections)
+            level_state = LevelState()
             player = Player.find_player()
             update_timer = Timer(5.0)
 
@@ -58,9 +117,13 @@ class EnemyAreaManager:
                 delta_time = World.get_delta_time()
                 if update_timer.tick(delta_time).has_stopped():
                     update_timer.reset()
+
+                    spawn_pos_x = Camera2D.get_position().x + 80
                     current_section = self._get_section_by_position(
                         player.position, area
                     )
+                    base_spawn_pos = Vector2(spawn_pos_x, level_state.floor_y)
+                    self._attempt_spawn_enemies(current_section, base_spawn_pos)
                 await co_suspend()
         except GeneratorExit:
             self._spawned_enemies.clear()
