@@ -12,6 +12,7 @@ class LevelAreaType:
 class LevelSection:
     def __init__(self, enemy_defs: List[EnemyDefinition]):
         self.enemy_defs = enemy_defs
+        self.index: Optional[int] = None
 
 
 class LevelArea:
@@ -25,6 +26,8 @@ class LevelArea:
         if not sections:
             sections = []
         self.sections = sections
+        for i, section in enumerate(sections):
+            section.index = i
 
 
 class LevelAreaDefinitions:

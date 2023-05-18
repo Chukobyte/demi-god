@@ -1,6 +1,7 @@
 from crescent_api import *
 
 from src.characters.player import Player
+
 # from src.enemy_manager import EnemyManager
 from src.level_area_manager import LevelAreaManager
 from src.level_state import LevelState

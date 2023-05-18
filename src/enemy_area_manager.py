@@ -49,7 +49,7 @@ class EnemyAreaManager:
         return area.sections[section_index]
 
     def _attempt_spawn_enemies(
-        self, section: LevelSection, base_spawn_pos: Vector2
+        self, base_spawn_pos: Vector2, section: LevelSection, total_sections: int
     ) -> None:
         enemy_defs = section.enemy_defs[:]
         x_range = MinMax(-96, 96)
@@ -68,7 +68,11 @@ class EnemyAreaManager:
                     1, random_enemy_def.max_spawn_count - enemy_count
                 )
                 # Adjust base spawn position to fall either on the left or right
-                if not random_enemy_def.balance_spawn_sides or enemy_count == 0:
+                if section.index == 0:
+                    x_modifier = x_range.max
+                elif section.index == total_sections - 1:
+                    x_modifier = x_range.min
+                elif not random_enemy_def.balance_spawn_sides or enemy_count == 0:
                     x_modifier = random.choice([x_range.min, x_range.max])
                 else:
                     left_side_count = 0
@@ -123,7 +127,9 @@ class EnemyAreaManager:
                         player.position, area
                     )
                     base_spawn_pos = Vector2(spawn_pos_x, level_state.floor_y)
-                    self._attempt_spawn_enemies(current_section, base_spawn_pos)
+                    self._attempt_spawn_enemies(
+                        base_spawn_pos, current_section, section_count
+                    )
                 await co_suspend()
         except GeneratorExit:
             self._spawned_enemies.clear()
