@@ -123,6 +123,7 @@ class EnemyAreaManager:
             player = Player.find_player()
             update_timer = Timer(5.0)
 
+            # Main enemy wave loop
             while True:
                 delta_time = World.get_delta_time()
                 if update_timer.tick(delta_time).has_stopped():
@@ -136,6 +137,11 @@ class EnemyAreaManager:
                     self._attempt_spawn_enemies(
                         base_spawn_pos, current_section, section_count
                     )
+                    if area.is_section_last(current_section):
+                        break
                 await co_suspend()
+            while self._spawned_enemies:
+                await co_suspend()
+            area.is_completed = True
         except GeneratorExit:
             self._spawned_enemies.clear()

@@ -28,6 +28,13 @@ class LevelArea:
         self.sections = sections
         for i, section in enumerate(sections):
             section.index = i
+        self.is_completed = False
+
+    def is_section_last(self, section: LevelSection) -> bool:
+        if self.sections:
+            last_index = len(self.sections) - 1
+            return self.sections[last_index] == section
+        return False
 
 
 class LevelAreaDefinitions:

@@ -1,7 +1,7 @@
 from crescent_api import *
 
 from src.characters.enemy_definitions import EnemyDefinition
-from src.characters.player import Player
+from src.characters.player import Player, PlayerStance
 from src.characters.wandering_soul import WanderingSoul
 from src.enemy_area_manager import EnemyAreaManager
 from src.environment.bridge_gate import BridgeGate
@@ -21,9 +21,14 @@ class LevelAreaManager:
         self._manage_level_areas_task = Task(coroutine=self.manage_level_areas())
         self._manage_enemy_area_task: Optional[Task] = None
         self._current_area: Optional[LevelArea] = None
+        self._has_processed_current_area_completion = False
 
     def update(self) -> None:
         self._manage_level_areas_task.resume()
+
+    def _set_current_area(self, area: LevelArea) -> None:
+        self._current_area = area
+        self._has_processed_current_area_completion = False
 
     # --- TASKS --- #
     async def manage_level_areas(self):
@@ -32,7 +37,9 @@ class LevelAreaManager:
             manage_bridge_transition_task: Optional[Task] = None
 
             # Set initial area
-            self._current_area = LevelAreaDefinitions.get_def(self.current_area_index)
+            self._set_current_area(
+                LevelAreaDefinitions.get_def(self.current_area_index)
+            )
             level_state.boundary.w += self._current_area.width
             Camera2D.set_boundary(level_state.boundary)
             # Set initial bridge gate
@@ -65,6 +72,14 @@ class LevelAreaManager:
                     manage_bridge_transition_task.resume()
 
                 self.level_cloud_manager.update()
+
+                if (
+                    self._current_area
+                    and self._current_area.is_completed
+                    and not self._has_processed_current_area_completion
+                ):
+                    level_state.bridge_gate_helper.open_gates()
+                    self._has_processed_current_area_completion = True
                 await co_suspend()
         except GeneratorExit:
             pass
@@ -158,7 +173,8 @@ class LevelAreaManager:
 
             await co_wait_seconds(1.0)
             player.time_dilation = prev_player_time_dilation
-            player.play_animation("walk")
+            if player.stance == PlayerStance.STANDING:
+                player.play_animation("walk")
             level_cloud_manager.set_clouds_time_dilation(1.0)
 
             # Setup next bridge gate
@@ -204,6 +220,7 @@ class LevelAreaManager:
                 wandering_soul.z_index = 10
                 SceneTree.get_root().add_child(wandering_soul)
 
+            self._set_current_area(next_level_area)
             self._manage_enemy_area_task = Task(
                 coroutine=self.enemy_area_manager.manage_area(next_level_area)
             )
