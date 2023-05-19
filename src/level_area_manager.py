@@ -1,10 +1,8 @@
 from crescent_api import *
 
-from src.characters.enemy_definitions import EnemyDefinition
 from src.characters.player import Player, PlayerStance
 from src.characters.wandering_soul import WanderingSoul
 from src.enemy_area_manager import EnemyAreaManager
-from src.environment.bridge_gate import BridgeGate
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState

@@ -2,9 +2,9 @@ import random
 
 from crescent_api import *
 
+from src.characters.enemy import Enemy, EnemyAttack
 from src.level_state import LevelState
 from src.utils.task import *
-from src.characters.enemy import Enemy, EnemyAttack
 from src.utils.timer import Timer
 
 

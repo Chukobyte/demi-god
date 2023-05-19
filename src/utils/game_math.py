@@ -1,5 +1,6 @@
 import math
 from typing import Callable
+
 from crescent_api import Vector2, Rect2
 
 # GENERAL

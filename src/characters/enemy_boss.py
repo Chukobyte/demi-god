@@ -1,7 +1,7 @@
-from crescent_api import Vector2, AnimatedSprite
+from crescent_api import Vector2
 
-from src.utils.task import *
 from src.characters.enemy import Enemy
+from src.utils.task import *
 
 
 class EnemyBoss(Enemy):

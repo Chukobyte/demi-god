@@ -1,9 +1,9 @@
 from typing import Type, List
 
-from src.characters.enemy_rabbit import EnemyRabbit
-from src.characters.enemy_jester import EnemyJester
-from src.characters.enemy_crow import EnemyCrow
 from src.characters.enemy_boss import EnemyBoss
+from src.characters.enemy_crow import EnemyCrow
+from src.characters.enemy_jester import EnemyJester
+from src.characters.enemy_rabbit import EnemyRabbit
 
 
 class EnemyScenePaths:
