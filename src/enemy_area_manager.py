@@ -30,7 +30,10 @@ class EnemyAreaManager:
         return enemies
 
     def _on_enemy_destroyed(self, enemy: Enemy) -> None:
-        self._spawned_enemies.remove(enemy)
+        try:
+            self._spawned_enemies.remove(enemy)
+        except ValueError as e:
+            pass
 
     def _get_section_by_position(
         self, position: Vector2, area: LevelArea

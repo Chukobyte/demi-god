@@ -3,6 +3,7 @@ from crescent_api import *
 from src.characters.player import Player, PlayerStance
 from src.characters.wandering_soul import WanderingSoul
 from src.enemy_area_manager import EnemyAreaManager
+from src.environment.bridge_gate import BridgeGate
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
@@ -151,7 +152,7 @@ class LevelAreaManager:
             transition_timer = Timer(5.0)
             initial_camera_pos = Camera2D.get_position()
             dest_camera_pos = Vector2(
-                level_state.boundary.w - 160, initial_camera_pos.y
+                level_state.boundary.w - next_level_area.width, initial_camera_pos.y
             )
             camera_pos_easer = Easer(
                 initial_camera_pos,
@@ -176,9 +177,11 @@ class LevelAreaManager:
             level_cloud_manager.set_clouds_time_dilation(1.0)
 
             # Setup next bridge gate
+            next_bridge_gate: Optional[BridgeGate] = None
             if not is_last_area:
-                bridge_gate = level_state.bridge_gate_helper.next_bridge_gate()
-                bridge_gate.position = Vector2(
+                next_bridge_gate = level_state.bridge_gate_helper.next_bridge_gate()
+                next_bridge_gate.set_closed()
+                next_bridge_gate.position = Vector2(
                     level_state.boundary.w - 10, level_state.floor_y - 31
                 )
 
@@ -200,7 +203,12 @@ class LevelAreaManager:
             Camera2D.follow_node(player)
 
             # Temp testing pass through
-            if next_level_area.area_type == LevelAreaType.BOSS:
+            if (
+                next_level_area.area_type == LevelAreaType.BOSS
+                or next_level_area.area_type == LevelAreaType.POWER_UP
+            ):
+                if next_bridge_gate:
+                    next_bridge_gate.set_opened()
                 prev_bridge_gate = (
                     level_state.bridge_gate_helper.get_previous_bridge_gate()
                 )
@@ -210,7 +218,7 @@ class LevelAreaManager:
 
             level_state.is_currently_transitioning_within_level = False
             # Temp wandering soul spawn
-            if next_level_area.area_type == LevelAreaType.POWER_UP:
+            if next_level_area.area_type == LevelAreaType.END:
                 wandering_soul = WanderingSoul.new()
                 wandering_soul.position = Vector2(
                     level_state.boundary.w - 32, level_state.floor_y
