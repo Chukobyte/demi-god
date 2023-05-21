@@ -9,7 +9,7 @@ from src.characters.player import Player
 from src.level_area import LevelArea, LevelSection, LevelAreaType
 from src.level_state import LevelState
 from src.utils import game_math
-from src.utils.task import co_suspend, co_return
+from src.utils.task import co_suspend, co_return, Task
 from src.utils.timer import Timer
 
 
@@ -116,6 +116,25 @@ class EnemyAreaManager:
             if not enemy_defs:
                 break
 
+    async def _lightning_flash_task(self):
+        main_node = SceneTree.get_root()
+        bg_color_rect: ColorRect = main_node.get_child("BGColorRect")
+        initial_color = bg_color_rect.color
+        flash_color = Color(240, 247, 243)
+        flash_timer = Timer(random.uniform(2.0, 8.0))
+        try:
+            while True:
+                flash_timer.tick(World.get_delta_time())
+                if flash_timer.has_stopped():
+                    flash_timer.time = random.uniform(2.0, 8.0)
+                    flash_timer.reset()
+                    bg_color_rect.color = flash_color
+                    await co_suspend()
+                    bg_color_rect.color = initial_color
+                await co_suspend()
+        except GeneratorExit:
+            bg_color_rect.color = initial_color
+
     async def manage_area(self, area: LevelArea):
         try:
             level_state = LevelState()
@@ -144,6 +163,8 @@ class EnemyAreaManager:
                         if area.is_section_last(current_section):
                             break
                     await co_suspend()
+                while self._spawned_enemies:
+                    await co_suspend()
             # Boss logic
             else:
                 main_node = SceneTree.get_root()
@@ -164,8 +185,12 @@ class EnemyAreaManager:
                 )
                 self._spawned_enemies.append(boss_enemy)
 
-            while self._spawned_enemies:
-                await co_suspend()
+                lightning_flash_task = Task(coroutine=self._lightning_flash_task())
+                while self._spawned_enemies:
+                    lightning_flash_task.resume()
+                    await co_suspend()
+                lightning_flash_task.close()
+
             area.is_completed = True
         except GeneratorExit:
             self._spawned_enemies.clear()
