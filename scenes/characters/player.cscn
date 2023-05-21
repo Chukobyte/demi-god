@@ -152,6 +152,40 @@
                             ]
                         },
                         {
+                            "name": "jump",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_jump.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "jump_t",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/demi/demi_transformed_jump.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
                             "name": "stand_attack",
                             "speed": 100,
                             "loops": false,

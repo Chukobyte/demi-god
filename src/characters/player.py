@@ -594,7 +594,7 @@ class Player(Node2D):
             pass
 
     async def _in_air_stance_task(self):
-        self.play_animation("idle")
+        self.play_animation("jump")
         attack_task: Optional[Task] = None
         try:
             level_state = LevelState()
@@ -613,7 +613,7 @@ class Player(Node2D):
                     attack_task.resume()
                     if not attack_task.valid:
                         attack_task = None
-                        self.play_animation("idle")
+                        self.play_animation("jump")
                 if Input.is_action_pressed("move_left"):
                     if not self._are_enemies_attached():
                         new_position = self.position + Vector2.LEFT() * Vector2(

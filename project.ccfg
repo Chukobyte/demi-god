@@ -207,6 +207,18 @@
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",
                 "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_jump.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_transformed_jump.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
             }
         ],
         "fonts": []
@@ -274,5 +286,5 @@
             ]
         }
     ],
-    "crescent_core_version": "0.12.0"
+    "crescent_core_version": "0.13.0"
 }
