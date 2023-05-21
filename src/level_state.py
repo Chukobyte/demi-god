@@ -22,12 +22,24 @@ class BridgeGateHelper:
             self._bridge_gates.append(bridge_gate)
 
     def next_bridge_gate(self) -> BridgeGate:
+        """
+        Increments the bridge gate index and returns the next one
+        """
         self._current_gate_index += 1
         if self._current_gate_index > self.max_bridges - 1:
             self._current_gate_index = 0
         return self._bridge_gates[self._current_gate_index]
 
+    def get_current_bridge_gate(self) -> BridgeGate:
+        """
+        Gets the current BridgeGate, basically the last one that was used
+        """
+        return self._bridge_gates[self._current_gate_index]
+
     def get_previous_bridge_gate(self) -> BridgeGate:
+        """
+        Just get the previous bridge gate (without decrementing)
+        """
         prev_gate_index = self._current_gate_index - 1
         if prev_gate_index < 0:
             prev_gate_index = self.max_bridges - 1

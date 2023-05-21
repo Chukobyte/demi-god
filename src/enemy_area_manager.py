@@ -6,7 +6,7 @@ from crescent_api import *
 from src.characters.enemy import Enemy
 from src.characters.enemy_definitions import EnemyDefinition
 from src.characters.player import Player
-from src.level_area import LevelArea, LevelSection
+from src.level_area import LevelArea, LevelSection, LevelAreaType
 from src.level_state import LevelState
 from src.utils import game_math
 from src.utils.task import co_suspend, co_return
@@ -47,6 +47,12 @@ class EnemyAreaManager:
         local_position_x = position.x - LevelState().boundary.x
         section_index = int(local_position_x / section_width)
         return area.sections[section_index]
+
+    def _spawn_enemy_from_def(self, enemy_def: EnemyDefinition) -> Enemy:
+        spawned_enemy: Enemy = self._enemy_scene_cache[
+            enemy_def.scene_path
+        ].create_instance()
+        return spawned_enemy
 
     def _attempt_spawn_enemies(
         self, base_spawn_pos: Vector2, section: LevelSection, total_sections: int
@@ -96,9 +102,7 @@ class EnemyAreaManager:
                         x_modifier = random.choice([x_range.min, x_range.max])
                 base_spawn_pos.x += x_modifier
                 for i in range(num_of_enemies_to_spawn):
-                    spawned_enemy: Enemy = self._enemy_scene_cache[
-                        random_enemy_def.scene_path
-                    ].create_instance()
+                    spawned_enemy = self._spawn_enemy_from_def(random_enemy_def)
                     spawned_enemy.position = base_spawn_pos + Vector2(
                         i * (x_modifier / 4), 0.0
                     )
@@ -114,31 +118,52 @@ class EnemyAreaManager:
 
     async def manage_area(self, area: LevelArea):
         try:
-            sections: List[LevelSection] = area.sections
-            if not sections:
-                await co_return()
-            section_count = len(sections)
             level_state = LevelState()
             player = Player.find_player()
-            update_timer = Timer(5.0)
 
             # Main enemy wave loop
-            while True:
-                delta_time = World.get_delta_time()
-                if update_timer.tick(delta_time).has_stopped():
-                    update_timer.reset()
+            if area.area_type != LevelAreaType.BOSS:
+                sections: List[LevelSection] = area.sections
+                if not sections:
+                    await co_return()
+                section_count = len(sections)
+                update_timer = Timer(5.0)
+                while True:
+                    delta_time = World.get_delta_time()
+                    if update_timer.tick(delta_time).has_stopped():
+                        update_timer.reset()
 
-                    spawn_pos_x = Camera2D.get_position().x + 80
-                    current_section = self._get_section_by_position(
-                        player.position, area
-                    )
-                    base_spawn_pos = Vector2(spawn_pos_x, level_state.floor_y)
-                    self._attempt_spawn_enemies(
-                        base_spawn_pos, current_section, section_count
-                    )
-                    if area.is_section_last(current_section):
-                        break
-                await co_suspend()
+                        spawn_pos_x = Camera2D.get_position().x + 80
+                        current_section = self._get_section_by_position(
+                            player.position, area
+                        )
+                        base_spawn_pos = Vector2(spawn_pos_x, level_state.floor_y)
+                        self._attempt_spawn_enemies(
+                            base_spawn_pos, current_section, section_count
+                        )
+                        if area.is_section_last(current_section):
+                            break
+                    await co_suspend()
+            # Boss logic
+            else:
+                main_node = SceneTree.get_root()
+                current_bridge_gate = (
+                    level_state.bridge_gate_helper.get_current_bridge_gate()
+                )
+                boss_spawn_pos = Vector2(
+                    current_bridge_gate.position.x - 20, level_state.floor_y
+                )
+                # If we decide to add more bosses, we can just add a definition to level area
+                boss_enemy_def = EnemyDefinition.BOSS()
+                boss_enemy = self._spawn_enemy_from_def(boss_enemy_def)
+                boss_enemy.position = boss_spawn_pos
+                boss_enemy.z_index = player.z_index
+                main_node.add_child(boss_enemy)
+                boss_enemy.subscribe_to_event(
+                    "destroyed", main_node, self._on_enemy_destroyed
+                )
+                self._spawned_enemies.append(boss_enemy)
+
             while self._spawned_enemies:
                 await co_suspend()
             area.is_completed = True

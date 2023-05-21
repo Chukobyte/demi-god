@@ -77,7 +77,10 @@ class LevelAreaManager:
                     and self._current_area.is_completed
                     and not self._has_processed_current_area_completion
                 ):
-                    level_state.bridge_gate_helper.open_gates()
+                    current_bridge_gate = (
+                        level_state.bridge_gate_helper.get_current_bridge_gate()
+                    )
+                    current_bridge_gate.set_opened()
                     self._has_processed_current_area_completion = True
                 await co_suspend()
         except GeneratorExit:
@@ -203,10 +206,7 @@ class LevelAreaManager:
             Camera2D.follow_node(player)
 
             # Temp testing pass through
-            if (
-                next_level_area.area_type == LevelAreaType.BOSS
-                or next_level_area.area_type == LevelAreaType.POWER_UP
-            ):
+            if next_level_area.area_type == LevelAreaType.POWER_UP:
                 if next_bridge_gate:
                     next_bridge_gate.set_opened()
                 prev_bridge_gate = (

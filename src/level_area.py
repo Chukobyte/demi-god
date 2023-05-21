@@ -39,7 +39,6 @@ class LevelArea:
 
 
 class LevelAreaDefinitions:
-    # Temp def map until we implement new enemy wave mechanics
     DEF_MAP = {
         1: LevelArea(
             area_type=LevelAreaType.NORMAL,
@@ -96,7 +95,10 @@ class LevelAreaDefinitions:
                 ),
             ],
         ),
-        4: LevelArea(area_type=LevelAreaType.BOSS, width=160),
+        4: LevelArea(
+            area_type=LevelAreaType.BOSS,
+            width=160,
+        ),
         5: LevelArea(area_type=LevelAreaType.END, width=160),
     }
 
