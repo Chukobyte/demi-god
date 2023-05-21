@@ -13,7 +13,7 @@
     ],
     "children": [
         {
-            "name": "ColorRect",
+            "name": "BGColorRect",
             "type": "ColorRect",
             "components": [
                 {

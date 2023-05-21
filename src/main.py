@@ -11,7 +11,7 @@ class Main(Node2D):
 
     def _start(self) -> None:
         max_game_width = 9999.0
-        bg_color_rect: ColorRect = self.get_child("ColorRect")
+        bg_color_rect: ColorRect = self.get_child("BGColorRect")
         bg_color_rect.size = Size2D(max_game_width, bg_color_rect.size.h)
         bridge_ground: Sprite = self.get_child("BridgeGround")
         bridge_ground_draw_source = bridge_ground.draw_source
