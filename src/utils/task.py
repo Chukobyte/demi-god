@@ -58,50 +58,29 @@ class Task:
 
 class TaskManager:
     def __init__(self, tasks: Optional[List[Task]] = None):
-        self.tasks = []
-        if tasks:
-            for task in tasks:
-                self.add_task(task)
+        if not tasks:
+            tasks = []
+        self.tasks: List[Task] = tasks
 
     def add_task(self, task: Task) -> None:
         self.tasks.append(task)
 
     def remove_task(self, task: Task) -> None:
-        if task.parent_task:
-            task.close()
-            try:
-                # Swap subtask with parent
-                task_index = self.tasks.index(task)
-                self.tasks[task_index] = task.parent_task
-            except ValueError as e:
-                print(f"Task manager remove task error!\nValue error: {e}")
-        else:
+        try:
             self.tasks.remove(task)
+        except ValueError as e:
+            pass
 
     def update(self) -> None:
-        for i, task in enumerate(self.tasks[:]):
-            if task.valid:
-                try:
-                    task_return_value = task.coroutine.send(None)
-                    if issubclass(type(task_return_value), Awaitable):
-                        if task_return_value.state == Awaitable.State.FINISHED:
-                            raise StopIteration
-                    elif issubclass(type(task_return_value), Task):
-                        # Swap subtask in place
-                        task_return_value.parent_task = task
-                        self.tasks[i] = task_return_value
-                except StopIteration:
-                    if self.tasks:
-                        self.remove_task(task)
+        for task in self.tasks[:]:
+            task.resume()
+            if not task.valid:
+                self.remove_task(task)
 
     def kill_tasks(self) -> None:
         for task in self.tasks[:]:
             if task.valid:
                 task.close()
-            parent_task = task.parent_task
-            while parent_task:
-                parent_task.close()
-                parent_task = parent_task.parent_task
         self.tasks.clear()
 
     def get_task_amount(self) -> int:
