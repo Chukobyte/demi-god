@@ -1,8 +1,8 @@
 shader_type sprite;
 
 uniform float flash_amount = 0.0f;
-uniform float split_min = -1.0;
-uniform float split_max = -1.0;
+uniform float split_min = -1.0f;
+uniform float split_max = -1.0f;
 
 void fragment() {
     if (UV.y > split_min && UV.y < split_max) {

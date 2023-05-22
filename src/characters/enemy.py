@@ -148,8 +148,8 @@ class Enemy(Node2D):
         split = MinMax(0.6, 0.6)
 
         def increment_split():
-            split.min -= 0.025
-            split.max += 0.025
+            split.min -= 0.05
+            split.max += 0.05
             shader_instance.set_float_param("split_min", split.min)
             shader_instance.set_float_param("split_max", split.max)
 
