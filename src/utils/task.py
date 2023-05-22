@@ -21,8 +21,8 @@ class Task:
         self.coroutine = coroutine
         self.on_close_subscribers = []
         self.valid = True
-        self.current_task = self
-        self.parent_task = None
+        self.current_task: "Task" = self
+        self.parent_task: Optional["Task"] = None
 
     def __await__(self):
         yield self
@@ -41,6 +41,7 @@ class Task:
             except StopIteration:
                 if self.current_task.parent_task:
                     self.current_task = self.current_task.parent_task
+                    self.current_task.resume()
                 else:
                     self.valid = False
 
@@ -155,7 +156,6 @@ async def co_wait_seconds(
             if delta >= _seconds:
                 break
             await co_suspend()
-        await co_suspend()
 
     await Task(co_wait_seconds_internal(seconds, time_func, ignore_time_dilation))
 

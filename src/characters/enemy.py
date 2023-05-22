@@ -1,7 +1,7 @@
 from crescent_api import *
 
 from src.level_state import LevelState
-from src.utils.task import Task, co_suspend, co_wait_seconds
+from src.utils.task import Task, co_suspend, co_wait_seconds, co_wait_until
 
 
 class EnemyAttack(Node2D):
@@ -132,7 +132,7 @@ class Enemy(Node2D):
                 )
                 for i in range(2):
                     self.position += knock_back_velocity
-                    await co_suspend()
+                    await co_wait_until(lambda: World.get_time_dilation() > 0.0)
             shader_instance = self.anim_sprite.shader_instance
             shader_instance.set_float_param("flash_amount", 0.75)
             await co_suspend()
@@ -157,6 +157,6 @@ class Enemy(Node2D):
             # Split enemy in half
             for i in range(50):
                 increment_split()
-                await co_suspend()
+                await co_wait_until(lambda: World.get_time_dilation() > 0.0)
         except GeneratorExit:
             pass
