@@ -145,6 +145,60 @@
             "children": []
         },
         {
+            "name": "ScoreLabel",
+            "type": "TextLabel",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 25.0,
+                        "y": 139.0
+                    },
+                    "z_index": 11,
+                    "ignore_camera": true
+                },
+                {
+                    "type": "text_label",
+                    "uid": "gameboy-8",
+                    "text": "0",
+                    "color": {
+                        "r": 2,
+                        "g": 3,
+                        "b": 2,
+                        "a": 255
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "TimeLabel",
+            "type": "TextLabel",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 105.0,
+                        "y": 139.0
+                    },
+                    "z_index": 11,
+                    "ignore_camera": true
+                },
+                {
+                    "type": "text_label",
+                    "uid": "gameboy-8",
+                    "text": "00:00",
+                    "color": {
+                        "r": 2,
+                        "g": 3,
+                        "b": 2,
+                        "a": 255
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
             "name": "Parallax",
             "type": "Parallax",
             "components": [

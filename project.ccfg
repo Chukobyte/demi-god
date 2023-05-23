@@ -221,7 +221,13 @@
                 "nearest_neighbor": true
             }
         ],
-        "fonts": []
+        "fonts": [
+            {
+                "file_path": "assets/fonts/gameboy.ttf",
+                "uid": "gameboy-8",
+                "size": 8
+            }
+        ]
     },
     "inputs": [
         {
