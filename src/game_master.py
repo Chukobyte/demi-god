@@ -29,7 +29,7 @@ class GameMaster:
             LevelState.reset_instance()
 
             # Shoot down player beam first
-            # await Task(coroutine=level_area_manager.beam_player_down(player_start_pos))
+            await Task(coroutine=level_area_manager.beam_player_down(player_start_pos))
 
             main_theme_audio_source = AudioManager.get_audio_source(
                 "assets/audio/music/main_theme.wav"

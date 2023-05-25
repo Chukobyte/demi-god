@@ -197,11 +197,6 @@ class Player(Node2D):
         # Start with 0 energy
         self.stats.energy = 0
         self.power_up_description = PlayerPowerUpDescription()
-        temp_power_up = AttackPowerUp.new()
-        temp_power_up.position = self.position + Vector2(20, 0)
-        temp_power_up.z_index = self.z_index + 1
-        SceneTree.get_root().add_child(temp_power_up)
-        # self.power_up_description.show_description(temp_power_up)
 
     @staticmethod
     def find_player() -> Optional["Player"]:
@@ -256,6 +251,8 @@ class Player(Node2D):
     def _collect_power_up(self, power_up: PowerUp) -> None:
         self.power_up_description.hide_description()
         power_up.queue_deletion()
+        current_gate = LevelState().bridge_gate_helper.get_current_bridge_gate()
+        current_gate.set_opened()
 
     def _are_enemies_attached(self) -> bool:
         return (

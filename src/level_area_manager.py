@@ -7,6 +7,7 @@ from src.environment.bridge_gate import BridgeGate
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
+from src.power_ups import AttackPowerUp
 from src.utils.game_math import Easer, Ease
 from src.utils.task import co_suspend, co_wait_seconds, Task
 from src.utils.timer import Timer
@@ -205,20 +206,19 @@ class LevelAreaManager:
             Camera2D.set_boundary(level_state.boundary)
             Camera2D.follow_node(player)
 
-            # Temp testing pass through
-            if next_level_area.area_type == LevelAreaType.POWER_UP:
-                if next_bridge_gate:
-                    next_bridge_gate.set_opened()
-                prev_bridge_gate = (
-                    level_state.bridge_gate_helper.get_previous_bridge_gate()
-                )
-                prev_bridge_gate.set_closed()
-            else:
-                level_state.bridge_gate_helper.close_gates()
+            level_state.bridge_gate_helper.close_gates()
 
             level_state.is_currently_transitioning_within_level = False
+            if next_level_area.area_type == LevelAreaType.POWER_UP:
+                # TODO: Thinking of spawning 3 random power ups, only doing one for now...
+                attack_power_up = AttackPowerUp.new()
+                attack_power_up.position = Vector2(
+                    level_state.boundary.w - 80, level_state.floor_y
+                )
+                attack_power_up.z_index = 10
+                SceneTree.get_root().add_child(attack_power_up)
             # Temp wandering soul spawn
-            if next_level_area.area_type == LevelAreaType.END:
+            elif next_level_area.area_type == LevelAreaType.END:
                 wandering_soul = WanderingSoul.new()
                 wandering_soul.position = Vector2(
                     level_state.boundary.w - 32, level_state.floor_y
