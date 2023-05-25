@@ -4,6 +4,7 @@ from src.characters.enemy import Enemy, EnemyAttack
 from src.characters.wandering_soul import WanderingSoul
 from src.environment.bridge_gate import BridgeGate
 from src.level_state import LevelState
+from src.power_ups import PowerUp, AttackPowerUp
 from src.utils.game_math import map_to_range, clamp
 from src.utils.task import *
 from src.utils.timer import Timer
@@ -70,6 +71,33 @@ class PlayerStance:
     STANDING = "standing"
     CROUCHING = "crouching"
     IN_AIR = "in_air"
+
+
+class PlayerPowerUpDescription:
+    def __init__(self):
+        self.window_bg: ColorRect = (
+            SceneTree.get_root().get_child("BottomUI").get_child("TextWindow")
+        )
+        self.text_label: TextLabel = self.window_bg.get_child("WindowText")
+        window_color = self.window_bg.color
+        self.show_color = Color(window_color.r, window_color.g, window_color.b)
+        self.hide_color = window_color
+        self.power_up_shown: Optional[PowerUp] = None
+
+    def show_description(self, power_up: PowerUp) -> None:
+        if not self.power_up_shown:
+            self.window_bg.color = self.show_color
+            self.text_label.text = power_up.description
+            self.power_up_shown = power_up
+
+    def hide_description(self) -> None:
+        if self.power_up_shown:
+            self.window_bg.color = self.hide_color
+            self.text_label.text = ""
+            self.power_up_shown = None
+
+    def get_hovered_power_up(self) -> Optional[PowerUp]:
+        return self.power_up_shown
 
 
 class PlayerStats:
@@ -159,6 +187,7 @@ class Player(Node2D):
             "assets/audio/sfx/attack_slash.wav"
         )
         self._current_animation_name = ""  # TODO: Add function to engine instead
+        self.power_up_description: Optional[PlayerPowerUpDescription] = None
 
     def _start(self) -> None:
         self.anim_sprite = self.get_child("AnimatedSprite")
@@ -167,6 +196,12 @@ class Player(Node2D):
         Camera2D.follow_node(self)
         # Start with 0 energy
         self.stats.energy = 0
+        self.power_up_description = PlayerPowerUpDescription()
+        temp_power_up = AttackPowerUp.new()
+        temp_power_up.position = self.position + Vector2(20, 0)
+        temp_power_up.z_index = self.z_index + 1
+        SceneTree.get_root().add_child(temp_power_up)
+        # self.power_up_description.show_description(temp_power_up)
 
     @staticmethod
     def find_player() -> Optional["Player"]:
@@ -185,7 +220,11 @@ class Player(Node2D):
 
         if not self._are_enemies_attached() and not level_state.is_game_state_paused():
             if Input.is_action_just_pressed("attack"):
-                self.attack_requested = True
+                hovered_power_up = self.power_up_description.get_hovered_power_up()
+                if hovered_power_up:
+                    self._collect_power_up(hovered_power_up)
+                else:
+                    self.attack_requested = True
             elif Input.is_action_just_pressed("special"):
                 if self.is_transformed:
                     self.is_transformed = False
@@ -213,6 +252,10 @@ class Player(Node2D):
             self.anim_sprite.play(f"{anim_name}_t")
         else:
             self.anim_sprite.play(anim_name)
+
+    def _collect_power_up(self, power_up: PowerUp) -> None:
+        self.power_up_description.hide_description()
+        power_up.queue_deletion()
 
     def _are_enemies_attached(self) -> bool:
         return (
@@ -276,7 +319,7 @@ class Player(Node2D):
     # --- TASKS --- #
     async def _physics_update_task(self):
         level_state = LevelState()
-        take_damage_task = Task(coroutine=self._damage_check_task())
+        collision_task = Task(coroutine=self._collision_check_task())
         prev_stance = None
         current_stance_task: Optional[Task] = None
 
@@ -292,7 +335,7 @@ class Player(Node2D):
         try:
             while True:
                 # Run take damage (collision) task first
-                take_damage_task.resume()
+                collision_task.resume()
                 # Transformation task
                 if self.transformation_task:
                     self.transformation_task.resume()
@@ -356,13 +399,14 @@ class Player(Node2D):
         except GeneratorExit:
             pass
 
-    async def _damage_check_task(self):
+    async def _collision_check_task(self):
         try:
             damage_cooldown_task: Optional[Task] = None
             attached_damage_cooldown_task: Optional[Task] = None
             level_state = LevelState()
             while True:
                 collisions = CollisionHandler.process_collisions(self.collider)
+                show_power_up_description = False
                 for collider in collisions:
                     collider_parent = collider.get_parent()
                     collider_parent_type = type(collider_parent)
@@ -419,6 +463,10 @@ class Player(Node2D):
                         damage_cooldown_task = Task(
                             coroutine=self._damage_cooldown_task(1.0)
                         )
+                    # Power Up
+                    elif issubclass(collider_parent_type, PowerUp):
+                        self.power_up_description.show_description(collider_parent)
+                        show_power_up_description = True
                     # Temp level finish
                     elif issubclass(collider_parent_type, WanderingSoul):
                         SceneTree.change_scene("scenes/title_screen.cscn")
@@ -464,6 +512,8 @@ class Player(Node2D):
                         if attached_damage_cooldown_task.valid:
                             attached_damage_cooldown_task.close()
                         attached_damage_cooldown_task = None
+                if not show_power_up_description:
+                    self.power_up_description.hide_description()
                 await co_suspend()
         except GeneratorExit:
             pass
