@@ -40,7 +40,8 @@ class LevelArea:
 
 class LevelAreaDefinitions:
     DEF_MAP = {
-        1: LevelArea(
+        1: LevelArea(area_type=LevelAreaType.POWER_UP, width=260),
+        2: LevelArea(
             area_type=LevelAreaType.NORMAL,
             width=896,
             sections=[
@@ -67,39 +68,39 @@ class LevelAreaDefinitions:
                 ),
             ],
         ),
-        2: LevelArea(area_type=LevelAreaType.POWER_UP, width=160),
-        3: LevelArea(
-            area_type=LevelAreaType.NORMAL,
-            width=896,
-            sections=[
-                LevelSection(enemy_defs=[EnemyDefinition.RABBIT()]),
-                LevelSection(
-                    enemy_defs=[EnemyDefinition.RABBIT(), EnemyDefinition.JESTER()]
-                ),
-                LevelSection(
-                    enemy_defs=[EnemyDefinition.RABBIT(), EnemyDefinition.JESTER()]
-                ),
-                LevelSection(
-                    enemy_defs=[
-                        EnemyDefinition.RABBIT(),
-                        EnemyDefinition.JESTER(),
-                        EnemyDefinition.CROW(),
-                    ]
-                ),
-                LevelSection(
-                    enemy_defs=[
-                        EnemyDefinition.RABBIT(),
-                        EnemyDefinition.JESTER(),
-                        EnemyDefinition.CROW(),
-                    ]
-                ),
-            ],
-        ),
+        3: LevelArea(area_type=LevelAreaType.POWER_UP, width=160),
         4: LevelArea(
+            area_type=LevelAreaType.NORMAL,
+            width=896,
+            sections=[
+                LevelSection(enemy_defs=[EnemyDefinition.RABBIT()]),
+                LevelSection(
+                    enemy_defs=[EnemyDefinition.RABBIT(), EnemyDefinition.JESTER()]
+                ),
+                LevelSection(
+                    enemy_defs=[EnemyDefinition.RABBIT(), EnemyDefinition.JESTER()]
+                ),
+                LevelSection(
+                    enemy_defs=[
+                        EnemyDefinition.RABBIT(),
+                        EnemyDefinition.JESTER(),
+                        EnemyDefinition.CROW(),
+                    ]
+                ),
+                LevelSection(
+                    enemy_defs=[
+                        EnemyDefinition.RABBIT(),
+                        EnemyDefinition.JESTER(),
+                        EnemyDefinition.CROW(),
+                    ]
+                ),
+            ],
+        ),
+        5: LevelArea(
             area_type=LevelAreaType.BOSS,
             width=160,
         ),
-        5: LevelArea(area_type=LevelAreaType.END, width=160),
+        6: LevelArea(area_type=LevelAreaType.END, width=160),
     }
 
     @staticmethod

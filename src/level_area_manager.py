@@ -30,6 +30,23 @@ class LevelAreaManager:
         self._current_area = area
         self._has_processed_current_area_completion = False
 
+    def _setup_area_type(self, area: LevelArea, level_state: LevelState) -> None:
+        if area.area_type == LevelAreaType.POWER_UP:
+            attack_power_up = AttackPowerUp.new()
+            attack_power_up.position = Vector2(
+                level_state.boundary.w - 80, level_state.floor_y
+            )
+            attack_power_up.z_index = 10
+            SceneTree.get_root().add_child(attack_power_up)
+        # Temp wandering soul spawn
+        elif area.area_type == LevelAreaType.END:
+            wandering_soul = WanderingSoul.new()
+            wandering_soul.position = Vector2(
+                level_state.boundary.w - 32, level_state.floor_y
+            )
+            wandering_soul.z_index = 10
+            SceneTree.get_root().add_child(wandering_soul)
+
     # --- TASKS --- #
     async def manage_level_areas(self):
         try:
@@ -48,6 +65,8 @@ class LevelAreaManager:
             bridge_gate.position = Vector2(
                 level_state.boundary.w - 10, level_state.floor_y - 31
             )
+
+            self._setup_area_type(self._current_area, level_state)
 
             self._manage_enemy_area_task = Task(
                 coroutine=self.enemy_area_manager.manage_area(self._current_area)
@@ -209,22 +228,7 @@ class LevelAreaManager:
             level_state.bridge_gate_helper.close_gates()
 
             level_state.is_currently_transitioning_within_level = False
-            if next_level_area.area_type == LevelAreaType.POWER_UP:
-                # TODO: Thinking of spawning 3 random power ups, only doing one for now...
-                attack_power_up = AttackPowerUp.new()
-                attack_power_up.position = Vector2(
-                    level_state.boundary.w - 80, level_state.floor_y
-                )
-                attack_power_up.z_index = 10
-                SceneTree.get_root().add_child(attack_power_up)
-            # Temp wandering soul spawn
-            elif next_level_area.area_type == LevelAreaType.END:
-                wandering_soul = WanderingSoul.new()
-                wandering_soul.position = Vector2(
-                    level_state.boundary.w - 32, level_state.floor_y
-                )
-                wandering_soul.z_index = 10
-                SceneTree.get_root().add_child(wandering_soul)
+            self._setup_area_type(next_level_area, level_state)
 
             self._set_current_area(next_level_area)
             self._manage_enemy_area_task = Task(

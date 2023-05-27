@@ -424,7 +424,6 @@ class Player(Node2D):
                     if (
                         issubclass(collider_parent_type, Enemy)
                         and not self.enemy_collision_invincible
-                        and not self.in_attack_damage_cooldown
                         and not collider_parent.is_destroyed
                     ):
                         if collider_parent.can_attach_to_player:

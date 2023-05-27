@@ -22,6 +22,9 @@ class GameMaster:
         player_start_pos = Vector2(20, 78)
         level_area_manager = LevelAreaManager()
         try:
+            # Call update once to set initial area up
+            level_area_manager.update()
+
             # TODO: put in main.py
             await Task(coroutine=LevelState.fade_transition(time=1.0, fade_out=False))
 
