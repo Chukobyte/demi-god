@@ -466,6 +466,11 @@ class Player(Node2D):
                         show_power_up_description = True
                     # Temp level finish
                     elif issubclass(collider_parent_type, WanderingSoul):
+                        await Task(
+                            coroutine=LevelState.fade_transition(
+                                time=1.0, fade_out=True
+                            )
+                        )
                         SceneTree.change_scene("scenes/title_screen.cscn")
                         await co_return()
                         break

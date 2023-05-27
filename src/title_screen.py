@@ -20,12 +20,14 @@ class TitleScreen(Node2D):
         self.start_game_triggered = False
 
     def _start(self) -> None:
+        LevelState.reset_instance()
         level_state = LevelState()
         if not level_state.screen_shader_instance:
             level_state.screen_shader_instance = ShaderUtil.compile_shader(
                 shader_path="shaders/screen.shader"
             )
         ShaderUtil.set_screen_shader(shader_instance=level_state.screen_shader_instance)
+        level_state.screen_shader_instance.set_float_param("brightness", 0.0)
         self.title_sprite = self.get_child("Title")
         new_title_pos = self.title_sprite.position
         new_title_pos.y -= 100
@@ -53,6 +55,8 @@ class TitleScreen(Node2D):
     # --- TASKS --- #
     async def _update_task(self):
         try:
+            await Task(coroutine=LevelState.fade_transition(time=1.0, fade_out=False))
+
             time_for_title_to_move_to_pos = 5.0
             title_easer = Easer(
                 self.title_sprite.position,

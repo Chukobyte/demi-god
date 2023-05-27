@@ -25,9 +25,6 @@ class GameMaster:
             # TODO: put in main.py
             await Task(coroutine=LevelState.fade_transition(time=1.0, fade_out=False))
 
-            # TODO: Place in a place when the game ends instead
-            LevelState.reset_instance()
-
             # Shoot down player beam first
             await Task(coroutine=level_area_manager.beam_player_down(player_start_pos))
 
