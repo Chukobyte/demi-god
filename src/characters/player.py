@@ -368,11 +368,11 @@ class Player(Node2D):
             if self.stats.hp <= 0:
                 SceneTree.change_scene("scenes/title_screen.cscn")
 
+        normal_hp_bar_color = self.stats.health_bar_ui.color
         try:
             if gamepad_vibration:
                 Input.start_gamepad_vibration(0, 0.5, 0.5, 0.25)
             cooldown_timer = Timer(cooldown_time)
-            normal_hp_bar_color = self.stats.health_bar_ui.color
             has_subtracted_health = False
             self.stats.health_bar_ui.color = Color(240, 247, 243)
             if modulate_color:
@@ -394,7 +394,7 @@ class Player(Node2D):
                         subtract_hp_value(hp_damage, normal_hp_bar_color)
                     break
         except GeneratorExit:
-            pass
+            self.stats.health_bar_ui.color = normal_hp_bar_color
 
     async def _collision_check_task(self):
         try:
