@@ -23,3 +23,4 @@ class BridgeGate(Sprite):
     def set_closed(self) -> None:
         self.draw_source = Rect2(0, 0, self.size.w, self.size.h)
         self.is_opened = False
+        self.has_player_ever_stepped_through = False
