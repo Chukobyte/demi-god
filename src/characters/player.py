@@ -5,7 +5,7 @@ from src.characters.wandering_soul import WanderingSoul
 from src.environment.bridge_gate import BridgeGate
 from src.level_state import LevelState
 from src.power_ups import PowerUp, AttackPowerUp
-from src.utils.game_math import map_to_range, clamp
+from src.utils.game_math import map_to_range, clamp, Easer, Ease
 from src.utils.task import *
 from src.utils.timer import Timer
 
@@ -364,9 +364,6 @@ class Player(Node2D):
         def subtract_hp_value(damage: float, bar_color: Color) -> None:
             self.stats.hp -= damage
             self.stats.health_bar_ui.color = bar_color
-            # TODO: Have game over state
-            if self.stats.hp <= 0:
-                SceneTree.change_scene("scenes/title_screen.cscn")
 
         normal_hp_bar_color = self.stats.health_bar_ui.color
         try:
@@ -374,6 +371,7 @@ class Player(Node2D):
                 Input.start_gamepad_vibration(0, 0.5, 0.5, 0.25)
             cooldown_timer = Timer(cooldown_time)
             has_subtracted_health = False
+            is_game_over = False
             self.stats.health_bar_ui.color = Color(240, 247, 243)
             if modulate_color:
                 self.anim_sprite.modulate = Color(255, 255, 255, 100)
@@ -386,13 +384,26 @@ class Player(Node2D):
                     if not has_subtracted_health:
                         has_subtracted_health = True
                         subtract_hp_value(hp_damage, normal_hp_bar_color)
+                        if self.stats.hp <= 0.0:
+                            is_game_over = True
+                            break
                     await co_suspend()
                 else:
                     if modulate_color:
                         self.anim_sprite.modulate = Color(255, 255, 255, 255)
                     if not has_subtracted_health:
                         subtract_hp_value(hp_damage, normal_hp_bar_color)
+                        if self.stats.hp <= 0.0:
+                            is_game_over = True
                     break
+            if is_game_over:
+                World.set_time_dilation(0.0)
+                await Task(coroutine=self._beam_player_up())
+                await Task(
+                    coroutine=LevelState.fade_transition(time=1.0, fade_out=True)
+                )
+                SceneTree.change_scene("scenes/title_screen.cscn")
+                World.set_time_dilation(1.0)
         except GeneratorExit:
             self.stats.health_bar_ui.color = normal_hp_bar_color
 
@@ -482,8 +493,6 @@ class Player(Node2D):
                         ):
                             bridge_gate.has_player_ever_stepped_through = True
                             level_state.queue_gate_transition()
-                            # SceneTree.change_scene("scenes/title_screen.cscn")
-                            # await co_return()
                             break
                 if damage_cooldown_task:
                     if damage_cooldown_task.valid:
@@ -712,3 +721,56 @@ class Player(Node2D):
         except GeneratorExit:
             if attack_task:
                 attack_task.close()
+
+    async def _beam_player_up(self):
+        try:
+            player_initial_pos = self.position + Vector2(0, -8)
+            player_dest_pos = Vector2(player_initial_pos.x, -20)
+            player_teleport_beam: Sprite = Sprite.new()
+            player_teleport_beam.position = player_initial_pos
+            player_teleport_beam.texture = Texture(
+                file_path="assets/images/demi/demi_teleport.png"
+            )
+            player_teleport_beam.draw_source = Rect2(48, 0, 48, 48)
+            player_teleport_beam.origin = Vector2(25, 18)
+            player_teleport_beam.z_index = 10
+            SceneTree.get_root().add_child(player_teleport_beam)
+            player_beam_timer = Timer(3.0)
+            player_beam_easer = Easer(
+                player_initial_pos,
+                player_dest_pos,
+                player_beam_timer.time,
+                Ease.Cubic.ease_in_vec2,
+            )
+
+            self.anim_sprite.modulate = Color(255, 255, 255, 0)
+
+            # Hard code animation that delays 2 frames each
+            player_teleport_beam.draw_source = Rect2(0, 0, 48, 48)
+            await co_suspend()
+            await co_suspend()
+            player_teleport_beam.draw_source = Rect2(48, 0, 48, 48)
+            await co_suspend()
+            await co_suspend()
+            player_teleport_beam.draw_source = Rect2(0, 0, 48, 48)
+            await co_suspend()
+            await co_suspend()
+            player_teleport_beam.draw_source = Rect2(48, 0, 48, 48)
+            await co_suspend()
+            await co_suspend()
+            player_teleport_beam.draw_source = Rect2(0, 0, 48, 48)
+            await co_suspend()
+            await co_suspend()
+
+            while True:
+                delta_time = Engine.get_global_physics_delta_time()
+                player_beam_timer.tick(delta_time)
+                if player_beam_timer.time_remaining > 0.0:
+                    new_beam_pos = player_beam_easer.ease(delta_time)
+                    player_teleport_beam.position = new_beam_pos
+                    await co_suspend()
+                else:
+                    player_teleport_beam.queue_deletion()
+                    break
+        except GeneratorExit:
+            pass
