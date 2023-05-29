@@ -7,7 +7,7 @@ from src.environment.bridge_gate import BridgeGate
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
-from src.power_ups import AttackPowerUp
+from src.items import AttackItem
 from src.utils.game_math import Easer, Ease
 from src.utils.task import co_suspend, co_wait_seconds, Task
 from src.utils.timer import Timer
@@ -32,12 +32,12 @@ class LevelAreaManager:
 
     def _setup_area_type(self, area: LevelArea, level_state: LevelState) -> None:
         if area.area_type == LevelAreaType.POWER_UP:
-            attack_power_up = AttackPowerUp.new()
-            attack_power_up.position = Vector2(
+            attack_item = AttackItem.new()
+            attack_item.position = Vector2(
                 level_state.boundary.w - 80, level_state.floor_y
             )
-            attack_power_up.z_index = 10
-            SceneTree.get_root().add_child(attack_power_up)
+            attack_item.z_index = 10
+            SceneTree.get_root().add_child(attack_item)
         # Temp wandering soul spawn
         elif area.area_type == LevelAreaType.END:
             wandering_soul = WanderingSoul.new()

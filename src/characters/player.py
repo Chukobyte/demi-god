@@ -4,7 +4,7 @@ from src.characters.enemy import Enemy, EnemyAttack
 from src.characters.wandering_soul import WanderingSoul
 from src.environment.bridge_gate import BridgeGate
 from src.level_state import LevelState
-from src.power_ups import PowerUp, AttackPowerUp
+from src.items import Item, AttackItem, HealthRestoreItem
 from src.utils.game_math import map_to_range, clamp, Easer, Ease
 from src.utils.task import *
 from src.utils.timer import Timer
@@ -73,7 +73,7 @@ class PlayerStance:
     IN_AIR = "in_air"
 
 
-class PlayerPowerUpDescription:
+class PlayerItemDescription:
     def __init__(self):
         self.window_bg: ColorRect = (
             SceneTree.get_root().get_child("BottomUI").get_child("TextWindow")
@@ -82,22 +82,22 @@ class PlayerPowerUpDescription:
         window_color = self.window_bg.color
         self.show_color = Color(window_color.r, window_color.g, window_color.b)
         self.hide_color = window_color
-        self.power_up_shown: Optional[PowerUp] = None
+        self.item_shown: Optional[Item] = None
 
-    def show_description(self, power_up: PowerUp) -> None:
-        if not self.power_up_shown:
+    def show_description(self, item: Item) -> None:
+        if not self.item_shown:
             self.window_bg.color = self.show_color
-            self.text_label.text = power_up.description
-            self.power_up_shown = power_up
+            self.text_label.text = item.description
+            self.item_shown = item
 
     def hide_description(self) -> None:
-        if self.power_up_shown:
+        if self.item_shown:
             self.window_bg.color = self.hide_color
             self.text_label.text = ""
-            self.power_up_shown = None
+            self.item_shown = None
 
-    def get_hovered_power_up(self) -> Optional[PowerUp]:
-        return self.power_up_shown
+    def get_hovered_item(self) -> Optional[Item]:
+        return self.item_shown
 
 
 class PlayerStats:
@@ -187,7 +187,7 @@ class Player(Node2D):
             "assets/audio/sfx/attack_slash.wav"
         )
         self._current_animation_name = ""  # TODO: Add function to engine instead
-        self.power_up_description: Optional[PlayerPowerUpDescription] = None
+        self.item_description: Optional[PlayerItemDescription] = None
 
     def _start(self) -> None:
         self.anim_sprite = self.get_child("AnimatedSprite")
@@ -196,7 +196,7 @@ class Player(Node2D):
         Camera2D.follow_node(self)
         # Start with 0 energy
         self.stats.energy = 0
-        self.power_up_description = PlayerPowerUpDescription()
+        self.item_description = PlayerItemDescription()
 
     @staticmethod
     def find_player() -> Optional["Player"]:
@@ -215,9 +215,9 @@ class Player(Node2D):
 
         if not self._are_enemies_attached() and not level_state.is_game_state_paused():
             if Input.is_action_just_pressed("attack"):
-                hovered_power_up = self.power_up_description.get_hovered_power_up()
-                if hovered_power_up:
-                    self._collect_power_up(hovered_power_up)
+                hovered_item = self.item_description.get_hovered_item()
+                if hovered_item:
+                    self._collect_item(hovered_item)
                 else:
                     self.attack_requested = True
             elif Input.is_action_just_pressed("special"):
@@ -248,9 +248,13 @@ class Player(Node2D):
         else:
             self.anim_sprite.play(anim_name)
 
-    def _collect_power_up(self, power_up: PowerUp) -> None:
-        self.power_up_description.hide_description()
-        power_up.queue_deletion()
+    def _collect_item(self, item: Item) -> None:
+        self.item_description.hide_description()
+        item.queue_deletion()
+        # Item specific
+        if isinstance(item, HealthRestoreItem):
+            health_item: HealthRestoreItem = item
+            self.stats.hp += health_item.restore_amount
         current_gate = LevelState().bridge_gate_helper.get_current_bridge_gate()
         current_gate.set_opened()
 
@@ -414,7 +418,7 @@ class Player(Node2D):
             level_state = LevelState()
             while True:
                 collisions = CollisionHandler.process_collisions(self.collider)
-                show_power_up_description = False
+                show_item_description = False
                 for collider in collisions:
                     collider_parent = collider.get_parent()
                     collider_parent_type = type(collider_parent)
@@ -471,9 +475,9 @@ class Player(Node2D):
                             coroutine=self._damage_cooldown_task(1.0)
                         )
                     # Power Up
-                    elif issubclass(collider_parent_type, PowerUp):
-                        self.power_up_description.show_description(collider_parent)
-                        show_power_up_description = True
+                    elif issubclass(collider_parent_type, Item):
+                        self.item_description.show_description(collider_parent)
+                        show_item_description = True
                     # Temp level finish
                     elif issubclass(collider_parent_type, WanderingSoul):
                         await Task(
@@ -522,8 +526,8 @@ class Player(Node2D):
                         if attached_damage_cooldown_task.valid:
                             attached_damage_cooldown_task.close()
                         attached_damage_cooldown_task = None
-                if not show_power_up_description:
-                    self.power_up_description.hide_description()
+                if not show_item_description:
+                    self.item_description.hide_description()
                 await co_suspend()
         except GeneratorExit:
             pass
