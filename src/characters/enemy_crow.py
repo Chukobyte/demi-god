@@ -36,9 +36,6 @@ class EnemyCrow(Enemy):
 
     # --- TASKS --- #
     async def _physics_update_task(self) -> None:
-        def determine_state() -> str:
-            return EnemyCrowState.HOVERING
-
         try:
             prev_state = None
             state_task: Optional[Task] = None
@@ -64,7 +61,7 @@ class EnemyCrow(Enemy):
     async def _hovering_state_task(self) -> None:
         try:
             self.anim_sprite.play(name="fly")
-            swoop_timer = Timer(6.0)
+            swoop_timer = Timer(random.uniform(5.0, 8.0))
             player_dir_update_timer = Timer(random.uniform(2.0, 4.0))
             player_dir = self.position.direction_to(self.player.position)
             while True:

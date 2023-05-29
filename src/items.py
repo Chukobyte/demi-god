@@ -33,7 +33,7 @@ class HealthRestoreItem(Item):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.description = "Restores health"
-        self.restore_amount = 2
+        self.restore_amount = 5
 
     def _start(self):
         size = Size2D(8, 8)
