@@ -51,7 +51,7 @@ class LevelArea:
 class LevelAreaDefinitions:
     DEF_MAP = {
         1: LevelArea(
-            area_type=LevelAreaType.POWER_UP, width=260, item_types=[SignItem]
+            area_type=LevelAreaType.POWER_UP, width=260, item_types=[AttackItem]
         ),
         2: LevelArea(
             area_type=LevelAreaType.NORMAL,
