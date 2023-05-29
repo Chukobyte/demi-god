@@ -1,7 +1,7 @@
 from typing import Optional, List, Type
 
 from src.characters.enemy_definitions import EnemyDefinition
-from src.items import AttackItem, HealthRestoreItem
+from src.items import AttackItem, HealthRestoreItem, SignItem
 
 
 class LevelAreaType:
@@ -51,7 +51,7 @@ class LevelArea:
 class LevelAreaDefinitions:
     DEF_MAP = {
         1: LevelArea(
-            area_type=LevelAreaType.POWER_UP, width=260, item_types=[AttackItem]
+            area_type=LevelAreaType.POWER_UP, width=260, item_types=[SignItem]
         ),
         2: LevelArea(
             area_type=LevelAreaType.NORMAL,

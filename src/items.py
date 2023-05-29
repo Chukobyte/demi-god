@@ -9,6 +9,27 @@ class Item(Node2D):
         self.color_rect: Optional[ColorRect] = None
         self.collider: Optional[Collider2D] = None
         self.description: Optional[str] = None
+        self.can_be_collected = True
+
+
+class SignItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.description = "Help the souls!"
+        self.can_be_collected = False
+
+    def _start(self):
+        size = Size2D(8, 8)
+        # Color Rect
+        self.color_rect = ColorRect.new()
+        self.color_rect.size = size
+        self.color_rect.color = Color.RED()
+        self.add_child(self.color_rect)
+        # Collider
+        self.collider = Collider2D.new()
+        self.collider.extents = size
+        self.add_child(self.collider)
+        self.z_index = 2
 
 
 class AttackItem(Item):
@@ -50,9 +71,13 @@ class HealthRestoreItem(Item):
 
 class ItemUtils:
     @staticmethod
-    def get_item_from_type(item_type: Type) -> AttackItem | HealthRestoreItem | None:
+    def get_item_from_type(
+        item_type: Type,
+    ) -> AttackItem | HealthRestoreItem | SignItem | None:
         if issubclass(item_type, AttackItem):
             return AttackItem.new()
         elif issubclass(item_type, HealthRestoreItem):
             return HealthRestoreItem.new()
+        elif issubclass(item_type, SignItem):
+            return SignItem.new()
         return None

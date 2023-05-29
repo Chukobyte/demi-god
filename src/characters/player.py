@@ -249,14 +249,15 @@ class Player(Node2D):
             self.anim_sprite.play(anim_name)
 
     def _collect_item(self, item) -> None:
-        self.item_description.hide_description()
-        item.queue_deletion()
-        # Item specific
-        if issubclass(type(item), HealthRestoreItem):
-            health_item: HealthRestoreItem = item
-            self.stats.hp += health_item.restore_amount
-        current_gate = LevelState().bridge_gate_helper.get_current_bridge_gate()
-        current_gate.set_opened()
+        if item.can_be_collected:
+            self.item_description.hide_description()
+            item.queue_deletion()
+            # Item specific
+            if issubclass(type(item), HealthRestoreItem):
+                health_item: HealthRestoreItem = item
+                self.stats.hp += health_item.restore_amount
+            current_gate = LevelState().bridge_gate_helper.get_current_bridge_gate()
+            current_gate.set_opened()
 
     def _are_enemies_attached(self) -> bool:
         return (
@@ -314,6 +315,8 @@ class Player(Node2D):
             )
             melee_attack.position = attack_pos
             melee_attack.z_index = attack_z_index
+            if self.is_transformed:
+                melee_attack.damage += 1
             SceneTree.get_root().add_child(melee_attack)
         AudioManager.play_sound(source=self.attack_slash_audio_source)
 
