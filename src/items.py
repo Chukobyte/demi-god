@@ -1,3 +1,5 @@
+from typing import Type
+
 from crescent_api import *
 
 
@@ -30,7 +32,7 @@ class AttackItem(Item):
 class HealthRestoreItem(Item):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self.description = "Add to attack"
+        self.description = "Restores health"
         self.restore_amount = 2
 
     def _start(self):
@@ -44,3 +46,13 @@ class HealthRestoreItem(Item):
         self.collider = Collider2D.new()
         self.collider.extents = size
         self.add_child(self.collider)
+
+
+class ItemUtils:
+    @staticmethod
+    def get_item_from_type(item_type: Type) -> AttackItem | HealthRestoreItem | None:
+        if issubclass(item_type, AttackItem):
+            return AttackItem.new()
+        elif issubclass(item_type, HealthRestoreItem):
+            return HealthRestoreItem.new()
+        return None

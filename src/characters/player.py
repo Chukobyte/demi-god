@@ -248,11 +248,11 @@ class Player(Node2D):
         else:
             self.anim_sprite.play(anim_name)
 
-    def _collect_item(self, item: Item) -> None:
+    def _collect_item(self, item) -> None:
         self.item_description.hide_description()
         item.queue_deletion()
         # Item specific
-        if isinstance(item, HealthRestoreItem):
+        if issubclass(type(item), HealthRestoreItem):
             health_item: HealthRestoreItem = item
             self.stats.hp += health_item.restore_amount
         current_gate = LevelState().bridge_gate_helper.get_current_bridge_gate()

@@ -1,6 +1,7 @@
-from typing import Optional, List
+from typing import Optional, List, Type
 
 from src.characters.enemy_definitions import EnemyDefinition
+from src.items import AttackItem, HealthRestoreItem
 
 
 class LevelAreaType:
@@ -21,7 +22,13 @@ class LevelArea:
     Area in a level separated by gates.  Can contain sections.
     """
 
-    def __init__(self, area_type: str, width: int, sections: List[LevelSection] = None):
+    def __init__(
+        self,
+        area_type: str,
+        width: int,
+        sections: List[LevelSection] = None,
+        item_types: List[Type] = None,
+    ):
         self.area_type = area_type
         self.width = width
         if not sections:
@@ -29,6 +36,9 @@ class LevelArea:
         self.sections = sections
         for i, section in enumerate(sections):
             section.index = i
+        if not item_types:
+            item_types = []
+        self.item_types = item_types
         self.is_completed = False
 
     def is_section_last(self, section: LevelSection) -> bool:
@@ -40,7 +50,9 @@ class LevelArea:
 
 class LevelAreaDefinitions:
     DEF_MAP = {
-        1: LevelArea(area_type=LevelAreaType.POWER_UP, width=260),
+        1: LevelArea(
+            area_type=LevelAreaType.POWER_UP, width=260, item_types=[AttackItem]
+        ),
         2: LevelArea(
             area_type=LevelAreaType.NORMAL,
             width=896,
@@ -68,7 +80,9 @@ class LevelAreaDefinitions:
                 ),
             ],
         ),
-        3: LevelArea(area_type=LevelAreaType.POWER_UP, width=160),
+        3: LevelArea(
+            area_type=LevelAreaType.POWER_UP, width=160, item_types=[HealthRestoreItem]
+        ),
         4: LevelArea(
             area_type=LevelAreaType.NORMAL,
             width=896,

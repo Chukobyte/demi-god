@@ -7,7 +7,7 @@ from src.environment.bridge_gate import BridgeGate
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
-from src.items import AttackItem
+from src.items import AttackItem, ItemUtils
 from src.utils.game_math import Easer, Ease
 from src.utils.task import co_suspend, co_wait_seconds, Task
 from src.utils.timer import Timer
@@ -32,7 +32,8 @@ class LevelAreaManager:
 
     def _setup_area_type(self, area: LevelArea, level_state: LevelState) -> None:
         if area.area_type == LevelAreaType.POWER_UP:
-            attack_item = AttackItem.new()
+            item_type = area.item_types[0]
+            attack_item = ItemUtils.get_item_from_type(item_type)
             attack_item.position = Vector2(
                 level_state.boundary.w - 80, level_state.floor_y
             )
