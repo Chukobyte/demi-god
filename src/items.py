@@ -7,6 +7,7 @@ class Item(Node2D):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.color_rect: Optional[ColorRect] = None
+        self.sprite: Optional[Sprite] = None
         self.collider: Optional[Collider2D] = None
         self.description: Optional[str] = None
         self.can_be_collected = True
@@ -57,16 +58,18 @@ class HealthRestoreItem(Item):
         self.restore_amount = 5
 
     def _start(self):
-        size = Size2D(8, 8)
-        # Color Rect
-        self.color_rect = ColorRect.new()
-        self.color_rect.size = size
-        self.color_rect.color = Color.RED()
-        self.add_child(self.color_rect)
+        size = Size2D(16, 16)
+        # Sprite
+        self.sprite = Sprite.new()
+        self.sprite.texture = Texture("assets/images/items/item_heart.png")
+        self.sprite.draw_source = Rect2(0, 0, 16, 16)
+        self.add_child(self.sprite)
         # Collider
         self.collider = Collider2D.new()
         self.collider.extents = size
         self.add_child(self.collider)
+
+        self.position += Vector2(0, -4)
 
 
 class ItemUtils:
