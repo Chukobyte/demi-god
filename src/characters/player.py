@@ -584,6 +584,7 @@ class Player(Node2D):
 
     async def _transformation_task(self):
         try:
+            level_state = LevelState()
             transformation_tick_rate = 0.25
             energy_drain_per_tick = 1
             # Update animation to transformed
@@ -591,10 +592,11 @@ class Player(Node2D):
             times_ticked = 0
             while True:
                 await co_wait_seconds(transformation_tick_rate)
-                self.stats.energy -= energy_drain_per_tick
-                times_ticked += 1
-                if times_ticked == 2:
-                    self.can_untransform = True
+                if not level_state.is_currently_transitioning_within_level:
+                    self.stats.energy -= energy_drain_per_tick
+                    times_ticked += 1
+                    if times_ticked == 2:
+                        self.can_untransform = True
                 await co_suspend()
         except GeneratorExit:
             self.play_animation(self._current_animation_name)
@@ -703,6 +705,8 @@ class Player(Node2D):
             jump_time = 0.5
             ascend_timer = Timer(jump_time)
             max_ascend_timer_skips = 2
+            if self.is_transformed:
+                max_ascend_timer_skips += 2
             ascent_timer_skips = 0
             is_ascending = True
             while True:
