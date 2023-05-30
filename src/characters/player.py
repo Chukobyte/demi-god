@@ -101,11 +101,13 @@ class PlayerItemDescription:
 
 
 class PlayerStats:
-    def __init__(self, base_hp=0.0, base_energy=0.0):
+    def __init__(self, base_hp=0.0, base_energy=0.0, base_move_speed=0):
         self._hp = base_hp
         self._base_hp = base_hp
         self._energy = base_energy
         self._base_energy = base_energy
+        self._move_speed = base_move_speed
+        self._base_move_speed = base_move_speed
         self.health_bar_ui: Optional[ColorRect] = None
         self.energy_bar_ui: Optional[ColorRect] = None
         self.base_health_bar_ui_size = Size2D(52, 9)
@@ -140,6 +142,14 @@ class PlayerStats:
     def energy(self, value: float) -> None:
         self.set_energy(value)
 
+    @property
+    def move_speed(self) -> int:
+        return self._move_speed
+
+    @move_speed.setter
+    def move_speed(self, value: int) -> None:
+        self._move_speed = value
+
     def set_hp(self, hp: float) -> None:
         self._hp = clamp(hp, 0.0, self._base_hp)
         new_hp_bar_width = map_to_range(
@@ -162,6 +172,9 @@ class PlayerStats:
             new_energy_bar_width, self.base_energy_bar_ui_size.h
         )
 
+    def reset_move_speed(self) -> None:
+        self._move_speed = self._base_move_speed
+
 
 class Player(Node2D):
     def __init__(self, entity_id: int):
@@ -169,8 +182,7 @@ class Player(Node2D):
         self.anim_sprite: Optional[AnimatedSprite] = None
         self.collider: Optional[Collider2D] = None
         self.stance = PlayerStance.STANDING
-        self.stats = PlayerStats(base_hp=10, base_energy=20)
-        self.move_speed = 25
+        self.stats = PlayerStats(base_hp=10, base_energy=20, base_move_speed=25)
         self.attack_requested = False
         self.special_attack_requested = False
         self.energy_attack_cost = 5
@@ -222,14 +234,14 @@ class Player(Node2D):
                     self.attack_requested = True
             elif Input.is_action_just_pressed("special"):
                 if self.is_transformed:
-                    self.is_transformed = False
+                    self._set_transformed(False)
                     if self.transformation_task:
                         self.transformation_task.close()
                         self.transformation_task = None
                 else:
                     # Transform if at max
                     if self.stats.energy == self.stats.base_energy:
-                        self.is_transformed = True
+                        self._set_transformed(True)
                         self.transformation_task = Task(
                             coroutine=self._transformation_task()
                         )
@@ -320,6 +332,14 @@ class Player(Node2D):
             SceneTree.get_root().add_child(melee_attack)
         AudioManager.play_sound(source=self.attack_slash_audio_source)
 
+    def _set_transformed(self, is_transformed: bool) -> None:
+        if self.is_transformed != is_transformed:
+            self.is_transformed = is_transformed
+            if self.is_transformed:
+                self.stats.move_speed += 5
+            else:
+                self.stats.reset_move_speed()
+
     # --- TASKS --- #
     async def _physics_update_task(self):
         level_state = LevelState()
@@ -344,7 +364,7 @@ class Player(Node2D):
                 if self.transformation_task:
                     self.transformation_task.resume()
                     if self.stats.energy == 0:
-                        self.is_transformed = False
+                        self._set_transformed(False)
                         self.transformation_task.close()
                         self.transformation_task = None
                 # Change stance if different from last frame
@@ -583,8 +603,8 @@ class Player(Node2D):
                     if Input.is_action_pressed("move_left"):
                         if not self._are_enemies_attached():
                             new_position = self.position + Vector2.LEFT() * Vector2(
-                                delta_time * self.move_speed,
-                                delta_time * self.move_speed,
+                                delta_time * self.stats.move_speed,
+                                delta_time * self.stats.move_speed,
                             )
                             new_position.x = clamp(
                                 new_position.x,
@@ -599,8 +619,8 @@ class Player(Node2D):
                     elif Input.is_action_pressed("move_right"):
                         if not self._are_enemies_attached():
                             new_position = self.position + Vector2.RIGHT() * Vector2(
-                                delta_time * self.move_speed,
-                                delta_time * self.move_speed,
+                                delta_time * self.stats.move_speed,
+                                delta_time * self.stats.move_speed,
                             )
                             new_position.x = clamp(
                                 new_position.x,
@@ -684,8 +704,8 @@ class Player(Node2D):
                 if Input.is_action_pressed("move_left"):
                     if not self._are_enemies_attached():
                         new_position = self.position + Vector2.LEFT() * Vector2(
-                            delta_time * self.move_speed,
-                            delta_time * self.move_speed,
+                            delta_time * self.stats.move_speed,
+                            delta_time * self.stats.move_speed,
                         )
                         new_position.x = clamp(
                             new_position.x,
@@ -699,8 +719,8 @@ class Player(Node2D):
                 elif Input.is_action_pressed("move_right"):
                     if not self._are_enemies_attached():
                         new_position = self.position + Vector2.RIGHT() * Vector2(
-                            delta_time * self.move_speed,
-                            delta_time * self.move_speed,
+                            delta_time * self.stats.move_speed,
+                            delta_time * self.stats.move_speed,
                         )
                         new_position.x = clamp(
                             new_position.x,
