@@ -4,10 +4,10 @@ from src.characters.player import Player, PlayerStance
 from src.characters.wandering_soul import WanderingSoul
 from src.enemy_area_manager import EnemyAreaManager
 from src.environment.bridge_gate import BridgeGate
+from src.items import ItemUtils
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
-from src.items import AttackItem, ItemUtils
 from src.utils.game_math import Easer, Ease
 from src.utils.task import co_suspend, co_wait_seconds, Task
 from src.utils.timer import Timer
@@ -167,9 +167,9 @@ class LevelAreaManager:
             )
             level_state = LevelState()
 
-            prev_player_time_dilation = player.time_dilation
-            player.time_dilation = 0.0
-            level_cloud_manager.set_clouds_time_dilation(0.0)
+            main_node = SceneTree.get_root()
+            prev_time_dilation = main_node.time_dilation
+            main_node.time_dilation = 0.0
             level_state.boundary.w += next_level_area.width
             Camera2D.unfollow_node(player)
             Camera2D.set_boundary(level_state.boundary)
@@ -195,10 +195,9 @@ class LevelAreaManager:
             )
 
             await co_wait_seconds(1.0)
-            player.time_dilation = prev_player_time_dilation
+            main_node.time_dilation = prev_time_dilation
             if player.stance == PlayerStance.STANDING:
                 player.play_animation("walk")
-            level_cloud_manager.set_clouds_time_dilation(1.0)
 
             # Setup next bridge gate
             next_bridge_gate: Optional[BridgeGate] = None

@@ -1,7 +1,7 @@
 from typing import Optional, List, Type
 
 from src.characters.enemy_definitions import EnemyDefinition
-from src.items import AttackItem, HealthRestoreItem, SignItem
+from src.items import HealthRestoreItem
 
 
 class LevelAreaType:

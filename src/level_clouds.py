@@ -37,10 +37,6 @@ class LevelCloudManager:
     def update(self) -> None:
         self.manage_clouds_task_handle.resume()
 
-    def set_clouds_time_dilation(self, dilation: float) -> None:
-        for cloud in self.spawned_clouds:
-            cloud.time_dilation = dilation
-
     async def _manage_clouds_task(self):
         try:
             max_clouds = 10

@@ -3,8 +3,8 @@ from crescent_api import *
 from src.characters.enemy import Enemy, EnemyAttack
 from src.characters.wandering_soul import WanderingSoul
 from src.environment.bridge_gate import BridgeGate
+from src.items import Item, HealthRestoreItem
 from src.level_state import LevelState
-from src.items import Item, AttackItem, HealthRestoreItem
 from src.utils.game_math import map_to_range, clamp, Easer, Ease
 from src.utils.task import *
 from src.utils.timer import Timer
