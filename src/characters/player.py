@@ -700,9 +700,10 @@ class Player(Node2D):
         try:
             level_state = LevelState()
             jump_speed = 30
-            jump_time = 1.0
-            ascend_timer = Timer(jump_time / 2.0)
-            descent_timer = Timer(jump_time / 2.0)
+            jump_time = 0.5
+            ascend_timer = Timer(jump_time)
+            max_ascend_timer_skips = 2
+            ascent_timer_skips = 0
             is_ascending = True
             while True:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
@@ -748,13 +749,19 @@ class Player(Node2D):
                 jump_vector = Vector2(delta_time * jump_speed, delta_time * jump_speed)
                 if is_ascending:
                     self.position += Vector2.UP() * jump_vector
-                    ascend_timer.tick(delta_time)
+                    skip_ascend_timer = (
+                        Input.is_action_pressed("jump")
+                        and ascent_timer_skips < max_ascend_timer_skips
+                    )
+                    if skip_ascend_timer:
+                        ascent_timer_skips += 1
+                    else:
+                        ascend_timer.tick(delta_time)
                     if ascend_timer.time_remaining <= 0:
                         is_ascending = False
                 else:
                     self.position += Vector2.DOWN() * jump_vector
-                    descent_timer.tick(delta_time)
-                    if descent_timer.time_remaining <= 0:
+                    if self.position.y == level_state.floor_y:
                         self.stance = PlayerStance.STANDING
                         await co_return()
                 await co_suspend()
