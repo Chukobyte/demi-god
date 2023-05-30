@@ -187,6 +187,7 @@ class Player(Node2D):
         self.special_attack_requested = False
         self.energy_attack_cost = 5
         self.is_transformed = False
+        self.can_untransform = False
         self.enemies_attached_to_left: List[Enemy] = []
         self.enemies_attached_to_right: List[Enemy] = []
         self.last_shake_dir = Vector2.ZERO()
@@ -234,21 +235,28 @@ class Player(Node2D):
                     self.attack_requested = True
             elif Input.is_action_just_pressed("special"):
                 if self.is_transformed:
-                    self._set_transformed(False)
-                    if self.transformation_task:
-                        self.transformation_task.close()
-                        self.transformation_task = None
+                    if self.can_untransform:
+                        self._set_transformed(False)
+                        if self.transformation_task:
+                            self.transformation_task.close()
+                            self.transformation_task = None
                 else:
-                    # Transform if at max
-                    if self.stats.energy == self.stats.base_energy:
+                    min_transform_amount = 2
+                    if self.stats.energy >= min_transform_amount:
                         self._set_transformed(True)
                         self.transformation_task = Task(
                             coroutine=self._transformation_task()
                         )
-                    elif self.stats.energy >= self.energy_attack_cost:
-                        self.stats.energy -= self.energy_attack_cost
-                        self.attack_requested = True
-                        self.special_attack_requested = True
+                    # Transform if at max
+                    # if self.stats.energy == self.stats.base_energy:
+                    #     self._set_transformed(True)
+                    #     self.transformation_task = Task(
+                    #         coroutine=self._transformation_task()
+                    #     )
+                    # elif self.stats.energy >= self.energy_attack_cost:
+                    #     self.stats.energy -= self.energy_attack_cost
+                    #     self.attack_requested = True
+                    #     self.special_attack_requested = True
 
     def _fixed_update(self, delta_time: float) -> None:
         self.physics_update_task.resume()
@@ -337,6 +345,7 @@ class Player(Node2D):
             self.is_transformed = is_transformed
             if self.is_transformed:
                 self.stats.move_speed += 5
+                self.can_untransform = False
             else:
                 self.stats.reset_move_speed()
 
@@ -579,12 +588,17 @@ class Player(Node2D):
             energy_drain_per_tick = 1
             # Update animation to transformed
             self.play_animation(self._current_animation_name)
+            times_ticked = 0
             while True:
                 await co_wait_seconds(transformation_tick_rate)
                 self.stats.energy -= energy_drain_per_tick
+                times_ticked += 1
+                if times_ticked == 2:
+                    self.can_untransform = True
                 await co_suspend()
         except GeneratorExit:
             self.play_animation(self._current_animation_name)
+            self.can_untransform = True
 
     async def _stand_stance_task(self):
         try:
