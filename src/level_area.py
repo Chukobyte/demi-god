@@ -1,3 +1,4 @@
+import copy
 from typing import Optional, List, Type
 
 from src.characters.enemy_definitions import EnemyDefinition
@@ -46,6 +47,9 @@ class LevelArea:
             last_index = len(self.sections) - 1
             return self.sections[last_index] == section
         return False
+
+    def copy(self) -> "LevelArea":
+        return copy.deepcopy(self)
 
 
 class LevelAreaDefinitions:
@@ -119,7 +123,7 @@ class LevelAreaDefinitions:
 
     @staticmethod
     def get_def(area_num: int) -> Optional[LevelArea]:
-        return LevelAreaDefinitions.DEF_MAP.get(area_num, None)
+        return LevelAreaDefinitions.DEF_MAP.get(area_num, None).copy()
 
     @staticmethod
     def is_valid_area_index(index: int) -> bool:

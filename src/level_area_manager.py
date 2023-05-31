@@ -84,9 +84,7 @@ class LevelAreaManager:
                     if manage_bridge_transition_task:
                         manage_bridge_transition_task.close()
                     manage_bridge_transition_task = Task(
-                        coroutine=self._manage_bridge_transition_task(
-                            self.level_cloud_manager
-                        )
+                        coroutine=self._manage_bridge_transition_task()
                     )
                 if manage_bridge_transition_task:
                     manage_bridge_transition_task.resume()
@@ -154,9 +152,7 @@ class LevelAreaManager:
         except GeneratorExit:
             pass
 
-    async def _manage_bridge_transition_task(
-        self, level_cloud_manager: LevelCloudManager
-    ):
+    async def _manage_bridge_transition_task(self):
         try:
             self._manage_enemy_area_task = None
             player = Player.find_player()
@@ -200,9 +196,8 @@ class LevelAreaManager:
                 player.play_animation("walk")
 
             # Setup next bridge gate
-            next_bridge_gate: Optional[BridgeGate] = None
+            next_bridge_gate = level_state.bridge_gate_helper.next_bridge_gate()
             if not is_last_area:
-                next_bridge_gate = level_state.bridge_gate_helper.next_bridge_gate()
                 next_bridge_gate.set_closed()
                 next_bridge_gate.position = Vector2(
                     level_state.boundary.w - 10, level_state.floor_y - 31
@@ -225,7 +220,8 @@ class LevelAreaManager:
             Camera2D.set_boundary(level_state.boundary)
             Camera2D.follow_node(player)
 
-            level_state.bridge_gate_helper.close_gates()
+            prev_bridge = level_state.bridge_gate_helper.get_previous_bridge_gate()
+            prev_bridge.set_closed()
 
             level_state.is_currently_transitioning_within_level = False
             self._setup_area_type(next_level_area, level_state)

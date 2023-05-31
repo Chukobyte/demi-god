@@ -45,14 +45,6 @@ class BridgeGateHelper:
             prev_gate_index = self.max_bridges - 1
         return self._bridge_gates[prev_gate_index]
 
-    def open_gates(self) -> None:
-        for gate in self._bridge_gates:
-            gate.set_opened()
-
-    def close_gates(self) -> None:
-        for gate in self._bridge_gates:
-            gate.set_closed()
-
 
 class LevelState:
     """
