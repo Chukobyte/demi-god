@@ -154,7 +154,9 @@ class LevelAreaManager:
 
     async def _manage_bridge_transition_task(self):
         try:
-            self._manage_enemy_area_task = None
+            if self._manage_enemy_area_task:
+                self._manage_enemy_area_task.close()
+                self._manage_enemy_area_task = None
             player = Player.find_player()
             self.current_area_index += 1
             next_level_area = LevelAreaDefinitions.get_def(self.current_area_index)

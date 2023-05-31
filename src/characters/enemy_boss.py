@@ -30,9 +30,9 @@ class EnemyBoss(Enemy):
             move_speed = 30
             _update_move_dir()
             while True:
-                if self._is_outside_of_level_boundary():
-                    self.queue_deletion()
-                    await co_return()
+                # if self._is_outside_of_level_boundary():
+                #     self.queue_deletion()
+                #     await co_return()
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 self.position += self.move_dir * Vector2(
                     move_speed * delta_time, move_speed * delta_time

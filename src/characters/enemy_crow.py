@@ -65,9 +65,9 @@ class EnemyCrow(Enemy):
             player_dir_update_timer = Timer(random.uniform(2.0, 4.0))
             player_dir = self.position.direction_to(self.player.position)
             while True:
-                if self._is_outside_of_level_boundary():
-                    self.queue_deletion()
-                    await co_return()
+                # if self._is_outside_of_level_boundary():
+                #     self.queue_deletion()
+                #     await co_return()
 
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 move_vector = Vector2(

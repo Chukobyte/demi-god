@@ -84,9 +84,9 @@ class EnemyJester(Enemy):
                 anim_sprite.flip_h = True
                 self.move_dir = Vector2.LEFT()
             while True:
-                if self._is_outside_of_level_boundary():
-                    self.queue_deletion()
-                    await co_return()
+                # if self._is_outside_of_level_boundary():
+                #     self.queue_deletion()
+                #     await co_return()
                 # Change state task if previous state doesn't match current
                 if self.state != prev_state:
                     if state_task:

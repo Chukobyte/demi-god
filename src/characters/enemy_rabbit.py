@@ -22,9 +22,9 @@ class EnemyRabbit(Enemy):
                 self.anim_sprite.flip_h = True
                 move_dir = Vector2.LEFT()
             while True:
-                if self._is_outside_of_level_boundary():
-                    self.queue_deletion()
-                    await co_return()
+                # if self._is_outside_of_level_boundary():
+                #     self.queue_deletion()
+                #     await co_return()
                 if not self.is_attached_to_player:
                     delta_time = self.get_full_time_dilation_with_physics_delta()
                     self.position += move_dir * Vector2(
