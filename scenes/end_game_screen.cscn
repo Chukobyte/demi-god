@@ -13,13 +13,36 @@
     ],
     "children": [
         {
+            "name": "BGColorRect",
+            "type": "ColorRect",
+            "components": [
+                {
+                    "type": "transform_2d"
+                },
+                {
+                    "type": "color_rect",
+                    "size": {
+                        "w": 800.0,
+                        "h": 450.0
+                    },
+                    "color": {
+                        "r": 163,
+                        "g": 163,
+                        "b": 163,
+                        "a": 163
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
             "name": "GameTimeLabel",
             "type": "TextLabel",
             "components": [
                 {
                     "type": "transform_2d",
                     "position": {
-                        "x": 30.0,
+                        "x": 15.0,
                         "y": 60.0
                     },
                     "z_index": 11,
