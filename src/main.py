@@ -22,12 +22,6 @@ class Main(Node2D):
         buildings_draw_source.w = max_game_width
         buildings.draw_source = buildings_draw_source
 
-    def _end(self) -> None:
-        self.main_theme_audio_source = AudioManager.get_audio_source(
-            "assets/audio/music/main_theme.wav"
-        )
-        AudioManager.stop_sound(source=self.main_theme_audio_source)
-
     def _update(self, delta_time: float) -> None:
         if Input.is_action_just_pressed("exit"):
             Engine.exit()

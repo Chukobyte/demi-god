@@ -438,7 +438,7 @@ class Player(Node2D):
                 await Task(
                     coroutine=LevelState.fade_transition(time=1.0, fade_out=True)
                 )
-                SceneTree.change_scene("scenes/title_screen.cscn")
+                SceneTree.change_scene("scenes/end_game_screen.cscn")
                 World.set_time_dilation(1.0)
         except GeneratorExit:
             self.stats.health_bar_ui.color = normal_hp_bar_color
@@ -517,7 +517,7 @@ class Player(Node2D):
                                 time=1.0, fade_out=True
                             )
                         )
-                        SceneTree.change_scene("scenes/title_screen.cscn")
+                        SceneTree.change_scene("scenes/end_game_screen.cscn")
                         await co_return()
                         break
                     elif issubclass(collider_parent_type, BridgeGate):

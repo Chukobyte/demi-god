@@ -1,0 +1,43 @@
+{
+    "name": "EndGameScreen",
+    "type": "Node2D",
+    "components": [
+        {
+            "type": "transform_2d"
+        },
+        {
+            "type": "script",
+            "class_path": "src.end_game_screen",
+            "class_name": "EndGameScreen"
+        }
+    ],
+    "children": [
+        {
+            "name": "GameTimeLabel",
+            "type": "TextLabel",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 30.0,
+                        "y": 60.0
+                    },
+                    "z_index": 11,
+                    "ignore_camera": true
+                },
+                {
+                    "type": "text_label",
+                    "uid": "gameboy-8",
+                    "text": "00:00",
+                    "color": {
+                        "r": 2,
+                        "g": 3,
+                        "b": 2,
+                        "a": 255
+                    }
+                }
+            ],
+            "children": []
+        }
+    ]
+}

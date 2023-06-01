@@ -2,40 +2,8 @@ from crescent_api import *
 
 from src.characters.player import Player
 from src.level_area_manager import LevelAreaManager
-from src.level_state import LevelState
+from src.level_state import LevelState, GameTimer
 from src.utils.task import *
-
-
-class GameTimer:
-    def __init__(self, time_label: TextLabel):
-        self.time_label = time_label
-        self._time = 0.0
-
-    def _get_formatted_time(self) -> str:
-        time_seconds = int(self._time)
-        if time_seconds < 10:
-            return f"00:0{time_seconds}"
-        elif time_seconds < 60:
-            return f"00:{time_seconds}"
-        else:
-            time_minutes = int(time_seconds / 60)
-            if time_minutes < 10:
-                minutes_string = f"0{time_minutes}"
-            else:
-                minutes_string = f"{time_minutes}"
-            left_over_seconds = int(time_seconds - time_minutes * 60)
-            if left_over_seconds < 10:
-                seconds_string = f"0{left_over_seconds}"
-            else:
-                seconds_string = f"{left_over_seconds}"
-            return f"{minutes_string}:{seconds_string}"
-
-    def update(self) -> None:
-        delta_time = World.get_delta_time()
-        prev_time = self._time
-        self._time += delta_time
-        if prev_time != self._time:
-            self.time_label.text = self._get_formatted_time()
 
 
 class GameMaster:
@@ -53,7 +21,8 @@ class GameMaster:
     async def _update_task(self):
         player_start_pos = Vector2(20, 78)
         level_area_manager = LevelAreaManager()
-        game_timer = GameTimer(SceneTree.get_root().get_child("TimeLabel"))
+        level_state = LevelState()
+        level_state.game_timer = GameTimer(SceneTree.get_root().get_child("TimeLabel"))
         try:
             # Call update once to set initial area up
             level_area_manager.update()
@@ -76,7 +45,7 @@ class GameMaster:
 
             while True:
                 level_area_manager.update()
-                game_timer.update()
+                level_state.game_timer.update()
                 await co_suspend()
         except GeneratorExit:
             pass

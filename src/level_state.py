@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from crescent_api import Rect2, ShaderInstance, Vector2, SceneTree
+from crescent_api import Rect2, ShaderInstance, Vector2, SceneTree, TextLabel, World
 
 from src.environment.bridge_gate import BridgeGate
 from src.utils.task import co_suspend
@@ -46,6 +46,38 @@ class BridgeGateHelper:
         return self._bridge_gates[prev_gate_index]
 
 
+class GameTimer:
+    def __init__(self, time_label: TextLabel):
+        self.time_label = time_label
+        self._time = 0.0
+
+    def get_formatted_time(self) -> str:
+        time_seconds = int(self._time)
+        if time_seconds < 10:
+            return f"00:0{time_seconds}"
+        elif time_seconds < 60:
+            return f"00:{time_seconds}"
+        else:
+            time_minutes = int(time_seconds / 60)
+            if time_minutes < 10:
+                minutes_string = f"0{time_minutes}"
+            else:
+                minutes_string = f"{time_minutes}"
+            left_over_seconds = int(time_seconds - time_minutes * 60)
+            if left_over_seconds < 10:
+                seconds_string = f"0{left_over_seconds}"
+            else:
+                seconds_string = f"{left_over_seconds}"
+            return f"{minutes_string}:{seconds_string}"
+
+    def update(self) -> None:
+        delta_time = World.get_delta_time()
+        prev_time = self._time
+        self._time += delta_time
+        if prev_time != self._time:
+            self.time_label.text = self.get_formatted_time()
+
+
 class LevelState:
     """
     Singleton state data needed for the game to run.
@@ -63,6 +95,7 @@ class LevelState:
             cls.is_currently_transitioning_within_level = False
             cls.screen_shader_instance: Optional[ShaderInstance] = None
             cls.bridge_gate_helper = BridgeGateHelper()
+            cls.game_timer: Optional[GameTimer] = None
         return cls._instance
 
     def is_game_state_paused(self) -> bool:

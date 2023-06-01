@@ -191,6 +191,10 @@ class EnemyAreaManager:
                     lightning_flash_task.resume()
                     await co_suspend()
                 lightning_flash_task.close()
+                self.main_theme_audio_source = AudioManager.get_audio_source(
+                    "assets/audio/music/main_theme.wav"
+                )
+                AudioManager.stop_sound(source=self.main_theme_audio_source)
 
             area.is_completed = True
         except GeneratorExit:
