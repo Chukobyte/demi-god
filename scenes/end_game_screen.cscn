@@ -36,6 +36,32 @@
             "children": []
         },
         {
+            "name": "StatusTextLabel",
+            "type": "TextLabel",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 45.0,
+                        "y": 35.0
+                    },
+                    "z_index": 11
+                },
+                {
+                    "type": "text_label",
+                    "uid": "gameboy-8",
+                    "text": "Game Over",
+                    "color": {
+                        "r": 240,
+                        "g": 247,
+                        "b": 243,
+                        "a": 255
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
             "name": "GameTimeLabel",
             "type": "TextLabel",
             "components": [
@@ -51,7 +77,7 @@
                 {
                     "type": "text_label",
                     "uid": "gameboy-8",
-                    "text": "00:00",
+                    "text": "Game Time: 00:00",
                     "color": {
                         "r": 240,
                         "g": 247,
