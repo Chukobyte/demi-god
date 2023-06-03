@@ -42,11 +42,7 @@ class EndGameScreen(Node2D):
         if self.can_update_options:
             self.option_box_manager.process_inputs()
             if Input.is_action_just_pressed("start"):
-                selected_option = self.option_box_manager.get_selected_option()
-                if selected_option == "Retry" or selected_option == "Title":
-                    self.confirmed_option = selected_option
-                elif selected_option == "Exit":
-                    Engine.exit()
+                self.confirmed_option = self.option_box_manager.get_selected_option()
                 self.option_box_manager.is_enabled = False
 
     def _fixed_update(self, delta_time: float) -> None:
@@ -69,5 +65,7 @@ class EndGameScreen(Node2D):
                 SceneTree.change_scene("scenes/main.cscn")
             elif confirmed_option == "Title":
                 SceneTree.change_scene("scenes/title_screen.cscn")
+            elif confirmed_option == "Exit":
+                Engine.exit()
         except GeneratorExit:
             pass

@@ -22,7 +22,7 @@ class TitleScreen(Node2D):
         self.white_rect: Optional[ColorRect] = None
         self.title_screen_anims_finished = False
         self.skip_title_screen_anims = False
-        self.start_game_triggered = False
+        self.confirmed_option: Optional[str] = None
 
     def _start(self) -> None:
         LevelState.reset_instance()
@@ -63,11 +63,7 @@ class TitleScreen(Node2D):
 
         if Input.is_action_just_pressed("start"):
             if self.title_screen_anims_finished:
-                selected_option = self.option_box_manager.get_selected_option()
-                if selected_option == "Start":
-                    self.start_game_triggered = True
-                elif selected_option == "Exit":
-                    Engine.exit()
+                self.confirmed_option = self.option_box_manager.get_selected_option()
                 self.option_box_manager.is_enabled = False
             else:
                 self.skip_title_screen_anims = True
@@ -93,7 +89,7 @@ class TitleScreen(Node2D):
             )
             title_screen_done_timer = Timer(time_for_title_to_move_to_pos)
             ease_ui_task = Task(coroutine=self._ease_ui_task())
-            while not self.start_game_triggered:
+            while not self.confirmed_option:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 # Title
                 if self.skip_title_screen_anims:
@@ -107,38 +103,47 @@ class TitleScreen(Node2D):
                     # Press Start
                     ease_ui_task.resume()
                 await co_suspend()
-            # Go to game now
-            self.option_box_sprite.modulate = Color(255, 255, 255)
-            self.option_arrow_top_sprite.modulate = Color(255, 255, 255)
-            self.option_arrow_bottom_sprite.modulate = Color(255, 255, 255)
-            self.option_text_label.color = Color(2, 3, 2, 255)
-            self.copyright_sprite.modulate = Color(255, 255, 255)
-            start_game_sfx = AudioManager.get_audio_source(
-                "assets/audio/sfx/start_game.wav"
-            )
-            AudioManager.play_sound(start_game_sfx)
-            white_rect_visible_alpha = 150
-            white_rect_color = self.white_rect.color
-            white_rect_color.a = white_rect_visible_alpha
-            self.white_rect.color = white_rect_color
-            await co_suspend()
-            white_rect_color.a = 0
-            self.white_rect.color = white_rect_color
-            await co_suspend()
-            white_rect_color.a = white_rect_visible_alpha
-            self.white_rect.color = white_rect_color
-            await co_suspend()
-            white_rect_color.a = 0
-            self.white_rect.color = white_rect_color
-            await co_suspend()
-            white_rect_color.a = white_rect_visible_alpha
-            self.white_rect.color = white_rect_color
-            await co_suspend()
-            white_rect_color.a = 0
-            self.white_rect.color = white_rect_color
-            await co_wait_seconds(0.8)
-            await Task(coroutine=LevelState.fade_transition(time=1.0, fade_out=True))
-            SceneTree.change_scene("scenes/main.cscn")
+            selected_option = self.confirmed_option
+            if selected_option == "Start":
+                # Go to game now
+                self.option_box_sprite.modulate = Color(255, 255, 255)
+                self.option_arrow_top_sprite.modulate = Color(255, 255, 255)
+                self.option_arrow_bottom_sprite.modulate = Color(255, 255, 255)
+                self.option_text_label.color = Color(2, 3, 2, 255)
+                self.copyright_sprite.modulate = Color(255, 255, 255)
+                start_game_sfx = AudioManager.get_audio_source(
+                    "assets/audio/sfx/start_game.wav"
+                )
+                AudioManager.play_sound(start_game_sfx)
+                white_rect_visible_alpha = 150
+                white_rect_color = self.white_rect.color
+                white_rect_color.a = white_rect_visible_alpha
+                self.white_rect.color = white_rect_color
+                await co_suspend()
+                white_rect_color.a = 0
+                self.white_rect.color = white_rect_color
+                await co_suspend()
+                white_rect_color.a = white_rect_visible_alpha
+                self.white_rect.color = white_rect_color
+                await co_suspend()
+                white_rect_color.a = 0
+                self.white_rect.color = white_rect_color
+                await co_suspend()
+                white_rect_color.a = white_rect_visible_alpha
+                self.white_rect.color = white_rect_color
+                await co_suspend()
+                white_rect_color.a = 0
+                self.white_rect.color = white_rect_color
+                await co_wait_seconds(0.8)
+                await Task(
+                    coroutine=LevelState.fade_transition(time=1.0, fade_out=True)
+                )
+                SceneTree.change_scene("scenes/main.cscn")
+            elif selected_option == "Exit":
+                await Task(
+                    coroutine=LevelState.fade_transition(time=1.0, fade_out=True)
+                )
+                Engine.exit()
         except GeneratorExit:
             pass
 
