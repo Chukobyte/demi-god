@@ -4,10 +4,12 @@ from src.characters.enemy_boss import EnemyBoss
 from src.characters.enemy_crow import EnemyCrow
 from src.characters.enemy_jester import EnemyJester
 from src.characters.enemy_rabbit import EnemyRabbit
+from src.characters.enemy_snake import EnemySnake
 
 
 class EnemyScenePaths:
     RABBIT = "scenes/characters/enemy_rabbit.cscn"
+    SNAKE = "scenes/characters/enemy_snake.cscn"
     JESTER = "scenes/characters/enemy_jester.cscn"
     CROW = "scenes/characters/enemy_crow.cscn"
     BOSS = "scenes/characters/enemy_boss.cscn"
@@ -42,6 +44,15 @@ class EnemyDefinition:
         )
 
     @staticmethod
+    def SNAKE() -> "EnemyDefinition":
+        return EnemyDefinition(
+            scene_path=EnemyScenePaths.SNAKE,
+            enemy_type=EnemySnake,
+            max_total_count=6,
+            max_spawn_count=3,
+        )
+
+    @staticmethod
     def JESTER() -> "EnemyDefinition":
         return EnemyDefinition(
             scene_path=EnemyScenePaths.JESTER,
@@ -70,6 +81,7 @@ class EnemyDefinition:
     def ALL() -> List["EnemyDefinition"]:
         return [
             EnemyDefinition.RABBIT(),
+            EnemyDefinition.SNAKE(),
             EnemyDefinition.JESTER(),
             EnemyDefinition.CROW(),
             EnemyDefinition.BOSS(),

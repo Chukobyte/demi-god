@@ -7,8 +7,8 @@
         },
         {
             "type": "script",
-            "class_path": "src.characters.enemy_rabbit",
-            "class_name": "EnemyRabbit"
+            "class_path": "src.characters.enemy_snake",
+            "class_name": "EnemySnake"
         }
     ],
     "children": [
@@ -22,10 +22,10 @@
                 {
                     "type": "animated_sprite",
                     "current_animation_name": "walk",
-                    "is_playing": true,
+                    "is_playing": false,
                     "origin": {
-                        "x": 14.0,
-                        "y": 23.0
+                        "x": 15.0,
+                        "y": 24.0
                     },
                     "animations": [
                         {
@@ -35,19 +35,9 @@
                             "frames": [
                                 {
                                     "frame": 0,
-                                    "texture_path": "assets/images/enemy_rabbit/enemy_rabbit_walk.png",
+                                    "texture_path": "assets/images/enemy_snake/enemy_snake_walk.png",
                                     "draw_source": {
                                         "x": 0.0,
-                                        "y": 0.0,
-                                        "w": 32.0,
-                                        "h": 32.0
-                                    }
-                                },
-                                {
-                                    "frame": 1,
-                                    "texture_path": "assets/images/enemy_rabbit/enemy_rabbit_walk.png",
-                                    "draw_source": {
-                                        "x": 32.0,
                                         "y": 0.0,
                                         "w": 32.0,
                                         "h": 32.0
@@ -67,15 +57,15 @@
                 {
                     "type": "transform_2d",
                     "position": {
-                        "x": -5.0,
-                        "y": -14.0
+                        "x": -6.0,
+                        "y": 3.0
                     }
                 },
                 {
                     "type": "collider_2d",
                     "extents": {
-                        "w": 12.0,
-                        "h": 24.0
+                        "w": 14.0,
+                        "h": 6.0
                     },
                     "color": {
                         "r": 0,
