@@ -53,7 +53,7 @@
             "children": []
         },
         {
-            "name": "Press Start",
+            "name": "OptionBox",
             "type": "Sprite",
             "components": [
                 {
@@ -62,12 +62,59 @@
                 },
                 {
                     "type": "sprite",
-                    "texture_path": "assets/images/title_screen/title_screen_press_start.png",
+                    "texture_path": "assets/images/title_screen/title_screen_option_box.png",
                     "draw_source": {
                         "x": 0.0,
                         "y": 0.0,
                         "w": 160.0,
                         "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "OptionArrows",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "z_index": 2
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/title_screen/title_screen_option_arrows.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "OptionsTextLabel",
+            "type": "TextLabel",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 60.0,
+                        "y": 114.0
+                    },
+                    "z_index": 11
+                },
+                {
+                    "type": "text_label",
+                    "uid": "gameboy-8",
+                    "text": "Start",
+                    "color": {
+                        "r": 2,
+                        "g": 3,
+                        "b": 2,
+                        "a": 255
                     }
                 }
             ],

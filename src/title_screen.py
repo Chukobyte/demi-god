@@ -1,6 +1,7 @@
 from crescent_api import *
 
 from src.level_state import LevelState
+from src.option_box_manager import OptionBoxManager
 from src.utils.game_math import Easer, Ease
 from src.utils.task import Task, co_suspend, co_wait_seconds
 from src.utils.timer import Timer
@@ -10,8 +11,11 @@ class TitleScreen(Node2D):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.update_task = Task(coroutine=self._update_task())
+        self.option_box_manager: Optional[OptionBoxManager] = None
         self.title_sprite: Optional[Sprite] = None
-        self.press_start_sprite: Optional[Sprite] = None
+        self.option_box_sprite: Optional[Sprite] = None
+        self.option_arrows_sprite: Optional[Sprite] = None
+        self.option_text_label: Optional[TextLabel] = None
         self.copyright_sprite: Optional[Sprite] = None
         self.buildings_sprite: Optional[Sprite] = None
         self.white_rect: Optional[ColorRect] = None
@@ -32,12 +36,20 @@ class TitleScreen(Node2D):
         new_title_pos = self.title_sprite.position
         new_title_pos.y -= 100
         self.title_sprite.position = new_title_pos
-        self.press_start_sprite = self.get_child("Press Start")
-        self.press_start_sprite.modulate = Color(255, 255, 255, 0)
+        self.option_box_sprite = self.get_child("OptionBox")
+        self.option_box_sprite.modulate = Color(255, 255, 255, 0)
+        self.option_arrows_sprite = self.get_child("OptionArrows")
+        self.option_arrows_sprite.modulate = Color(255, 255, 255, 0)
+        self.option_text_label: TextLabel = self.get_child("OptionsTextLabel")
+        self.option_text_label.color = Color(2, 3, 2, 0)
         self.copyright_sprite = self.get_child("Copyright")
         self.copyright_sprite.modulate = Color(255, 255, 255, 0)
         self.buildings_sprite = self.get_child("Buildings")
         self.white_rect = self.get_child("WhiteRect")
+
+        self.option_box_manager = OptionBoxManager(
+            self.option_text_label, ["Start", "Exit"]
+        )
 
     def _update(self, delta_time: float) -> None:
         if Input.is_action_just_pressed("exit"):
@@ -45,9 +57,16 @@ class TitleScreen(Node2D):
 
         if Input.is_action_just_pressed("start"):
             if self.title_screen_anims_finished:
-                self.start_game_triggered = True
+                selected_option = self.option_box_manager.get_selected_option()
+                if selected_option == "Start":
+                    self.start_game_triggered = True
+                elif selected_option == "Exit":
+                    Engine.exit()
             else:
                 self.skip_title_screen_anims = True
+
+        if self.title_screen_anims_finished:
+            self.option_box_manager.process_inputs()
 
     def _fixed_update(self, delta_time: float) -> None:
         self.update_task.resume()
@@ -65,7 +84,7 @@ class TitleScreen(Node2D):
                 Ease.Cubic.ease_out_vec2,
             )
             title_screen_done_timer = Timer(time_for_title_to_move_to_pos)
-            press_start_flicker_task = Task(coroutine=self._press_start_flicker_task())
+            ease_ui_task = Task(coroutine=self._ease_ui_task())
             while not self.start_game_triggered:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 # Title
@@ -78,10 +97,12 @@ class TitleScreen(Node2D):
                 if title_screen_done_timer.time_remaining <= 0.0:
                     self.title_screen_anims_finished = True
                     # Press Start
-                    press_start_flicker_task.resume()
+                    ease_ui_task.resume()
                 await co_suspend()
             # Go to game now
-            self.press_start_sprite.modulate = Color(255, 255, 255)
+            self.option_box_sprite.modulate = Color(255, 255, 255)
+            self.option_arrows_sprite.modulate = Color(255, 255, 255)
+            self.option_text_label.color = Color(2, 3, 2, 255)
             self.copyright_sprite.modulate = Color(255, 255, 255)
             start_game_sfx = AudioManager.get_audio_source(
                 "assets/audio/sfx/start_game.wav"
@@ -112,33 +133,24 @@ class TitleScreen(Node2D):
         except GeneratorExit:
             pass
 
-    async def _press_start_flicker_task(self):
+    async def _ease_ui_task(self):
         try:
             # Ease in appearance
             appearance_easer = Easer(0, 255, 1.0, Ease.Cubic.ease_out)
             while True:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 new_alpha = int(appearance_easer.ease(delta_time))
-                self.press_start_sprite.modulate = Color(255, 255, 255, new_alpha)
+                self.option_box_sprite.modulate = Color(255, 255, 255, new_alpha)
+                self.option_arrows_sprite.modulate = Color(255, 255, 255, new_alpha)
+                self.option_text_label.color = Color(2, 3, 2, new_alpha)
                 self.copyright_sprite.modulate = Color(255, 255, 255, new_alpha)
                 if new_alpha == 255:
                     break
                 await co_suspend()
 
-            self.press_start_sprite.modulate = Color(255, 255, 255)
+            self.option_box_sprite.modulate = Color(255, 255, 255)
+            self.option_arrows_sprite.modulate = Color(255, 255, 255)
+            self.option_text_label.color = Color(2, 3, 2, 255)
             self.copyright_sprite.modulate = Color(255, 255, 255)
-            press_start_timer = Timer(1.0)
-            press_start_visible = True
-            while True:
-                delta_time = self.get_full_time_dilation_with_physics_delta()
-                press_start_timer.tick(delta_time)
-                if press_start_timer.time_remaining <= 0.0:
-                    press_start_timer.reset()
-                    if press_start_visible:
-                        self.press_start_sprite.modulate = Color(255, 255, 255)
-                    else:
-                        self.press_start_sprite.modulate = Color(255, 255, 255, 0)
-                    press_start_visible = not press_start_visible
-                await co_suspend()
         except GeneratorExit:
             pass
