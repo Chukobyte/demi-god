@@ -68,6 +68,7 @@ class TitleScreen(Node2D):
                     self.start_game_triggered = True
                 elif selected_option == "Exit":
                     Engine.exit()
+                self.option_box_manager.is_enabled = False
             else:
                 self.skip_title_screen_anims = True
 

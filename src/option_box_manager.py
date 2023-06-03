@@ -23,16 +23,21 @@ class OptionBoxManager:
         self.arrow_bottom = arrow_bottom
         self.arrow_top = arrow_top
         self.options = options
+        self.is_enabled = True
         self._current_index = 0
         self._initial_text_pos = self.option_text_label.position
-        self.normal_arrow_color = Color(240, 247, 243)
-        self.flicker_arrow_color = Color(80, 80, 80)
-        self.flicker_task: Optional[Task] = None
+        self._normal_arrow_color = Color(240, 247, 243)
+        self._flicker_arrow_color = Color(80, 80, 80)
+        self._flicker_task: Optional[Task] = None
 
     def get_selected_option(self) -> str:
+        if not self.is_enabled:
+            return ""
         return self.options[self._current_index]
 
     def process_inputs(self) -> Optional[OptionInputsResponse]:
+        if not self.is_enabled:
+            return None
         # Confirm
         if Input.is_action_just_pressed("start"):
             return OptionInputsResponse(
@@ -45,7 +50,9 @@ class OptionBoxManager:
                 self._current_index = len(self.options) - 1
             selected_option = self.get_selected_option()
             self._update_text_label(selected_option)
-            self.flicker_task = Task(coroutine=self._flicker_arrow_task(self.arrow_top))
+            self._flicker_task = Task(
+                coroutine=self._flicker_arrow_task(self.arrow_top)
+            )
             return OptionInputsResponse(
                 selected_option=selected_option, confirmed=False
             )
@@ -56,7 +63,7 @@ class OptionBoxManager:
                 self._current_index = 0
             selected_option = self.get_selected_option()
             self._update_text_label(selected_option)
-            self.flicker_task = Task(
+            self._flicker_task = Task(
                 coroutine=self._flicker_arrow_task(self.arrow_bottom)
             )
             return OptionInputsResponse(
@@ -65,8 +72,8 @@ class OptionBoxManager:
         return None
 
     def update_tasks(self) -> None:
-        if self.flicker_task:
-            self.flicker_task.resume()
+        if self._flicker_task:
+            self._flicker_task.resume()
 
     def _update_text_label(self, text: str) -> None:
         # Need to update positions as we don't have proper text label functionality yet...
@@ -80,9 +87,9 @@ class OptionBoxManager:
     async def _flicker_arrow_task(self, arrow: Sprite):
         has_finished = False
         try:
-            arrow.modulate = self.flicker_arrow_color
+            arrow.modulate = self._flicker_arrow_color
             await co_suspend()
-            arrow.modulate = self.normal_arrow_color
+            arrow.modulate = self._normal_arrow_color
         except GeneratorExit:
             if not has_finished:
-                arrow.modulate = self.normal_arrow_color
+                arrow.modulate = self._normal_arrow_color

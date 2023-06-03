@@ -87,6 +87,95 @@
                 }
             ],
             "children": []
+        },
+        {
+            "name": "OptionBox",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "z_index": 2
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/title_screen/title_screen_option_box.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "OptionArrowTop",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "z_index": 2
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/title_screen/title_screen_option_arrow_top.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "OptionArrowBot",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "z_index": 2
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/title_screen/title_screen_option_arrow_bottom.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "OptionsTextLabel",
+            "type": "TextLabel",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 60.0,
+                        "y": 114.0
+                    },
+                    "z_index": 11
+                },
+                {
+                    "type": "text_label",
+                    "uid": "gameboy-8",
+                    "text": "Retry",
+                    "color": {
+                        "r": 2,
+                        "g": 3,
+                        "b": 2,
+                        "a": 255
+                    }
+                }
+            ],
+            "children": []
         }
     ]
 }
