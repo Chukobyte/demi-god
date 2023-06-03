@@ -203,7 +203,13 @@
                 "nearest_neighbor": true
             },
             {
-                "file_path": "assets/images/title_screen/title_screen_option_arrows.png",
+                "file_path": "assets/images/title_screen/title_screen_option_arrow_top.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/title_screen/title_screen_option_arrow_bottom.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",
                 "nearest_neighbor": true

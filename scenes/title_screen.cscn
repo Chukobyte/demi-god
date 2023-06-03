@@ -74,7 +74,7 @@
             "children": []
         },
         {
-            "name": "OptionArrows",
+            "name": "OptionArrowTop",
             "type": "Sprite",
             "components": [
                 {
@@ -83,7 +83,28 @@
                 },
                 {
                     "type": "sprite",
-                    "texture_path": "assets/images/title_screen/title_screen_option_arrows.png",
+                    "texture_path": "assets/images/title_screen/title_screen_option_arrow_top.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 160.0,
+                        "h": 144.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "OptionArrowBot",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "z_index": 2
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/title_screen/title_screen_option_arrow_bottom.png",
                     "draw_source": {
                         "x": 0.0,
                         "y": 0.0,
