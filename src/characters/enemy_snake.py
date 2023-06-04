@@ -22,6 +22,10 @@ class EnemySnake(Enemy):
                 self.anim_sprite.flip_h = True
                 move_dir = Vector2.LEFT()
             while True:
+                # TODO: Only check if outside of viewport after it passes the player at least once
+                if self._is_outside_of_camera_viewport():
+                    self.destroy()
+                    await co_return()
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 self.position += move_dir * Vector2(
                     move_speed * delta_time, move_speed * delta_time

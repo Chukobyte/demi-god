@@ -96,7 +96,6 @@ class Enemy(Node2D):
         return SceneTree.get_root().get_child("Player")
 
     def _is_outside_of_level_boundary(self, padding=Vector2(64.0, 64.0)) -> bool:
-        # Only handles horizontal
         level_boundary = LevelState().boundary
         position = self.position
         return (
@@ -104,6 +103,17 @@ class Enemy(Node2D):
             or position.x > level_boundary.w + padding.x
             or position.y < level_boundary.y - padding.y
             or position.y > level_boundary.h + padding.y
+        )
+
+    def _is_outside_of_camera_viewport(self, padding=Vector2(64.0, 64.0)) -> bool:
+        position = self.position
+        camera_pos = Camera2D.get_position()
+        camera_dimension = Size2D(160 + camera_pos.x, 144 + camera_pos.y)
+        return (
+            position.x < camera_pos.x - padding.x
+            or position.x > camera_dimension.w + padding.x
+            or position.y < camera_pos.y - padding.y
+            or position.y > camera_dimension.h + padding.y
         )
 
         # --- TASKS --- #
