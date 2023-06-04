@@ -72,14 +72,12 @@ class LevelAreaDefinitions:
                     enemy_defs=[
                         EnemyDefinition.RABBIT(),
                         EnemyDefinition.JESTER(),
-                        EnemyDefinition.CROW(),
                     ]
                 ),
                 LevelSection(
                     enemy_defs=[
                         EnemyDefinition.RABBIT(),
                         EnemyDefinition.JESTER(),
-                        EnemyDefinition.CROW(),
                     ]
                 ),
             ],
@@ -91,17 +89,26 @@ class LevelAreaDefinitions:
             area_type=LevelAreaType.NORMAL,
             width=896,
             sections=[
-                LevelSection(enemy_defs=[EnemyDefinition.RABBIT()]),
+                LevelSection(enemy_defs=[EnemyDefinition.SNAKE()]),
                 LevelSection(
-                    enemy_defs=[EnemyDefinition.RABBIT(), EnemyDefinition.JESTER()]
-                ),
-                LevelSection(
-                    enemy_defs=[EnemyDefinition.RABBIT(), EnemyDefinition.JESTER()]
+                    enemy_defs=[
+                        EnemyDefinition.RABBIT(),
+                        EnemyDefinition.JESTER(),
+                        EnemyDefinition.SNAKE(),
+                    ]
                 ),
                 LevelSection(
                     enemy_defs=[
                         EnemyDefinition.RABBIT(),
                         EnemyDefinition.JESTER(),
+                        EnemyDefinition.SNAKE(),
+                    ]
+                ),
+                LevelSection(
+                    enemy_defs=[
+                        EnemyDefinition.RABBIT(),
+                        EnemyDefinition.JESTER(),
+                        EnemyDefinition.SNAKE(),
                         EnemyDefinition.CROW(),
                     ]
                 ),
@@ -109,6 +116,7 @@ class LevelAreaDefinitions:
                     enemy_defs=[
                         EnemyDefinition.RABBIT(),
                         EnemyDefinition.JESTER(),
+                        EnemyDefinition.SNAKE(),
                         EnemyDefinition.CROW(),
                     ]
                 ),
