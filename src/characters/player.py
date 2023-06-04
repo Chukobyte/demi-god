@@ -397,18 +397,27 @@ class Player(Node2D):
         hp_damage=1.0,
         modulate_color=True,
     ):
-        def subtract_hp_value(damage: float, bar_color: Color) -> None:
-            self.stats.hp -= damage
-            self.stats.health_bar_ui.color = bar_color
+        take_transform_damage = self.is_transformed
+        if take_transform_damage:
+            bar_ui = self.stats.energy_bar_ui
+        else:
+            bar_ui = self.stats.health_bar_ui
 
-        normal_hp_bar_color = self.stats.health_bar_ui.color
+        def subtract_hp_value(damage: float, bar_color: Color) -> None:
+            if take_transform_damage:
+                self.stats.energy -= damage
+            else:
+                self.stats.hp -= damage
+            bar_ui.color = bar_color
+
+        normal_hp_bar_color = bar_ui.color
         try:
             if gamepad_vibration:
                 Input.start_gamepad_vibration(0, 0.5, 0.5, 0.25)
             cooldown_timer = Timer(cooldown_time)
             has_subtracted_health = False
             is_game_over = False
-            self.stats.health_bar_ui.color = Color(240, 247, 243)
+            bar_ui.color = Color(240, 247, 243)
             if modulate_color:
                 self.anim_sprite.modulate = Color(255, 255, 255, 100)
             cooldown_timer.tick(self.get_full_time_dilation_with_physics_delta())
@@ -441,7 +450,7 @@ class Player(Node2D):
                 SceneTree.change_scene("scenes/end_game_screen.cscn")
                 World.set_time_dilation(1.0)
         except GeneratorExit:
-            self.stats.health_bar_ui.color = normal_hp_bar_color
+            bar_ui.color = normal_hp_bar_color
 
     async def _collision_check_task(self):
         try:
