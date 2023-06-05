@@ -3,7 +3,6 @@ from crescent_api import *
 from src.characters.player import Player, PlayerStance
 from src.characters.wandering_soul import WanderingSoul
 from src.enemy_area_manager import EnemyAreaManager
-from src.environment.bridge_gate import BridgeGate
 from src.items import ItemUtils
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
@@ -34,6 +33,13 @@ class LevelAreaManager:
         if area.area_type == LevelAreaType.POWER_UP:
             item_type = area.item_types[0]
             attack_item = ItemUtils.get_item_from_type(item_type)
+            main_node = SceneTree.get_root()
+            # Only expected to collect one item per power up area, which completes the area
+            attack_item.subscribe_to_event(
+                event_id="collected",
+                scoped_node=main_node,
+                callback_func=lambda args: self._current_area.set_completed(True),
+            )
             attack_item.position = Vector2(
                 level_state.boundary.w - 80, level_state.floor_y
             )

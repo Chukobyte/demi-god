@@ -268,16 +268,14 @@ class Player(Node2D):
         else:
             self.anim_sprite.play(anim_name)
 
-    def _collect_item(self, item) -> None:
+    def _collect_item(self, item: Item) -> None:
         if item.can_be_collected:
             self.item_description.hide_description()
-            item.queue_deletion()
+            item.collect()
             # Item specific
             if issubclass(type(item), HealthRestoreItem):
                 health_item: HealthRestoreItem = item
                 self.stats.hp += health_item.restore_amount
-            current_gate = LevelState().bridge_gate_helper.get_current_bridge_gate()
-            current_gate.set_opened()
 
     def _are_enemies_attached(self) -> bool:
         return (

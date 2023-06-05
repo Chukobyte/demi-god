@@ -59,7 +59,7 @@ class LevelCloudManager:
                 cloud.position = camera_pos + Vector2(
                     i * random.randint(5, 40), random.randint(0, 40)
                 )
-                cloud.z_index = 2
+                cloud.z_index = 1
                 self.spawned_clouds.append(cloud)
                 main_node.add_child(cloud)
             while True:
@@ -72,7 +72,7 @@ class LevelCloudManager:
                     cloud.position = camera_pos + Vector2(
                         i * random.randint(5, 40), random.randint(0, 40)
                     )
-                    cloud.z_index = 2
+                    cloud.z_index = 1
                     self.spawned_clouds.append(cloud)
                     main_node.add_child(cloud)
                 await co_wait_seconds(10.0)

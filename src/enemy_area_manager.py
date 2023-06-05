@@ -144,7 +144,6 @@ class EnemyAreaManager:
             if area.area_type != LevelAreaType.BOSS:
                 sections: List[LevelSection] = area.sections
                 if not sections:
-                    area.is_completed = True
                     await co_return()
                 section_count = len(sections)
                 update_timer = Timer(5.0)

@@ -42,6 +42,9 @@ class LevelArea:
         self.item_types = item_types
         self.is_completed = False
 
+    def set_completed(self, is_completed: bool) -> None:
+        self.is_completed = is_completed
+
     def is_section_last(self, section: LevelSection) -> bool:
         if self.sections:
             last_index = len(self.sections) - 1

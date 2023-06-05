@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from crescent_api import TextLabel, Input, Vector2, Sprite, Color
 
-from src.utils.task import Task, co_wait_seconds, co_suspend
+from src.utils.task import Task, co_suspend
 
 
 class OptionInputsResponse:

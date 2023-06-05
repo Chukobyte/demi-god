@@ -12,6 +12,10 @@ class Item(Node2D):
         self.description: Optional[str] = None
         self.can_be_collected = True
 
+    def collect(self) -> None:
+        self.broadcast_event("collected")
+        self.queue_deletion()
+
 
 class SignItem(Item):
     def __init__(self, entity_id: int):
