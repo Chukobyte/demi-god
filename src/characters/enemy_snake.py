@@ -1,4 +1,4 @@
-from crescent_api import Vector2
+from crescent_api import Vector2, MinMax
 
 from src.characters.enemy import Enemy
 from src.utils.task import *
@@ -10,6 +10,8 @@ class EnemySnake(Enemy):
         self._set_base_hp(1)
         self.destroy_on_touch = True
         self.physics_update_task = Task(coroutine=self._physics_update_task())
+        self.split_range = MinMax(0.9, 0.9)
+        self.split_amount = 0.02
 
     def _get_move_dir(self, player) -> Vector2:
         if player.position.x > self.position.x:

@@ -45,6 +45,8 @@ class Enemy(Node2D):
         self.destroyed_split_task: Optional[Task] = None
         self.knock_back_on_death = True
         self.split_on_death = True
+        self.split_range = MinMax(0.6, 0.6)
+        self.split_amount = 0.05
 
     def _start(self) -> None:
         self.anim_sprite: AnimatedSprite = self.get_child("AnimatedSprite")
@@ -155,11 +157,11 @@ class Enemy(Node2D):
 
     async def _destroyed_split_task(self) -> None:
         shader_instance = self.anim_sprite.shader_instance
-        split = MinMax(0.6, 0.6)
+        split = self.split_range
 
         def increment_split():
-            split.min -= 0.05
-            split.max += 0.05
+            split.min -= self.split_amount
+            split.max += self.split_amount
             shader_instance.set_float_param("split_min", split.min)
             shader_instance.set_float_param("split_max", split.max)
 
