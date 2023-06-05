@@ -93,13 +93,18 @@ class LevelState:
             cls.is_paused = False
             cls.is_gate_transition_queued = False
             cls.is_currently_transitioning_within_level = False
+            cls.is_paused_from_boss = False
             cls.screen_shader_instance: Optional[ShaderInstance] = None
             cls.bridge_gate_helper = BridgeGateHelper()
             cls.game_timer: Optional[GameTimer] = None
         return cls._instance
 
     def is_game_state_paused(self) -> bool:
-        return self.is_paused or self.is_currently_transitioning_within_level
+        return (
+            self.is_paused
+            or self.is_currently_transitioning_within_level
+            or self.is_paused_from_boss
+        )
 
     @classmethod
     def reset_instance(cls) -> None:

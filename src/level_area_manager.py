@@ -45,6 +45,11 @@ class LevelAreaManager:
             )
             attack_item.z_index = 10
             SceneTree.get_root().add_child(attack_item)
+        elif area.area_type == LevelAreaType.BOSS:
+            player = Player.find_player()
+            player.play_animation("idle")
+            # The boss is expected to set this to False after entrance
+            level_state.is_paused_from_boss = True
         # Temp wandering soul spawn
         elif area.area_type == LevelAreaType.END:
             wandering_soul = WanderingSoul.new()
