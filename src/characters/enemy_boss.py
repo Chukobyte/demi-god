@@ -152,6 +152,7 @@ class EnemyBoss(Enemy):
                 fill_hp_amount += 1
                 self.health_bar_ui.update(self.base_hp, fill_hp_amount)
                 await co_suspend()
+                await co_suspend()
 
         except GeneratorExit:
             pass

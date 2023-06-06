@@ -36,7 +36,7 @@ class Task:
                         raise StopIteration
                 elif issubclass(type(task_return_value), Task):
                     # Swap subtask in place
-                    task_return_value.parent_task = self
+                    task_return_value.parent_task = self.current_task
                     self.current_task = task_return_value
             except StopIteration:
                 if self.current_task.parent_task:
