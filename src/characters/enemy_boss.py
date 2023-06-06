@@ -1,10 +1,51 @@
-from crescent_api import Vector2
+from crescent_api import Vector2, ColorRect, Node2D, Size2D, Color, SceneTree
 
 from src.characters.enemy import Enemy
 from src.level_state import LevelState
-from src.utils.game_math import Easer, Ease
+from src.utils.game_math import Easer, Ease, map_to_range
 from src.utils.task import *
 from src.utils.timer import Timer
+
+
+class BossHealthBarUI(Node2D):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.border_color_rect: Optional[ColorRect] = None
+        self.inner_health_color_rect: Optional[ColorRect] = None
+        self.size = Size2D(64, 10)
+        self._base_inner_health_color_rect_size = self.size - Size2D(2, 2)
+
+    def _start(self) -> None:
+        # Border
+        self.border_color_rect = ColorRect.new()
+        self.border_color_rect.ignore_camera = True
+        self.border_color_rect.color = Color(2, 3, 2, 255)
+        self.add_child(self.border_color_rect)
+        # Inner Health Bar
+        self.inner_health_color_rect = ColorRect.new()
+        self.inner_health_color_rect.ignore_camera = True
+        self.inner_health_color_rect.color = Color(163, 163, 163, 255)
+        self.inner_health_color_rect.position += Vector2(1, 1)
+        self.z_index += 1
+        self.add_child(self.inner_health_color_rect)
+
+        self._set_initial_size(self.size)
+
+    def _set_initial_size(self, size: Size2D) -> None:
+        self.size = size
+        self.border_color_rect.size = size
+        self._base_inner_health_color_rect_size = self.size - Size2D(2, 2)
+        self.inner_health_color_rect.size = Size2D(
+            0, self._base_inner_health_color_rect_size.h
+        )
+
+    def update(self, base_hp: int, hp: int) -> None:
+        new_bar_width = map_to_range(
+            hp, 0.0, base_hp, 0.0, self._base_inner_health_color_rect_size.w
+        )
+        self.inner_health_color_rect.size = Size2D(
+            new_bar_width, self._base_inner_health_color_rect_size.h
+        )
 
 
 class EnemyBoss(Enemy):
@@ -14,14 +55,40 @@ class EnemyBoss(Enemy):
         self.move_dir = Vector2.RIGHT()
         self.physics_update_task = Task(coroutine=self._physics_update_task())
         self.do_entrance_stuff = True
+        self.health_bar_ui: Optional[BossHealthBarUI] = None
 
     def _start(self) -> None:
         super()._start()
         self.anim_sprite.flip_h = True
+        self.health_bar_ui = BossHealthBarUI.new()
+        self.health_bar_ui.ignore_camera = True
+        self.health_bar_ui.position = Vector2(53, 101)
+        self.health_bar_ui.z_index = 10
+        SceneTree.get_root().add_child(self.health_bar_ui)
         if self.do_entrance_stuff:
             self.position += Vector2(0, -101)
         else:
             self.position += Vector2(0, -1)
+
+    def take_damage(self, damage: int) -> None:
+        if self.take_damage_task:
+            self.take_damage_task.close()
+            self.take_damage_task = None
+        self.hp = max(self.hp - damage, 0)
+        self.health_bar_ui.update(self.base_hp, self.hp)
+        if self.hp == 0:
+            self.is_destroyed = True  # Maybe we want a callback here for enemies?
+            self.destroyed_task = Task(coroutine=self._destroyed_task())
+            if self.split_on_death:
+                self.destroyed_split_task = Task(coroutine=self._destroyed_split_task())
+            self.broadcast_event("destroyed", self)
+        else:
+            self.take_damage_task = Task(coroutine=self._take_damage_task())
+        self.anim_sprite.shader_instance.set_float_param("flash_amount", 0.5)
+
+    def _end(self) -> None:
+        if self.health_bar_ui:
+            self.health_bar_ui.queue_deletion()
 
     # --- TASKS --- #
     async def _physics_update_task(self) -> None:
@@ -79,5 +146,12 @@ class EnemyBoss(Enemy):
             await co_suspend()
             await co_suspend()
             await co_suspend()
+            # Fill up health bar 1 point at a time
+            fill_hp_amount = 0
+            while fill_hp_amount < self.base_hp:
+                fill_hp_amount += 1
+                self.health_bar_ui.update(self.base_hp, fill_hp_amount)
+                await co_suspend()
+
         except GeneratorExit:
             pass
