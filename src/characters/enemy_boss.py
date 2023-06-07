@@ -1,4 +1,4 @@
-from crescent_api import Vector2, ColorRect, Node2D, Size2D, Color, SceneTree
+from crescent_api import *
 
 from src.characters.enemy import Enemy
 from src.level_state import LevelState
@@ -105,7 +105,7 @@ class EnemyBoss(Enemy):
 
             if self.do_entrance_stuff:
                 landing_pos = self.position + Vector2(0, 100)
-                await Task(coroutine=self._entrance_task(landing_pos))
+                await Task(coroutine=self._entrance_task(player, landing_pos))
             level_state = LevelState()
             level_state.is_paused_from_boss = False
 
@@ -122,8 +122,18 @@ class EnemyBoss(Enemy):
         except GeneratorExit:
             pass
 
-    async def _entrance_task(self, landing_pos: Vector2) -> None:
+    async def _entrance_task(self, player, landing_pos: Vector2) -> None:
         try:
+            # Last minute hack to make sure the player lands when entering boss room while in the air
+            if player.stance == "in_air":
+                level_state = LevelState()
+                player.input_enabled = False
+                level_state.is_paused_from_boss = False
+                while player.stance == "in_air":
+                    await co_suspend()
+                player.input_enabled = True
+                level_state.is_paused_from_boss = True
+
             # Fall from the sky and land
             landing_time = 5.0
             landing_timer = Timer(landing_time)
@@ -147,10 +157,14 @@ class EnemyBoss(Enemy):
             await co_suspend()
             await co_suspend()
             # Fill up health bar 1 point at a time
+            health_gain_audio_source = AudioManager.get_audio_source(
+                "assets/audio/sfx/health_gain.wav"
+            )
             fill_hp_amount = 0
             while fill_hp_amount < self.base_hp:
                 fill_hp_amount += 1
                 self.health_bar_ui.update(self.base_hp, fill_hp_amount)
+                AudioManager.play_sound(health_gain_audio_source)
                 await co_suspend()
                 await co_suspend()
 

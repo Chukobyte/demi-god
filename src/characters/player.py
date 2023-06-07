@@ -201,6 +201,7 @@ class Player(Node2D):
         )
         self._current_animation_name = ""  # TODO: Add function to engine instead
         self.item_description: Optional[PlayerItemDescription] = None
+        self.input_enabled = True
 
     def _start(self) -> None:
         self.anim_sprite = self.get_child("AnimatedSprite")
@@ -217,6 +218,8 @@ class Player(Node2D):
         return player
 
     def _update(self, delta_time: float) -> None:
+        if not self.input_enabled:
+            return None
         # Pause game
         level_state = LevelState()
         if Input.is_action_just_pressed("start"):
@@ -622,7 +625,8 @@ class Player(Node2D):
                     await self._attack_task()
                     self.attack_requested = False
                     self.play_animation("idle")
-                else:
+                    continue
+                elif self.input_enabled:
                     if Input.is_action_pressed("move_left"):
                         if not self._are_enemies_attached():
                             new_position = self.position + Vector2.LEFT() * Vector2(
@@ -669,7 +673,7 @@ class Player(Node2D):
                     ):
                         self.stance = PlayerStance.CROUCHING
                         await co_return()
-                    await co_suspend()
+                await co_suspend()
         except GeneratorExit:
             pass
 
@@ -684,7 +688,8 @@ class Player(Node2D):
                     await self._attack_task()
                     self.attack_requested = False
                     self.play_animation("crouch")
-                else:
+                    continue
+                elif self.input_enabled:
                     if Input.is_action_pressed("move_left"):
                         if self._are_enemies_attached():
                             self._handle_attached_shake(Vector2.LEFT())
@@ -699,7 +704,7 @@ class Player(Node2D):
                     elif not Input.is_action_pressed("crouch"):
                         self.stance = PlayerStance.STANDING
                         await co_return()
-                    await co_suspend()
+                await co_suspend()
         except GeneratorExit:
             pass
 
@@ -727,41 +732,43 @@ class Player(Node2D):
                     if not attack_task.valid:
                         attack_task = None
                         self.play_animation("jump")
-                if Input.is_action_pressed("move_left"):
-                    if not self._are_enemies_attached():
-                        new_position = self.position + Vector2.LEFT() * Vector2(
-                            delta_time * self.stats.move_speed,
-                            delta_time * self.stats.move_speed,
-                        )
-                        new_position.x = clamp(
-                            new_position.x,
-                            level_state.boundary.x,
-                            level_state.boundary.w,
-                        )
-                        self.position = new_position
-                    else:
-                        self._handle_attached_shake(Vector2.LEFT())
-                    self.anim_sprite.flip_h = True
-                elif Input.is_action_pressed("move_right"):
-                    if not self._are_enemies_attached():
-                        new_position = self.position + Vector2.RIGHT() * Vector2(
-                            delta_time * self.stats.move_speed,
-                            delta_time * self.stats.move_speed,
-                        )
-                        new_position.x = clamp(
-                            new_position.x,
-                            level_state.boundary.x,
-                            level_state.boundary.w,
-                        )
-                        self.position = new_position
-                    else:
-                        self._handle_attached_shake(Vector2.RIGHT())
-                    self.anim_sprite.flip_h = False
+                if self.input_enabled:
+                    if Input.is_action_pressed("move_left"):
+                        if not self._are_enemies_attached():
+                            new_position = self.position + Vector2.LEFT() * Vector2(
+                                delta_time * self.stats.move_speed,
+                                delta_time * self.stats.move_speed,
+                            )
+                            new_position.x = clamp(
+                                new_position.x,
+                                level_state.boundary.x,
+                                level_state.boundary.w,
+                            )
+                            self.position = new_position
+                        else:
+                            self._handle_attached_shake(Vector2.LEFT())
+                        self.anim_sprite.flip_h = True
+                    elif Input.is_action_pressed("move_right"):
+                        if not self._are_enemies_attached():
+                            new_position = self.position + Vector2.RIGHT() * Vector2(
+                                delta_time * self.stats.move_speed,
+                                delta_time * self.stats.move_speed,
+                            )
+                            new_position.x = clamp(
+                                new_position.x,
+                                level_state.boundary.x,
+                                level_state.boundary.w,
+                            )
+                            self.position = new_position
+                        else:
+                            self._handle_attached_shake(Vector2.RIGHT())
+                        self.anim_sprite.flip_h = False
                 jump_vector = Vector2(delta_time * jump_speed, delta_time * jump_speed)
                 if is_ascending:
                     self.position += Vector2.UP() * jump_vector
                     skip_ascend_timer = (
-                        Input.is_action_pressed("jump")
+                        self.input_enabled
+                        and Input.is_action_pressed("jump")
                         and ascent_timer_skips < max_ascend_timer_skips
                     )
                     if skip_ascend_timer:
