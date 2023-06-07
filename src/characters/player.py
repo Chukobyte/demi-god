@@ -196,6 +196,7 @@ class Player(Node2D):
         self.in_attack_damage_cooldown = False
         self.physics_update_task = Task(coroutine=self._physics_update_task())
         self.transformation_task: Optional[Task] = None
+        self.health_restore_task: Optional[Task] = None
         self.attack_slash_audio_source = AudioManager.get_audio_source(
             "assets/audio/sfx/attack_slash.wav"
         )
@@ -278,7 +279,9 @@ class Player(Node2D):
             # Item specific
             if issubclass(type(item), HealthRestoreItem):
                 health_item: HealthRestoreItem = item
-                self.stats.hp += health_item.restore_amount
+                self.health_restore_task = Task(
+                    coroutine=self._health_restore_task(health_item.restore_amount)
+                )
 
     def _are_enemies_attached(self) -> bool:
         return (
@@ -377,6 +380,9 @@ class Player(Node2D):
                         self._set_transformed(False)
                         self.transformation_task.close()
                         self.transformation_task = None
+                # Health restore task
+                if self.health_restore_task:
+                    self.health_restore_task.resume()
                 # Change stance if different from last frame
                 if prev_stance != self.stance:
                     if current_stance_task:
@@ -611,6 +617,25 @@ class Player(Node2D):
         except GeneratorExit:
             self.play_animation(self._current_animation_name)
             self.can_untransform = True
+
+    async def _health_restore_task(self, restore_amount: int):
+        try:
+            self.input_enabled = False
+            World.set_time_dilation(0.0)
+            health_gain_audio_source = AudioManager.get_audio_source(
+                "assets/audio/sfx/health_gain.wav"
+            )
+            amount_to_restore = restore_amount
+            while self.stats.hp < self.stats.base_hp and amount_to_restore > 0:
+                self.stats.hp += 1
+                AudioManager.play_sound(health_gain_audio_source)
+                amount_to_restore -= 1
+                await co_suspend()
+                await co_suspend()
+            self.input_enabled = True
+            World.set_time_dilation(1.0)
+        except GeneratorExit:
+            pass
 
     async def _stand_stance_task(self):
         try:
