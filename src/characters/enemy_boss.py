@@ -1,6 +1,7 @@
 from crescent_api import *
 
 from src.characters.enemy import Enemy
+from src.characters.player import Player, PlayerStance
 from src.level_state import LevelState
 from src.utils.game_math import Easer, Ease, map_to_range
 from src.utils.task import *
@@ -48,11 +49,18 @@ class BossHealthBarUI(Node2D):
         )
 
 
+class EnemyBossState:
+    OLD_MOVE_TASK = "move_task"
+    IDLE = "idle"
+    JUMP_AND_ATTACK = "jump_attack"
+
+
 class EnemyBoss(Enemy):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self._set_base_hp(8)
         self.move_dir = Vector2.RIGHT()
+        self.state = EnemyBossState.OLD_MOVE_TASK
         self.physics_update_task = Task(coroutine=self._physics_update_task())
         self.do_entrance_stuff = True
         self.health_bar_ui: Optional[BossHealthBarUI] = None
@@ -92,6 +100,36 @@ class EnemyBoss(Enemy):
 
     # --- TASKS --- #
     async def _physics_update_task(self) -> None:
+        try:
+            player = Player.find_player()
+
+            if self.do_entrance_stuff:
+                landing_pos = self.position + Vector2(0, 100)
+                await Task(coroutine=self._entrance_task(player, landing_pos))
+            level_state = LevelState()
+            level_state.is_paused_from_boss = False
+
+            prev_state: Optional[str] = None
+            state_task: Optional[Task] = None
+            while True:
+                if self.state != prev_state:
+                    if self.state == EnemyBossState.OLD_MOVE_TASK:
+                        state_task = Task(coroutine=self._old_move_state_task(player))
+                    elif self.state == EnemyBossState.IDLE:
+                        state_task = Task(coroutine=self._idle_state_task(player))
+                    elif self.state == EnemyBossState.JUMP_AND_ATTACK:
+                        state_task = Task(
+                            coroutine=self._jump_and_attack_state_task(player)
+                        )
+                    else:
+                        print(f"ERROR: invalid boss state {self.state}")
+                prev_state = self.state
+                state_task.resume()
+                await co_suspend()
+        except GeneratorExit:
+            pass
+
+    async def _old_move_state_task(self, player: Player) -> None:
         def _update_move_dir() -> None:
             if player.position.x > self.position.x:
                 self.anim_sprite.flip_h = False
@@ -101,14 +139,6 @@ class EnemyBoss(Enemy):
                 self.move_dir = Vector2.LEFT()
 
         try:
-            player = self._find_player()
-
-            if self.do_entrance_stuff:
-                landing_pos = self.position + Vector2(0, 100)
-                await Task(coroutine=self._entrance_task(player, landing_pos))
-            level_state = LevelState()
-            level_state.is_paused_from_boss = False
-
             move_speed = 30
             _update_move_dir()
             while True:
@@ -122,14 +152,28 @@ class EnemyBoss(Enemy):
         except GeneratorExit:
             pass
 
-    async def _entrance_task(self, player, landing_pos: Vector2) -> None:
+    async def _idle_state_task(self, player: Player) -> None:
+        try:
+            while True:
+                await co_suspend()
+        except GeneratorExit:
+            pass
+
+    async def _jump_and_attack_state_task(self, player: Player) -> None:
+        try:
+            while True:
+                await co_suspend()
+        except GeneratorExit:
+            pass
+
+    async def _entrance_task(self, player: Player, landing_pos: Vector2) -> None:
         try:
             # Last minute hack to make sure the player lands when entering boss room while in the air
-            if player.stance == "in_air":
+            if player.stance == PlayerStance.IN_AIR:
                 level_state = LevelState()
                 player.input_enabled = False
                 level_state.is_paused_from_boss = False
-                while player.stance == "in_air":
+                while player.stance == PlayerStance.IN_AIR:
                     await co_suspend()
                 player.input_enabled = True
                 level_state.is_paused_from_boss = True
