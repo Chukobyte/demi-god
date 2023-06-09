@@ -1,6 +1,8 @@
+import random
+
 from crescent_api import *
 
-from src.characters.enemy import Enemy
+from src.characters.enemy import Enemy, EnemyAttack
 from src.characters.player import Player, PlayerStance
 from src.level_state import LevelState
 from src.utils.game_math import Easer, Ease, map_to_range
@@ -53,6 +55,36 @@ class EnemyBossState:
     OLD_MOVE_TASK = "move_task"
     IDLE = "idle"
     JUMP_AND_ATTACK = "jump_attack"
+    PROJECTILE_ATTACKS = "projectile_attacks"
+
+
+class EnemyBossProjectile(EnemyAttack):
+    def _start(self) -> None:
+        self.move_speed = 40
+        size = Size2D(4, 4)
+        self.collider = Collider2D.new()
+        self.collider.extents = size
+        self.add_child(self.collider)
+        self.sprite = Sprite.new()
+        self.sprite.position = Vector2(-2, -2)
+        # TODO: Use boss projectile sprite
+        self.sprite.texture = Texture(
+            file_path="assets/images/enemy_jester/enemy_jester_ball_attack.png"
+        )
+        self.sprite.draw_source = Rect2(0, 0, 8, 8)
+        self.add_child(self.sprite)
+        self.physics_update_task = Task(coroutine=self._physics_update_task())
+
+    # --- TASKS --- #
+    async def _physics_update_task(self) -> None:
+        try:
+            life_timer = Timer(15.0)
+            while life_timer.time_remaining > 0.0:
+                life_timer.tick(self.get_full_time_dilation_with_physics_delta())
+                await co_suspend()
+            self.queue_deletion()
+        except GeneratorExit:
+            self.physics_update_task = None
 
 
 class EnemyBoss(Enemy):
@@ -98,6 +130,20 @@ class EnemyBoss(Enemy):
         if self.health_bar_ui:
             self.health_bar_ui.queue_deletion()
 
+    def _face_player(self, player) -> None:
+        if player.position.x > self.position.x:
+            self.anim_sprite.flip_h = False
+            self.move_dir = Vector2.RIGHT()
+        else:
+            self.anim_sprite.flip_h = True
+            self.move_dir = Vector2.LEFT()
+
+    def _spawn_projectile(self) -> EnemyBossProjectile:
+        attack = EnemyBossProjectile.new()
+        attack.direction = self.move_dir
+        attack.z_index = self.z_index + 1
+        return attack
+
     # --- TASKS --- #
     async def _physics_update_task(self) -> None:
         try:
@@ -113,6 +159,8 @@ class EnemyBoss(Enemy):
             state_task: Optional[Task] = None
             while True:
                 if self.state != prev_state:
+                    if state_task:
+                        state_task.close()
                     if self.state == EnemyBossState.OLD_MOVE_TASK:
                         state_task = Task(coroutine=self._old_move_state_task(player))
                     elif self.state == EnemyBossState.IDLE:
@@ -120,6 +168,10 @@ class EnemyBoss(Enemy):
                     elif self.state == EnemyBossState.JUMP_AND_ATTACK:
                         state_task = Task(
                             coroutine=self._jump_and_attack_state_task(player)
+                        )
+                    elif self.state == EnemyBossState.PROJECTILE_ATTACKS:
+                        state_task = Task(
+                            coroutine=self._projectile_attacks_state_task(player)
                         )
                     else:
                         print(f"ERROR: invalid boss state {self.state}")
@@ -130,31 +182,32 @@ class EnemyBoss(Enemy):
             pass
 
     async def _old_move_state_task(self, player: Player) -> None:
-        def _update_move_dir() -> None:
-            if player.position.x > self.position.x:
-                self.anim_sprite.flip_h = False
-                self.move_dir = Vector2.RIGHT()
-            else:
-                self.anim_sprite.flip_h = True
-                self.move_dir = Vector2.LEFT()
-
         try:
             move_speed = 30
-            _update_move_dir()
+            self._face_player(player)
+            move_state_timer = Timer(random.uniform(2.0, 4.0))
             while True:
+                if self._is_outside_of_camera_viewport(Vector2.ZERO()):
+                    self._face_player(player)
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 self.position += self.move_dir * Vector2(
                     move_speed * delta_time, move_speed * delta_time
                 )
-                if self.position.distance_to(player.position) > 60:
-                    _update_move_dir()
+                move_state_timer.tick(delta_time)
+                if move_state_timer.has_stopped():
+                    self.state = EnemyBossState.PROJECTILE_ATTACKS
                 await co_suspend()
         except GeneratorExit:
             pass
 
     async def _idle_state_task(self, player: Player) -> None:
         try:
+            idle_state_timer = Timer(random.uniform(2.0, 4.0))
             while True:
+                delta_time = self.get_full_time_dilation_with_physics_delta()
+                idle_state_timer.tick(delta_time)
+                if idle_state_timer.has_stopped():
+                    self.state = EnemyBossState.OLD_MOVE_TASK
                 await co_suspend()
         except GeneratorExit:
             pass
@@ -163,6 +216,25 @@ class EnemyBoss(Enemy):
         try:
             while True:
                 await co_suspend()
+        except GeneratorExit:
+            pass
+
+    async def _projectile_attacks_state_task(self, player: Player) -> None:
+        try:
+            self._face_player(player)
+            await co_wait_seconds(1.0)
+
+            y_offsets = random.choice(
+                [[2, -10, 2], [-10, 2, -10]]
+            )  # 2 = low, -10 = high
+            projectiles_to_spawn = 3
+            for i in range(projectiles_to_spawn):
+                attack = self._spawn_projectile()
+                attack.position = self.position + Vector2(0, y_offsets[i])
+                SceneTree.get_root().add_child(attack)
+                await co_wait_seconds(1.0)
+            self.state = EnemyBossState.OLD_MOVE_TASK
+            await co_suspend()
         except GeneratorExit:
             pass
 
