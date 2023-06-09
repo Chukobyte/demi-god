@@ -89,7 +89,7 @@ class EnemyBossProjectile(EnemyAttack):
 class EnemyBoss(Enemy):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self._set_base_hp(8)
+        self._set_base_hp(32)
         self.move_dir = Vector2.RIGHT()
         self.state = EnemyBossState.OLD_MOVE_TASK
         self.physics_update_task = Task(coroutine=self._physics_update_task())
@@ -180,7 +180,7 @@ class EnemyBoss(Enemy):
 
     async def _old_move_state_task(self, player: Player) -> None:
         try:
-            move_speed = 30
+            move_speed = 25
             self._face_player(player)
             move_state_timer = Timer(random.uniform(1.5, 3.0))
             while True:
@@ -206,6 +206,7 @@ class EnemyBoss(Enemy):
             jump_speed = Vector2(random.randint(25, 50), -50)
             if self.move_dir == Vector2.LEFT():
                 jump_speed.x *= -1
+            # ASCEND
             while is_ascending:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 jump_vector = jump_speed * Vector2(delta_time, delta_time)
@@ -215,6 +216,15 @@ class EnemyBoss(Enemy):
                 if level_state.floor_y - self.position.y >= jump_height:
                     is_ascending = False
                 await co_suspend()
+            # ATTACK
+            await co_wait_seconds(0.25)
+            attack = self._spawn_projectile()
+            attack.position = self.position
+            attack.direction = self.position.direction_to(player.position)
+            attack.move_speed = 60
+            SceneTree.get_root().add_child(attack)
+            await co_wait_seconds(0.1)
+            # DESCENT
             is_descending = True
             jump_speed.y *= -1
             while is_descending:
@@ -284,13 +294,14 @@ class EnemyBoss(Enemy):
             await co_suspend()
             await co_suspend()
             await co_suspend()
-            # Fill up health bar 1 point at a time
+            # Fill up health bar in small increments at a time
             health_gain_audio_source = AudioManager.get_audio_source(
                 "assets/audio/sfx/health_gain.wav"
             )
             fill_hp_amount = 0
+            hp_increment_amount = int(self.base_hp / 8)
             while fill_hp_amount < self.base_hp:
-                fill_hp_amount += 1
+                fill_hp_amount += hp_increment_amount
                 self.health_bar_ui.update(self.base_hp, fill_hp_amount)
                 AudioManager.play_sound(health_gain_audio_source)
                 await co_suspend()

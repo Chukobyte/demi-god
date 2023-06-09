@@ -9,7 +9,7 @@ from src.characters.player import Player
 from src.level_area import LevelArea, LevelSection, LevelAreaType
 from src.level_state import LevelState
 from src.utils import game_math
-from src.utils.task import co_suspend, co_return, Task
+from src.utils.task import co_suspend, co_return, Task, co_wait_seconds
 from src.utils.timer import Timer
 
 
@@ -195,6 +195,8 @@ class EnemyAreaManager:
                 )
                 AudioManager.stop_sound(source=self.main_theme_audio_source)
 
+            # Small delay in case of knock back
+            await co_wait_seconds(1.0)
             area.is_completed = True
         except GeneratorExit:
             if not area.is_completed:
