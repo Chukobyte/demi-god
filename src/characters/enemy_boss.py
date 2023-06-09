@@ -53,7 +53,6 @@ class BossHealthBarUI(Node2D):
 
 class EnemyBossState:
     OLD_MOVE_TASK = "move_task"
-    IDLE = "idle"
     JUMP_AND_ATTACK = "jump_attack"
     PROJECTILE_ATTACKS = "projectile_attacks"
 
@@ -163,8 +162,6 @@ class EnemyBoss(Enemy):
                         state_task.close()
                     if self.state == EnemyBossState.OLD_MOVE_TASK:
                         state_task = Task(coroutine=self._old_move_state_task(player))
-                    elif self.state == EnemyBossState.IDLE:
-                        state_task = Task(coroutine=self._idle_state_task(player))
                     elif self.state == EnemyBossState.JUMP_AND_ATTACK:
                         state_task = Task(
                             coroutine=self._jump_and_attack_state_task(player)
@@ -185,7 +182,7 @@ class EnemyBoss(Enemy):
         try:
             move_speed = 30
             self._face_player(player)
-            move_state_timer = Timer(random.uniform(2.0, 4.0))
+            move_state_timer = Timer(random.uniform(1.5, 3.0))
             while True:
                 if self._is_outside_of_camera_viewport(Vector2.ZERO()):
                     self._face_player(player)
@@ -200,22 +197,37 @@ class EnemyBoss(Enemy):
         except GeneratorExit:
             pass
 
-    async def _idle_state_task(self, player: Player) -> None:
-        try:
-            idle_state_timer = Timer(random.uniform(2.0, 4.0))
-            while True:
-                delta_time = self.get_full_time_dilation_with_physics_delta()
-                idle_state_timer.tick(delta_time)
-                if idle_state_timer.has_stopped():
-                    self.state = EnemyBossState.OLD_MOVE_TASK
-                await co_suspend()
-        except GeneratorExit:
-            pass
-
     async def _jump_and_attack_state_task(self, player: Player) -> None:
         try:
-            while True:
+            level_state = LevelState()
+            self._face_player(player)
+            is_ascending = True
+            jump_height = random.randint(35, 50)
+            jump_speed = Vector2(random.randint(25, 50), -50)
+            if self.move_dir == Vector2.LEFT():
+                jump_speed.x *= -1
+            while is_ascending:
+                delta_time = self.get_full_time_dilation_with_physics_delta()
+                jump_vector = jump_speed * Vector2(delta_time, delta_time)
+                new_pos = self.position + jump_vector
+                new_pos.y = max(new_pos.y, level_state.floor_y - jump_height)
+                self.position = new_pos
+                if level_state.floor_y - self.position.y >= jump_height:
+                    is_ascending = False
                 await co_suspend()
+            is_descending = True
+            jump_speed.y *= -1
+            while is_descending:
+                delta_time = self.get_full_time_dilation_with_physics_delta()
+                jump_vector = jump_speed * Vector2(delta_time, delta_time)
+                new_pos = self.position + jump_vector
+                new_pos.y = min(new_pos.y, level_state.floor_y)
+                self.position = new_pos
+                if self.position.y >= level_state.floor_y:
+                    is_descending = False
+                await co_suspend()
+            self.state = EnemyBossState.OLD_MOVE_TASK
+            await co_suspend()
         except GeneratorExit:
             pass
 
@@ -224,16 +236,16 @@ class EnemyBoss(Enemy):
             self._face_player(player)
             await co_wait_seconds(1.0)
 
-            y_offsets = random.choice(
-                [[2, -10, 2], [-10, 2, -10]]
-            )  # 2 = low, -10 = high
+            # Random offsets either starting attack high or low (2 = low, -10 = high)
+            y_offsets = random.choice([[2, -10, 2], [-10, 2, -10]])
             projectiles_to_spawn = 3
             for i in range(projectiles_to_spawn):
+                self._face_player(player)
                 attack = self._spawn_projectile()
                 attack.position = self.position + Vector2(0, y_offsets[i])
                 SceneTree.get_root().add_child(attack)
                 await co_wait_seconds(1.0)
-            self.state = EnemyBossState.OLD_MOVE_TASK
+            self.state = EnemyBossState.JUMP_AND_ATTACK
             await co_suspend()
         except GeneratorExit:
             pass
