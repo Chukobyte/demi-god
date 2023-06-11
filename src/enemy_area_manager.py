@@ -91,9 +91,9 @@ class EnemyAreaManager:
                     player_pos = Player.find_player().position
                     for enemy in enemies_of_type_in_level:
                         if enemy.position.x > player_pos.x:
-                            left_side_count += 1
-                        else:
                             right_side_count += 1
+                        else:
+                            left_side_count += 1
                     if left_side_count > right_side_count:
                         x_modifier = x_range.max
                     elif right_side_count > left_side_count:

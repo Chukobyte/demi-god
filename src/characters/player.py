@@ -101,13 +101,21 @@ class PlayerItemDescription:
 
 
 class PlayerStats:
-    def __init__(self, base_hp=0.0, base_energy=0.0, base_move_speed=0):
+    def __init__(
+        self,
+        base_hp=0.0,
+        base_energy=0.0,
+        base_move_speed=0,
+        base_energy_restored_from_attacks=0.0,
+    ):
         self._hp = base_hp
         self._base_hp = base_hp
         self._energy = base_energy
         self._base_energy = base_energy
         self._move_speed = base_move_speed
         self._base_move_speed = base_move_speed
+        self._energy_restored_from_attacks = base_energy_restored_from_attacks
+        self._base_energy_restored_from_attacks = base_energy_restored_from_attacks
         self.health_bar_ui: Optional[ColorRect] = None
         self.energy_bar_ui: Optional[ColorRect] = None
         self.base_health_bar_ui_size = Size2D(52, 9)
@@ -150,6 +158,14 @@ class PlayerStats:
     def move_speed(self, value: int) -> None:
         self._move_speed = value
 
+    @property
+    def energy_restored_from_attacks(self) -> float:
+        return self._energy_restored_from_attacks
+
+    @energy_restored_from_attacks.setter
+    def energy_restored_from_attacks(self, value: float) -> None:
+        self._energy_restored_from_attacks = value
+
     def set_hp(self, hp: float) -> None:
         self._hp = clamp(hp, 0.0, self._base_hp)
         new_hp_bar_width = map_to_range(
@@ -175,6 +191,9 @@ class PlayerStats:
     def reset_move_speed(self) -> None:
         self._move_speed = self._base_move_speed
 
+    def reset_energy_restored_from_attacks(self) -> None:
+        self._energy_restored_from_attacks = self._base_energy_restored_from_attacks
+
 
 class Player(Node2D):
     def __init__(self, entity_id: int):
@@ -182,7 +201,12 @@ class Player(Node2D):
         self.anim_sprite: Optional[AnimatedSprite] = None
         self.collider: Optional[Collider2D] = None
         self.stance = PlayerStance.STANDING
-        self.stats = PlayerStats(base_hp=10, base_energy=20, base_move_speed=25)
+        self.stats = PlayerStats(
+            base_hp=10,
+            base_energy=20,
+            base_move_speed=25,
+            base_energy_restored_from_attacks=0.5,
+        )
         self.attack_requested = False
         self.special_attack_requested = False
         self.energy_attack_cost = 5
@@ -335,7 +359,7 @@ class Player(Node2D):
             melee_attack.subscribe_to_event(
                 event_id="hit_enemy",
                 scoped_node=self,
-                callback_func=lambda args: self.stats.set_energy(self.stats.energy + 1),
+                callback_func=lambda args: self._on_attack_hit_enemy(),
             )
             melee_attack.position = attack_pos
             melee_attack.z_index = attack_z_index
@@ -344,14 +368,21 @@ class Player(Node2D):
             SceneTree.get_root().add_child(melee_attack)
         AudioManager.play_sound(source=self.attack_slash_audio_source)
 
+    def _on_attack_hit_enemy(self) -> None:
+        self.stats.set_energy(
+            self.stats.energy + self.stats.energy_restored_from_attacks
+        )
+
     def _set_transformed(self, is_transformed: bool) -> None:
         if self.is_transformed != is_transformed:
             self.is_transformed = is_transformed
             if self.is_transformed:
                 self.stats.move_speed += 5
+                self.stats.energy_restored_from_attacks = 0.25
                 self.can_untransform = False
             else:
                 self.stats.reset_move_speed()
+                self.stats.reset_energy_restored_from_attacks()
 
     # --- TASKS --- #
     async def _physics_update_task(self):
