@@ -15,9 +15,9 @@ class EnemySnake(Enemy):
 
     def _get_move_dir(self, player) -> Vector2:
         if player.position.x > self.position.x:
-            return Vector2.RIGHT()
+            return Vector2.RIGHT
         else:
-            return Vector2.LEFT()
+            return Vector2.LEFT
 
     # --- TASKS --- #
     async def _physics_update_task(self) -> None:
@@ -26,7 +26,7 @@ class EnemySnake(Enemy):
             move_speed = 30
             has_passed_player = False
             move_dir = self._get_move_dir(player)
-            if move_dir == Vector2.LEFT():
+            if move_dir == Vector2.LEFT:
                 self.anim_sprite.flip_h = True
             while True:
                 if has_passed_player and self._is_outside_of_camera_viewport():

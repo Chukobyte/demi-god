@@ -50,7 +50,7 @@ class EnemyJester(Enemy):
         self.state = EnemyJesterState.FOLLOWING_PLAYER
         self.physics_update_task = Task(coroutine=self._physics_update_task())
         self.move_speed = 30
-        self.move_dir = Vector2.RIGHT()
+        self.move_dir = Vector2.RIGHT
         self.player: Optional[Node2D] = None
         self.level_state = LevelState()
 
@@ -78,11 +78,11 @@ class EnemyJester(Enemy):
             prev_state = None
             state_task: Optional[Task] = None
             if self.player.position.x > self.position.x:
-                self.move_dir = Vector2.RIGHT()
+                self.move_dir = Vector2.RIGHT
             else:
                 anim_sprite = self.get_child("AnimatedSprite")
                 anim_sprite.flip_h = True
-                self.move_dir = Vector2.LEFT()
+                self.move_dir = Vector2.LEFT
             while True:
                 # if self._is_outside_of_level_boundary():
                 #     self.queue_deletion()
@@ -148,7 +148,7 @@ class EnemyJester(Enemy):
                     self._spawn_projectile_attack()
                     attack_timer.time = random.uniform(0.25, 3.0)
                     attack_timer.reset()
-                    self.anim_sprite.modulate = Color.WHITE()
+                    self.anim_sprite.modulate = Color.WHITE
                     # Slight cooldown after attacking
                     await co_wait_seconds(0.25)
                     has_attacked_once = True

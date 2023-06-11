@@ -10,7 +10,7 @@ class LevelCloud(Sprite):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.move_speed = random.randint(5, 15)
-        self.move_dir = Vector2.RIGHT()
+        self.move_dir = Vector2.RIGHT
         self._elapsed_time = 0.0
 
     def _fixed_update(self, delta_time: float) -> None:

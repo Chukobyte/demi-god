@@ -90,7 +90,7 @@ class EnemyBoss(Enemy):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self._set_base_hp(32)
-        self.move_dir = Vector2.RIGHT()
+        self.move_dir = Vector2.RIGHT
         self.state = EnemyBossState.OLD_MOVE_TASK
         self.physics_update_task = Task(coroutine=self._physics_update_task())
         self.do_entrance_stuff = True
@@ -132,10 +132,10 @@ class EnemyBoss(Enemy):
     def _face_player(self, player) -> None:
         if player.position.x > self.position.x:
             self.anim_sprite.flip_h = False
-            self.move_dir = Vector2.RIGHT()
+            self.move_dir = Vector2.RIGHT
         else:
             self.anim_sprite.flip_h = True
-            self.move_dir = Vector2.LEFT()
+            self.move_dir = Vector2.LEFT
 
     def _spawn_projectile(self) -> EnemyBossProjectile:
         attack = EnemyBossProjectile.new()
@@ -184,7 +184,7 @@ class EnemyBoss(Enemy):
             self._face_player(player)
             move_state_timer = Timer(random.uniform(1.5, 3.0))
             while True:
-                if self._is_outside_of_camera_viewport(Vector2.ZERO()):
+                if self._is_outside_of_camera_viewport(Vector2.ZERO):
                     self._face_player(player)
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 self.position += self.move_dir * Vector2(
@@ -204,7 +204,7 @@ class EnemyBoss(Enemy):
             is_ascending = True
             jump_height = random.randint(35, 50)
             jump_speed = Vector2(random.randint(25, 50), -50)
-            if self.move_dir == Vector2.LEFT():
+            if self.move_dir == Vector2.LEFT:
                 jump_speed.x *= -1
             # ASCEND
             while is_ascending:

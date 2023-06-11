@@ -190,7 +190,7 @@ class Player(Node2D):
         self.can_untransform = False
         self.enemies_attached_to_left: List[Enemy] = []
         self.enemies_attached_to_right: List[Enemy] = []
-        self.last_shake_dir = Vector2.ZERO()
+        self.last_shake_dir = Vector2.ZERO
         # Used when attacking to delay a frame on contact
         self.enemy_collision_invincible = False
         self.in_attack_damage_cooldown = False
@@ -307,7 +307,7 @@ class Player(Node2D):
             if self._are_enemies_attached():
                 self.last_shake_dir = new_shake_dir
             else:
-                self.last_shake_dir = Vector2.ZERO()
+                self.last_shake_dir = Vector2.ZERO
 
     def _execute_attack(self) -> None:
         if self.stance == PlayerStance.CROUCHING:
@@ -317,10 +317,10 @@ class Player(Node2D):
         if self.anim_sprite.flip_h:
             left_side_offset = Vector2(-12, 0)
             attack_pos_offset = Vector2(-12, attack_y) + left_side_offset
-            attack_dir = Vector2.LEFT()
+            attack_dir = Vector2.LEFT
         else:
             attack_pos_offset = Vector2(12, attack_y)
-            attack_dir = Vector2.RIGHT()
+            attack_dir = Vector2.RIGHT
         attack_pos = self.position + attack_pos_offset
         attack_z_index = self.z_index + 1
         if self.special_attack_requested:
@@ -654,7 +654,7 @@ class Player(Node2D):
                 elif self.input_enabled:
                     if Input.is_action_pressed("move_left"):
                         if not self._are_enemies_attached():
-                            new_position = self.position + Vector2.LEFT() * Vector2(
+                            new_position = self.position + Vector2.LEFT * Vector2(
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
                             )
@@ -666,11 +666,11 @@ class Player(Node2D):
                             self.play_animation("walk")
                             self.position = new_position
                         else:
-                            self._handle_attached_shake(Vector2.LEFT())
+                            self._handle_attached_shake(Vector2.LEFT)
                         self.anim_sprite.flip_h = True
                     elif Input.is_action_pressed("move_right"):
                         if not self._are_enemies_attached():
-                            new_position = self.position + Vector2.RIGHT() * Vector2(
+                            new_position = self.position + Vector2.RIGHT * Vector2(
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
                             )
@@ -682,7 +682,7 @@ class Player(Node2D):
                             self.play_animation("walk")
                             self.position = new_position
                         else:
-                            self._handle_attached_shake(Vector2.RIGHT())
+                            self._handle_attached_shake(Vector2.RIGHT)
                         self.anim_sprite.flip_h = False
                     else:
                         self.play_animation("idle")
@@ -717,11 +717,11 @@ class Player(Node2D):
                 elif self.input_enabled:
                     if Input.is_action_pressed("move_left"):
                         if self._are_enemies_attached():
-                            self._handle_attached_shake(Vector2.LEFT())
+                            self._handle_attached_shake(Vector2.LEFT)
                         self.anim_sprite.flip_h = True
                     elif Input.is_action_pressed("move_right"):
                         if self._are_enemies_attached():
-                            self._handle_attached_shake(Vector2.RIGHT())
+                            self._handle_attached_shake(Vector2.RIGHT)
                         self.anim_sprite.flip_h = False
                     if Input.is_action_pressed("jump"):
                         self.stance = PlayerStance.IN_AIR
@@ -760,7 +760,7 @@ class Player(Node2D):
                 if self.input_enabled:
                     if Input.is_action_pressed("move_left"):
                         if not self._are_enemies_attached():
-                            new_position = self.position + Vector2.LEFT() * Vector2(
+                            new_position = self.position + Vector2.LEFT * Vector2(
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
                             )
@@ -771,11 +771,11 @@ class Player(Node2D):
                             )
                             self.position = new_position
                         else:
-                            self._handle_attached_shake(Vector2.LEFT())
+                            self._handle_attached_shake(Vector2.LEFT)
                         self.anim_sprite.flip_h = True
                     elif Input.is_action_pressed("move_right"):
                         if not self._are_enemies_attached():
-                            new_position = self.position + Vector2.RIGHT() * Vector2(
+                            new_position = self.position + Vector2.RIGHT * Vector2(
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
                             )
@@ -786,11 +786,11 @@ class Player(Node2D):
                             )
                             self.position = new_position
                         else:
-                            self._handle_attached_shake(Vector2.RIGHT())
+                            self._handle_attached_shake(Vector2.RIGHT)
                         self.anim_sprite.flip_h = False
                 jump_vector = Vector2(delta_time * jump_speed, delta_time * jump_speed)
                 if is_ascending:
-                    self.position += Vector2.UP() * jump_vector
+                    self.position += Vector2.UP * jump_vector
                     skip_ascend_timer = (
                         self.input_enabled
                         and Input.is_action_pressed("jump")
@@ -803,7 +803,7 @@ class Player(Node2D):
                     if ascend_timer.time_remaining <= 0:
                         is_ascending = False
                 else:
-                    self.position += Vector2.DOWN() * jump_vector
+                    self.position += Vector2.DOWN * jump_vector
                     if self.position.y == level_state.floor_y:
                         self.stance = PlayerStance.STANDING
                         await co_return()

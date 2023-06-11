@@ -28,7 +28,7 @@ class SignItem(Item):
         # Color Rect
         self.color_rect = ColorRect.new()
         self.color_rect.size = size
-        self.color_rect.color = Color.RED()
+        self.color_rect.color = Color.RED
         self.add_child(self.color_rect)
         # Collider
         self.collider = Collider2D.new()
@@ -47,7 +47,7 @@ class AttackItem(Item):
         # Color Rect
         self.color_rect = ColorRect.new()
         self.color_rect.size = size
-        self.color_rect.color = Color.RED()
+        self.color_rect.color = Color.RED
         self.add_child(self.color_rect)
         # Collider
         self.collider = Collider2D.new()

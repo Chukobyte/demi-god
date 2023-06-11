@@ -17,10 +17,10 @@ class EnemyRabbit(Enemy):
             player = self._find_player()
             move_speed = 30
             if player.position.x > self.position.x:
-                move_dir = Vector2.RIGHT()
+                move_dir = Vector2.RIGHT
             else:
                 self.anim_sprite.flip_h = True
-                move_dir = Vector2.LEFT()
+                move_dir = Vector2.LEFT
             while True:
                 # if self._is_outside_of_level_boundary():
                 #     self.queue_deletion()

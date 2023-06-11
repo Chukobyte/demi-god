@@ -9,7 +9,7 @@ class EnemyAttack(Node2D):
         super().__init__(entity_id)
         self.damage = 0
         self.move_speed = 0
-        self.direction = Vector2.ZERO()
+        self.direction = Vector2.ZERO
         self.physics_update_task: Optional[Task] = None
         self.collider: Optional[Collider2D] = None
         self.destroy_on_touch = True
@@ -17,7 +17,7 @@ class EnemyAttack(Node2D):
     def _fixed_update(self, delta_time: float) -> None:
         if self.physics_update_task:
             self.physics_update_task.resume()
-        if self.direction == Vector2.ZERO():
+        if self.direction == Vector2.ZERO:
             return None
         self.add_to_position(
             Vector2(
@@ -136,9 +136,9 @@ class Enemy(Node2D):
                 player = self._find_player()
                 knock_back_distance = 5
                 if self.position.x > player.position.x:
-                    knock_back_dir = Vector2.RIGHT()
+                    knock_back_dir = Vector2.RIGHT
                 else:
-                    knock_back_dir = Vector2.LEFT()
+                    knock_back_dir = Vector2.LEFT
                 knock_back_velocity = (
                     Vector2(knock_back_distance, knock_back_distance) * knock_back_dir
                 )

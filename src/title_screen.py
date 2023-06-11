@@ -83,7 +83,7 @@ class TitleScreen(Node2D):
             time_for_title_to_move_to_pos = 5.0
             title_easer = Easer(
                 self.title_sprite.position,
-                Vector2.ZERO(),
+                Vector2.ZERO,
                 time_for_title_to_move_to_pos,
                 Ease.Cubic.ease_out_vec2,
             )
@@ -93,7 +93,7 @@ class TitleScreen(Node2D):
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 # Title
                 if self.skip_title_screen_anims:
-                    self.title_sprite.position = Vector2.ZERO()
+                    self.title_sprite.position = Vector2.ZERO
                     title_screen_done_timer.time_remaining = 0.0
                 else:
                     self.title_sprite.position = title_easer.ease(delta_time)
