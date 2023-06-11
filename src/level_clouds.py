@@ -21,12 +21,27 @@ class LevelCloud(Sprite):
             + Vector2(delta_time * self.move_speed, delta_time * self.move_speed)
             * self.move_dir
         )
-        self.position = Ease.Cubic.ease_in_vec2(
+        new_pos = Ease.Cubic.ease_in_vec2(
             elapsed_time=self._elapsed_time,
             from_pos=current_pos,
             to_pos=new_pos,
             duration=self._elapsed_time + 0.1,
         )
+        self.position = self._attempt_reposition(new_pos)
+
+    def _attempt_reposition(self, position: Vector2, padding=96) -> Vector2:
+        camera_pos = Camera2D.get_position()
+        game_props = GameProperties()
+        camera_dimension = Size2D(
+            game_props.game_resolution.w + camera_pos.x,
+            game_props.game_resolution.h + camera_pos.y,
+        )
+        # Check if too far to left
+        if position.x < camera_pos.x - padding:
+            position.x = camera_dimension.w + padding - 32
+        elif position.x > camera_dimension.w + padding:
+            position.x = camera_pos.x - padding + 32
+        return position
 
 
 class LevelCloudManager:

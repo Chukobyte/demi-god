@@ -110,7 +110,11 @@ class Enemy(Node2D):
     def _is_outside_of_camera_viewport(self, padding=Vector2(64.0, 64.0)) -> bool:
         position = self.position
         camera_pos = Camera2D.get_position()
-        camera_dimension = Size2D(160 + camera_pos.x, 144 + camera_pos.y)
+        game_props = GameProperties()
+        camera_dimension = Size2D(
+            game_props.game_resolution.w + camera_pos.x,
+            game_props.game_resolution.h + camera_pos.y,
+        )
         return (
             position.x < camera_pos.x - padding.x
             or position.x > camera_dimension.w + padding.x

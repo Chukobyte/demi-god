@@ -1,6 +1,8 @@
 import copy
 from typing import Optional, List, Type
 
+from crescent_api import GameProperties
+
 from src.characters.enemy_definitions import EnemyDefinition
 from src.items import HealthRestoreItem
 
@@ -86,7 +88,9 @@ class LevelAreaDefinitions:
             ],
         ),
         3: LevelArea(
-            area_type=LevelAreaType.POWER_UP, width=160, item_types=[HealthRestoreItem]
+            area_type=LevelAreaType.POWER_UP,
+            width=GameProperties().game_resolution.w,
+            item_types=[HealthRestoreItem],
         ),
         4: LevelArea(
             area_type=LevelAreaType.NORMAL,
@@ -127,9 +131,11 @@ class LevelAreaDefinitions:
         ),
         5: LevelArea(
             area_type=LevelAreaType.BOSS,
-            width=160,
+            width=GameProperties().game_resolution.w,
         ),
-        6: LevelArea(area_type=LevelAreaType.END, width=160),
+        6: LevelArea(
+            area_type=LevelAreaType.END, width=GameProperties().game_resolution.w
+        ),
     }
 
     @staticmethod

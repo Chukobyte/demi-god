@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from crescent_api import Rect2, ShaderInstance, Vector2, SceneTree, TextLabel, World
+from crescent_api import *
 
 from src.environment.bridge_gate import BridgeGate
 from src.utils.task import co_suspend
@@ -88,7 +88,7 @@ class LevelState:
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = object.__new__(cls)
-            cls.boundary = Rect2(0, 0, 0, 144)
+            cls.boundary = Rect2(0, 0, 0, GameProperties().game_resolution.h)
             cls.floor_y = 78.0
             cls.is_paused = False
             cls.is_gate_transition_queued = False
