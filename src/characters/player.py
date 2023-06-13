@@ -39,7 +39,7 @@ class PlayerAttack(ColorRect):
                     and not collider_parent.is_destroyed
                     and collider_parent not in self.damaged_enemies
                 ):
-                    self.broadcast_event("hit_enemy")
+                    self.broadcast_event("hit_enemy", collider_parent)
                     collider_parent.take_damage(self.damage)
                     self.damaged_enemies.append(collider_parent)
 
@@ -359,7 +359,7 @@ class Player(Node2D):
             melee_attack.subscribe_to_event(
                 event_id="hit_enemy",
                 scoped_node=self,
-                callback_func=lambda args: self._on_attack_hit_enemy(),
+                callback_func=lambda enemy: self._on_attack_hit_enemy(enemy),
             )
             melee_attack.position = attack_pos
             melee_attack.z_index = attack_z_index
@@ -368,10 +368,14 @@ class Player(Node2D):
             SceneTree.get_root().add_child(melee_attack)
         AudioManager.play_sound(source=self.attack_slash_audio_source)
 
-    def _on_attack_hit_enemy(self) -> None:
+    def _on_attack_hit_enemy(self, enemy: Enemy) -> None:
         self.stats.set_energy(
             self.stats.energy + self.stats.energy_restored_from_attacks
         )
+        if enemy in self.enemies_attached_to_left:
+            self.enemies_attached_to_left.remove(enemy)
+        elif enemy in self.enemies_attached_to_right:
+            self.enemies_attached_to_right.remove(enemy)
 
     def _set_transformed(self, is_transformed: bool) -> None:
         if self.is_transformed != is_transformed:
