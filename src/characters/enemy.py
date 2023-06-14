@@ -90,6 +90,12 @@ class Enemy(Node2D):
             self.broadcast_event("destroyed", self)
             self.queue_deletion()
 
+    def destroy_from_shake(self) -> None:
+        self.destroy()
+
+    def destroy_from_contact(self) -> None:
+        self.destroy()
+
     def _set_base_hp(self, hp: int) -> None:
         self.base_hp = hp
         self.hp = hp
