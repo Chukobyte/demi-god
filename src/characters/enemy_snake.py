@@ -2,6 +2,7 @@ from crescent_api import Vector2, MinMax
 
 from src.characters.enemy import Enemy
 from src.utils.task import *
+from src.utils.timer import Timer
 
 
 class EnemySnake(Enemy):
@@ -19,7 +20,38 @@ class EnemySnake(Enemy):
         else:
             return Vector2.LEFT
 
+    def destroy_from_contact(self) -> None:
+        self.destroy()
+        # TODO: Fix rotation position with camera in engine.
+        # if not self.is_destroyed:
+        #     self.is_destroyed = True
+        #     self.broadcast_event("destroyed", self)
+        #     self.anim_sprite.stop()
+        #     self.destroyed_task = Task(coroutine=self._destroy_from_contact_task())
+
     # --- TASKS --- #
+    async def _destroy_from_contact_task(self) -> None:
+        try:
+            fly_speed = 10
+            if self.anim_sprite.flip_h:
+                fly_dir = Vector2(1, -1)
+            else:
+                fly_dir = Vector2(-1, -1)
+            self.rotation = 90
+            fly_timer = Timer(5.0)
+            while True:
+                delta_time = self.get_full_time_dilation_with_physics_delta()
+                fly_timer.tick(delta_time)
+                if fly_timer.has_stopped():
+                    break
+                self.position += fly_dir * Vector2(
+                    fly_speed * delta_time, fly_speed * delta_time
+                )
+                await co_suspend()
+            self.queue_deletion()
+        except GeneratorExit:
+            pass
+
     async def _physics_update_task(self) -> None:
         try:
             player = self._find_player()
