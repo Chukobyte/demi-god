@@ -16,26 +16,26 @@ class EnemyRabbit(Enemy):
         if not self.is_destroyed:
             self.is_destroyed = True
             self.broadcast_event("destroyed", self)
+            self.anim_sprite.stop()
             self.destroyed_task = Task(coroutine=self._destroy_from_shake_task())
 
     # --- TASKS --- #
     async def _destroy_from_shake_task(self) -> None:
         try:
-            # fly_speed = 60
-            # if self.anim_sprite.flip_h:
-            #     fly_dir = Vector2.RIGHT
-            # else:
-            #     fly_dir = Vector2.LEFT
-            # fly_dir.y = -1
+            fly_speed = 60
+            if self.anim_sprite.flip_h:
+                fly_dir = Vector2(1, -1)
+            else:
+                fly_dir = Vector2(-1, -1)
             fly_timer = Timer(5.0)
             while True:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 fly_timer.tick(delta_time)
                 if fly_timer.has_stopped():
                     break
-                # self.position += fly_dir * Vector2(
-                #     fly_speed * delta_time, fly_speed * delta_time
-                # )
+                self.position += fly_dir * Vector2(
+                    fly_speed * delta_time, fly_speed * delta_time
+                )
                 await co_suspend()
             self.queue_deletion()
         except GeneratorExit:
