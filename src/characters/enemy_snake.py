@@ -21,28 +21,40 @@ class EnemySnake(Enemy):
             return Vector2.LEFT
 
     def destroy_from_contact(self) -> None:
-        self.destroy()
         # TODO: Fix rotation position with camera in engine.
-        # if not self.is_destroyed:
-        #     self.is_destroyed = True
-        #     self.broadcast_event("destroyed", self)
-        #     self.anim_sprite.stop()
-        #     self.destroyed_task = Task(coroutine=self._destroy_from_contact_task())
+        if not self.is_destroyed:
+            self.is_destroyed = True
+            self.broadcast_event("destroyed", self)
+            self.anim_sprite.play("death")
+            self.destroyed_task = Task(coroutine=self._destroy_from_contact_task())
 
     # --- TASKS --- #
     async def _destroy_from_contact_task(self) -> None:
         try:
-            fly_speed = 10
+            fly_speed = 40
             if self.anim_sprite.flip_h:
                 fly_dir = Vector2(1, -1)
             else:
                 fly_dir = Vector2(-1, -1)
-            self.rotation = 90
-            fly_timer = Timer(5.0)
+            # Ascend
+            ascend_timer = Timer(0.25)
             while True:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
-                fly_timer.tick(delta_time)
-                if fly_timer.has_stopped():
+                ascend_timer.tick(delta_time)
+                if ascend_timer.has_stopped():
+                    break
+                self.position += fly_dir * Vector2(
+                    fly_speed * delta_time, fly_speed * delta_time
+                )
+                await co_suspend()
+            # Descend
+            fly_speed = 30
+            fly_dir = Vector2(0, 1)
+            descend_timer = Timer(4.5)
+            while True:
+                delta_time = self.get_full_time_dilation_with_physics_delta()
+                descend_timer.tick(delta_time)
+                if descend_timer.has_stopped():
                     break
                 self.position += fly_dir * Vector2(
                     fly_speed * delta_time, fly_speed * delta_time

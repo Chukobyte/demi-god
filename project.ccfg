@@ -63,6 +63,12 @@
                 "nearest_neighbor": true
             },
             {
+                "file_path": "assets/images/enemy_snake/enemy_snake_death.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
                 "file_path": "assets/images/enemy_jester/enemy_jester_idle.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",
