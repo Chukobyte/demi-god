@@ -20,6 +20,7 @@ class LevelAreaManager:
         self._manage_level_areas_task = Task(coroutine=self.manage_level_areas())
         self._manage_enemy_area_task: Optional[Task] = None
         self._current_area: Optional[LevelArea] = None
+        self._choose_item_label: Optional[TextLabel] = None
         self._has_processed_current_area_completion = False
 
     def update(self) -> None:
@@ -30,7 +31,10 @@ class LevelAreaManager:
         self._has_processed_current_area_completion = False
 
     def _setup_area_type(self, area: LevelArea, level_state: LevelState) -> None:
-        if area.area_type == LevelAreaType.POWER_UP:
+        if (
+            area.area_type == LevelAreaType.POWER_UP
+            or area.area_type == LevelAreaType.INTRO
+        ):
             item_type = area.item_types[0]
             attack_item = ItemUtils.get_item_from_type(item_type)
             main_node = SceneTree.get_root()
@@ -44,7 +48,16 @@ class LevelAreaManager:
                 level_state.boundary.w - 80, level_state.floor_y
             )
             attack_item.z_index = 10
-            SceneTree.get_root().add_child(attack_item)
+            main_node.add_child(attack_item)
+            if area.area_type != LevelAreaType.INTRO:
+                # Add choose item label
+                self._choose_item_label = TextLabel.new()
+                self._choose_item_label.position = Vector2(40, 40)
+                self._choose_item_label.z_index = 20
+                self._choose_item_label.ignore_camera = True
+                self._choose_item_label.font_uid = "gameboy-8"
+                self._choose_item_label.text = "Choose One"
+                main_node.add_child(self._choose_item_label)
         elif area.area_type == LevelAreaType.BOSS:
             player = Player.find_player()
             player.play_animation("idle")
@@ -111,6 +124,11 @@ class LevelAreaManager:
                         level_state.bridge_gate_helper.get_current_bridge_gate()
                     )
                     current_bridge_gate.set_opened()
+
+                    if self._choose_item_label:
+                        self._choose_item_label.queue_deletion()
+                        self._choose_item_label = None
+
                     self._has_processed_current_area_completion = True
                 await co_suspend()
         except GeneratorExit:

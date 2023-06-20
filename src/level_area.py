@@ -8,6 +8,7 @@ from src.items import HealthRestoreItem
 
 
 class LevelAreaType:
+    INTRO = "intro"
     NORMAL = "normal"
     POWER_UP = "power_up"
     BOSS = "boss"
@@ -60,7 +61,7 @@ class LevelArea:
 class LevelAreaDefinitions:
     DEF_MAP = {
         1: LevelArea(
-            area_type=LevelAreaType.POWER_UP, width=260, item_types=[HealthRestoreItem]
+            area_type=LevelAreaType.INTRO, width=260, item_types=[HealthRestoreItem]
         ),
         2: LevelArea(
             area_type=LevelAreaType.NORMAL,
