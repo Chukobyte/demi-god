@@ -3,7 +3,7 @@ from crescent_api import *
 from src.characters.player import Player, PlayerStance
 from src.characters.wandering_soul import WanderingSoul
 from src.enemy_area_manager import EnemyAreaManager
-from src.items import ItemUtils
+from src.items import ItemUtils, Item
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
@@ -22,9 +22,20 @@ class LevelAreaManager:
         self._current_area: Optional[LevelArea] = None
         self._choose_item_label: Optional[TextLabel] = None
         self._has_processed_current_area_completion = False
+        self._power_up_items: List[Item] = []
 
     def update(self) -> None:
         self._manage_level_areas_task.resume()
+
+    def _on_item_collected(self, item) -> None:
+        self._current_area.set_completed(True)
+        try:
+            self._power_up_items.remove(item)
+        except ValueError as e:
+            pass
+        for item in self._power_up_items:
+            item.queue_deletion()
+        self._power_up_items.clear()
 
     def _set_current_area(self, area: LevelArea) -> None:
         self._current_area = area
@@ -35,20 +46,21 @@ class LevelAreaManager:
             area.area_type == LevelAreaType.POWER_UP
             or area.area_type == LevelAreaType.INTRO
         ):
-            item_type = area.item_types[0]
-            attack_item = ItemUtils.get_item_from_type(item_type)
-            main_node = SceneTree.get_root()
-            # Only expected to collect one item per power up area, which completes the area
-            attack_item.subscribe_to_event(
-                event_id="collected",
-                scoped_node=main_node,
-                callback_func=lambda args: self._current_area.set_completed(True),
-            )
-            attack_item.position = Vector2(
-                level_state.boundary.w - 80, level_state.floor_y
-            )
-            attack_item.z_index = 10
-            main_node.add_child(attack_item)
+            for i, item_type in enumerate(area.item_types):
+                power_up_item = ItemUtils.get_item_from_type(item_type)
+                main_node = SceneTree.get_root()
+                # Only expected to collect one item per power up area, which completes the area
+                power_up_item.subscribe_to_event(
+                    event_id="collected",
+                    scoped_node=main_node,
+                    callback_func=lambda item: self._on_item_collected(item),
+                )
+                power_up_item.position = Vector2(
+                    level_state.boundary.w - 120 + (i * 40), level_state.floor_y
+                )
+                power_up_item.z_index = 10
+                main_node.add_child(power_up_item)
+                self._power_up_items.append(power_up_item)
             if area.area_type != LevelAreaType.INTRO:
                 # Add choose item label
                 self._choose_item_label = TextLabel.new()

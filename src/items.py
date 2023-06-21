@@ -13,7 +13,7 @@ class Item(Node2D):
         self.can_be_collected = True
 
     def collect(self) -> None:
-        self.broadcast_event("collected")
+        self.broadcast_event("collected", self)
         self.queue_deletion()
 
 
@@ -21,7 +21,7 @@ class SignItem(Item):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.description = "Help the souls!"
-        self.can_be_collected = False
+        # self.can_be_collected = False
 
     def _start(self):
         size = Size2D(8, 8)
@@ -35,6 +35,8 @@ class SignItem(Item):
         self.collider.extents = size
         self.add_child(self.collider)
         self.z_index = 2
+        # Other
+        self.position += Vector2(40, 0)
 
 
 class AttackItem(Item):
@@ -66,7 +68,7 @@ class HealthRestoreItem(Item):
         # Sprite
         self.sprite = Sprite.new()
         self.sprite.texture = Texture("assets/images/items/item_heart.png")
-        self.sprite.draw_source = Rect2(0, 0, 16, 16)
+        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
         self.add_child(self.sprite)
         # Collider
         self.collider = Collider2D.new()
@@ -76,15 +78,56 @@ class HealthRestoreItem(Item):
         self.position += Vector2(0, -4)
 
 
+class EnergyDrainDecreaseItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.description = "Lowers energy drain"
+
+    def _start(self):
+        size = Size2D(8, 8)
+        # Color Rect
+        self.color_rect = ColorRect.new()
+        self.color_rect.size = size
+        self.color_rect.color = Color.RED
+        self.add_child(self.color_rect)
+        # Collider
+        self.collider = Collider2D.new()
+        self.collider.extents = size
+        self.add_child(self.collider)
+
+
+class DamageDecreaseItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.description = "Reduces damage"
+
+    def _start(self):
+        size = Size2D(8, 8)
+        # Color Rect
+        self.color_rect = ColorRect.new()
+        self.color_rect.size = size
+        self.color_rect.color = Color.RED
+        self.add_child(self.color_rect)
+        # Collider
+        self.collider = Collider2D.new()
+        self.collider.extents = size
+        self.add_child(self.collider)
+
+
 class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> AttackItem | HealthRestoreItem | SignItem | None:
+    ) -> AttackItem | HealthRestoreItem | SignItem | EnergyDrainDecreaseItem | DamageDecreaseItem | None:
         if issubclass(item_type, AttackItem):
             return AttackItem.new()
         elif issubclass(item_type, HealthRestoreItem):
             return HealthRestoreItem.new()
         elif issubclass(item_type, SignItem):
             return SignItem.new()
+        elif issubclass(item_type, EnergyDrainDecreaseItem):
+            return EnergyDrainDecreaseItem.new()
+        elif issubclass(item_type, DamageDecreaseItem):
+            return DamageDecreaseItem.new()
+        print("ERROR: doesn't have item type in 'ItemUtils.get_item_from_type'!")
         return None

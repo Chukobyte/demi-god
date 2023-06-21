@@ -4,7 +4,12 @@ from typing import Optional, List, Type
 from crescent_api import GameProperties
 
 from src.characters.enemy_definitions import EnemyDefinition
-from src.items import HealthRestoreItem
+from src.items import (
+    HealthRestoreItem,
+    SignItem,
+    EnergyDrainDecreaseItem,
+    DamageDecreaseItem,
+)
 
 
 class LevelAreaType:
@@ -60,9 +65,7 @@ class LevelArea:
 
 class LevelAreaDefinitions:
     DEF_MAP = {
-        1: LevelArea(
-            area_type=LevelAreaType.INTRO, width=260, item_types=[HealthRestoreItem]
-        ),
+        1: LevelArea(area_type=LevelAreaType.INTRO, width=260, item_types=[SignItem]),
         2: LevelArea(
             area_type=LevelAreaType.NORMAL,
             width=896,
@@ -91,7 +94,7 @@ class LevelAreaDefinitions:
         3: LevelArea(
             area_type=LevelAreaType.POWER_UP,
             width=GameProperties().game_resolution.w,
-            item_types=[HealthRestoreItem],
+            item_types=[EnergyDrainDecreaseItem, HealthRestoreItem, DamageDecreaseItem],
         ),
         4: LevelArea(
             area_type=LevelAreaType.NORMAL,
