@@ -1,4 +1,5 @@
 import copy
+import random
 from typing import Optional, List, Type
 
 from crescent_api import GameProperties
@@ -9,6 +10,7 @@ from src.items import (
     SignItem,
     EnergyDrainDecreaseItem,
     DamageDecreaseItem,
+    AttackRangeIncreaseItem,
 )
 
 
@@ -37,6 +39,7 @@ class LevelArea:
         width: int,
         sections: List[LevelSection] = None,
         item_types: List[Type] = None,
+        spawn_health_restore_for_middle_item=True,
     ):
         self.area_type = area_type
         self.width = width
@@ -48,6 +51,7 @@ class LevelArea:
         if not item_types:
             item_types = []
         self.item_types = item_types
+        self.spawn_health_restore_for_middle_item = spawn_health_restore_for_middle_item
         self.is_completed = False
 
     def set_completed(self, is_completed: bool) -> None:
@@ -59,13 +63,37 @@ class LevelArea:
             return self.sections[last_index] == section
         return False
 
+    def get_random_item_types(self, max_item_types=3) -> List[Type]:
+        random_item_types = []
+        item_types_count = len(self.item_types)
+        if item_types_count == 1:
+            random_item_types.append(self.item_types[0])
+        else:
+            item_types_copy = self.item_types[:]
+            random.shuffle(item_types_copy)
+            for i in range(max_item_types):
+                # Always spawn health restore as the second item (or middle if default is 3)
+                if i == 1 and self.spawn_health_restore_for_middle_item:
+                    random_item_types.append(HealthRestoreItem)
+                else:
+                    if item_types_copy:
+                        random_item_types.append(item_types_copy.pop())
+                    else:
+                        break
+        return random_item_types
+
     def copy(self) -> "LevelArea":
         return copy.deepcopy(self)
 
 
 class LevelAreaDefinitions:
     DEF_MAP = {
-        1: LevelArea(area_type=LevelAreaType.INTRO, width=260, item_types=[SignItem]),
+        1: LevelArea(
+            area_type=LevelAreaType.INTRO,
+            width=260,
+            item_types=[SignItem],
+            spawn_health_restore_for_middle_item=False,
+        ),
         2: LevelArea(
             area_type=LevelAreaType.NORMAL,
             width=896,
@@ -94,7 +122,11 @@ class LevelAreaDefinitions:
         3: LevelArea(
             area_type=LevelAreaType.POWER_UP,
             width=GameProperties().game_resolution.w,
-            item_types=[EnergyDrainDecreaseItem, HealthRestoreItem, DamageDecreaseItem],
+            item_types=[
+                EnergyDrainDecreaseItem,
+                DamageDecreaseItem,
+                AttackRangeIncreaseItem,
+            ],
         ),
         4: LevelArea(
             area_type=LevelAreaType.NORMAL,

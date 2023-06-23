@@ -1,9 +1,11 @@
+import random
+
 from crescent_api import *
 
 from src.characters.player import Player, PlayerStance
 from src.characters.wandering_soul import WanderingSoul
 from src.enemy_area_manager import EnemyAreaManager
-from src.items import ItemUtils, Item
+from src.items import ItemUtils, Item, HealthRestoreItem
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
@@ -46,9 +48,10 @@ class LevelAreaManager:
             area.area_type == LevelAreaType.POWER_UP
             or area.area_type == LevelAreaType.INTRO
         ):
-            for i, item_type in enumerate(area.item_types):
+            main_node = SceneTree.get_root()
+            random_item_types = area.get_random_item_types()
+            for i, item_type in enumerate(random_item_types):
                 power_up_item = ItemUtils.get_item_from_type(item_type)
-                main_node = SceneTree.get_root()
                 # Only expected to collect one item per power up area, which completes the area
                 power_up_item.subscribe_to_event(
                     event_id="collected",

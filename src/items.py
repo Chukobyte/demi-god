@@ -114,11 +114,29 @@ class DamageDecreaseItem(Item):
         self.add_child(self.collider)
 
 
+class AttackRangeIncreaseItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.description = "More attack range"
+
+    def _start(self):
+        size = Size2D(8, 8)
+        # Color Rect
+        self.color_rect = ColorRect.new()
+        self.color_rect.size = size
+        self.color_rect.color = Color.RED
+        self.add_child(self.color_rect)
+        # Collider
+        self.collider = Collider2D.new()
+        self.collider.extents = size
+        self.add_child(self.collider)
+
+
 class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> AttackItem | HealthRestoreItem | SignItem | EnergyDrainDecreaseItem | DamageDecreaseItem | None:
+    ) -> AttackItem | HealthRestoreItem | SignItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | None:
         if issubclass(item_type, AttackItem):
             return AttackItem.new()
         elif issubclass(item_type, HealthRestoreItem):
@@ -129,5 +147,7 @@ class ItemUtils:
             return EnergyDrainDecreaseItem.new()
         elif issubclass(item_type, DamageDecreaseItem):
             return DamageDecreaseItem.new()
+        elif issubclass(item_type, AttackRangeIncreaseItem):
+            return AttackRangeIncreaseItem.new()
         print("ERROR: doesn't have item type in 'ItemUtils.get_item_from_type'!")
         return None
