@@ -3,7 +3,13 @@ from crescent_api import *
 from src.characters.enemy import Enemy, EnemyAttack
 from src.characters.wandering_soul import WanderingSoul
 from src.environment.bridge_gate import BridgeGate
-from src.items import Item, HealthRestoreItem
+from src.items import (
+    Item,
+    HealthRestoreItem,
+    EnergyDrainDecreaseItem,
+    DamageDecreaseItem,
+    AttackRangeIncreaseItem,
+)
 from src.level_state import LevelState
 from src.utils.game_math import map_to_range, clamp, Easer, Ease
 from src.utils.task import *
@@ -48,6 +54,9 @@ class PlayerMeleeAttack(PlayerAttack):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.life_time = 0.25
+
+    def set_attack_range(self, extra_range: int) -> None:
+        pass
 
 
 class PlayerSpecialAttack(PlayerAttack):
@@ -120,6 +129,10 @@ class PlayerStats:
         self.energy_bar_ui: Optional[ColorRect] = None
         self.base_health_bar_ui_size = Size2D(52, 9)
         self.base_energy_bar_ui_size = Size2D(52, 9)
+        # Stats that will only be touched by items
+        self.transformation_energy_drain = 1
+        self.damage_taken_from_attacks_multiple = 1.0
+        self.extra_attack_range = 0
 
     def refresh_bar_nodes(self) -> None:
         main_node = SceneTree.get_root()
@@ -306,6 +319,12 @@ class Player(Node2D):
                 self.health_restore_task = Task(
                     coroutine=self._health_restore_task(health_item.restore_amount)
                 )
+            elif issubclass(type(item), EnergyDrainDecreaseItem):
+                self.stats.transformation_energy_drain -= 0.25
+            elif issubclass(type(item), DamageDecreaseItem):
+                self.stats.damage_taken_from_attacks_multiple -= 0.25
+            elif issubclass(type(item), AttackRangeIncreaseItem):
+                self.stats.extra_attack_range += 1
 
     def _are_enemies_attached(self) -> bool:
         return (
@@ -356,6 +375,7 @@ class Player(Node2D):
             self.special_attack_requested = False
         else:
             melee_attack = PlayerMeleeAttack.new()
+            melee_attack.set_attack_range(self.stats.extra_attack_range)
             melee_attack.subscribe_to_event(
                 event_id="hit_enemy",
                 scoped_node=self,
@@ -446,6 +466,7 @@ class Player(Node2D):
             bar_ui = self.stats.health_bar_ui
 
         def subtract_hp_value(damage: float, bar_color: Color) -> None:
+            damage *= self.stats.damage_taken_from_attacks_multiple
             if take_transform_damage:
                 self.stats.energy -= damage
             else:
@@ -637,7 +658,7 @@ class Player(Node2D):
         try:
             level_state = LevelState()
             transformation_tick_rate = 0.25
-            energy_drain_per_tick = 1
+            energy_drain_per_tick = self.stats.transformation_energy_drain
             # Update animation to transformed
             self.play_animation(self._current_animation_name)
             times_ticked = 0
