@@ -16,6 +16,9 @@
                 "file_path": "assets/audio/music/main_theme.wav"
             },
             {
+                "file_path": "assets/audio/music/boss_theme.wav"
+            },
+            {
                 "file_path": "assets/audio/sfx/start_game.wav"
             },
             {
