@@ -8,9 +8,7 @@ from src.characters.enemy_definitions import EnemyDefinition
 from src.items import (
     HealthRestoreItem,
     SignItem,
-    EnergyDrainDecreaseItem,
-    DamageDecreaseItem,
-    AttackRangeIncreaseItem,
+    ItemUtils,
 )
 
 
@@ -118,11 +116,7 @@ class LevelAreaDefinitions:
         3: LevelArea(
             area_type=LevelAreaType.POWER_UP,
             width=GameProperties().game_resolution.w,
-            item_types=[
-                EnergyDrainDecreaseItem,
-                DamageDecreaseItem,
-                AttackRangeIncreaseItem,
-            ],
+            item_types=ItemUtils.get_power_up_area_item_types(),
         ),
         4: LevelArea(
             area_type=LevelAreaType.NORMAL,
@@ -162,10 +156,15 @@ class LevelAreaDefinitions:
             ],
         ),
         5: LevelArea(
+            area_type=LevelAreaType.POWER_UP,
+            width=GameProperties().game_resolution.w,
+            item_types=ItemUtils.get_power_up_area_item_types(),
+        ),
+        6: LevelArea(
             area_type=LevelAreaType.BOSS,
             width=GameProperties().game_resolution.w,
         ),
-        6: LevelArea(
+        7: LevelArea(
             area_type=LevelAreaType.END, width=GameProperties().game_resolution.w
         ),
     }

@@ -167,6 +167,13 @@ class EnemyAreaManager:
                     await co_suspend()
             # Boss logic
             else:
+                # Stop main theme
+                main_theme_audio_source = AudioManager.get_audio_source(
+                    "assets/audio/music/main_theme.wav"
+                )
+                AudioManager.stop_sound(source=main_theme_audio_source)
+                # TODO: Play boss theme
+
                 main_node = SceneTree.get_root()
                 current_bridge_gate = (
                     level_state.bridge_gate_helper.get_current_bridge_gate()
@@ -190,10 +197,6 @@ class EnemyAreaManager:
                     lightning_flash_task.resume()
                     await co_suspend()
                 lightning_flash_task.close()
-                self.main_theme_audio_source = AudioManager.get_audio_source(
-                    "assets/audio/music/main_theme.wav"
-                )
-                AudioManager.stop_sound(source=self.main_theme_audio_source)
 
             # Small delay in case of knock back
             await co_wait_seconds(1.0)

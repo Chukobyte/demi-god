@@ -151,3 +151,7 @@ class ItemUtils:
             return AttackRangeIncreaseItem.new()
         print("ERROR: doesn't have item type in 'ItemUtils.get_item_from_type'!")
         return None
+
+    @staticmethod
+    def get_power_up_area_item_types() -> List[Type]:
+        return [EnergyDrainDecreaseItem, DamageDecreaseItem, AttackRangeIncreaseItem]
