@@ -65,21 +65,17 @@ class LevelArea:
 
     def get_random_item_types(self, max_item_types=3) -> List[Type]:
         random_item_types = []
-        item_types_count = len(self.item_types)
-        if item_types_count == 1:
-            random_item_types.append(self.item_types[0])
-        else:
-            item_types_copy = self.item_types[:]
-            random.shuffle(item_types_copy)
-            for i in range(max_item_types):
-                # Always spawn health restore as the second item (or middle if default is 3)
-                if i == 1 and self.spawn_health_restore_for_middle_item:
-                    random_item_types.append(HealthRestoreItem)
+        item_types_copy = self.item_types[:]
+        random.shuffle(item_types_copy)
+        for i in range(max_item_types):
+            # Always spawn health restore as the second item (or middle if default is 3)
+            if i == 1 and self.spawn_health_restore_for_middle_item:
+                random_item_types.append(HealthRestoreItem)
+            else:
+                if item_types_copy:
+                    random_item_types.append(item_types_copy.pop())
                 else:
-                    if item_types_copy:
-                        random_item_types.append(item_types_copy.pop())
-                    else:
-                        break
+                    break
         return random_item_types
 
     def copy(self) -> "LevelArea":
