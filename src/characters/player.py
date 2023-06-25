@@ -56,7 +56,7 @@ class PlayerMeleeAttack(PlayerAttack):
         self.life_time = 0.25
 
     def set_attack_range(self, extra_range: int) -> None:
-        pass
+        self.size += Size2D(extra_range, 0)
 
 
 class PlayerSpecialAttack(PlayerAttack):
@@ -357,8 +357,9 @@ class Player(Node2D):
             attack_y = 2
         else:
             attack_y = -2
+        attack_range = self.stats.extra_attack_range * 5
         if self.anim_sprite.flip_h:
-            left_side_offset = Vector2(-12, 0)
+            left_side_offset = Vector2(-12 + -attack_range, 0)
             attack_pos_offset = Vector2(-12, attack_y) + left_side_offset
             attack_dir = Vector2.LEFT
         else:
@@ -375,7 +376,7 @@ class Player(Node2D):
             self.special_attack_requested = False
         else:
             melee_attack = PlayerMeleeAttack.new()
-            melee_attack.set_attack_range(self.stats.extra_attack_range)
+            melee_attack.set_attack_range(attack_range)
             melee_attack.subscribe_to_event(
                 event_id="hit_enemy",
                 scoped_node=self,
