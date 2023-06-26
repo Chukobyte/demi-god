@@ -26,6 +26,9 @@
             },
             {
                 "file_path": "assets/audio/sfx/health_gain.wav"
+            },
+            {
+                "file_path": "assets/audio/sfx/player_hurt.wav"
             }
         ],
         "textures": [

@@ -521,6 +521,9 @@ class Player(Node2D):
             damage_cooldown_task: Optional[Task] = None
             attached_damage_cooldown_task: Optional[Task] = None
             level_state = LevelState()
+            player_hurt_audio_source = AudioManager.get_audio_source(
+                "assets/audio/sfx/player_hurt.wav"
+            )
             while True:
                 collisions = CollisionHandler.process_collisions(self.collider)
                 show_item_description = False
@@ -565,6 +568,7 @@ class Player(Node2D):
                             if collider_parent.destroy_on_touch:
                                 collider_parent.destroy_from_contact()
                             self.in_attack_damage_cooldown = True
+                            AudioManager.play_sound(player_hurt_audio_source)
                             damage_cooldown_task = Task(
                                 coroutine=self._damage_cooldown_task(1.0)
                             )
@@ -576,6 +580,7 @@ class Player(Node2D):
                     ):
                         collider_parent.queue_deletion()
                         self.in_attack_damage_cooldown = True
+                        AudioManager.play_sound(player_hurt_audio_source)
                         damage_cooldown_task = Task(
                             coroutine=self._damage_cooldown_task(1.0)
                         )
