@@ -116,22 +116,36 @@ class EnemyAreaManager:
             if not enemy_defs:
                 break
 
-    async def _lightning_flash_task(self):
+    async def _lightning_flash_task(self, flash_time_range=MinMax(2.0, 8.0)):
         main_node = SceneTree.get_root()
         bg_color_rect: ColorRect = main_node.get_child("BGColorRect")
         initial_color = bg_color_rect.color
         flash_color = Color(240, 247, 243)
-        flash_timer = Timer(random.uniform(2.0, 8.0))
+        flash_timer = Timer(random.uniform(flash_time_range.min, flash_time_range.max))
         try:
             while True:
                 flash_timer.tick(World.get_delta_time())
                 if flash_timer.has_stopped():
-                    flash_timer.time = random.uniform(2.0, 8.0)
+                    flash_timer.time = random.uniform(
+                        flash_time_range.min, flash_time_range.max
+                    )
                     flash_timer.reset()
                     bg_color_rect.color = flash_color
                     await co_suspend()
                     bg_color_rect.color = initial_color
                 await co_suspend()
+        except GeneratorExit:
+            bg_color_rect.color = initial_color
+
+    async def _death_lightning_flash_task(self, flash_delay=1.0):
+        main_node = SceneTree.get_root()
+        bg_color_rect: ColorRect = main_node.get_child("BGColorRect")
+        initial_color = bg_color_rect.color
+        flash_color = Color(240, 247, 243)
+        try:
+            bg_color_rect.color = flash_color
+            await co_wait_seconds(flash_delay, ignore_time_dilation=True)
+            bg_color_rect.color = initial_color
         except GeneratorExit:
             bg_color_rect.color = initial_color
 
@@ -202,6 +216,26 @@ class EnemyAreaManager:
                     await co_suspend()
                 lightning_flash_task.close()
                 AudioManager.stop_sound(source=boss_theme_audio_source)
+
+                # Enemy defeated now flash lightning
+                player.input_enabled = False
+                World.set_time_dilation(0.0)
+                await self._death_lightning_flash_task(1.0)
+                World.set_time_dilation(1.0)
+                player.input_enabled = True
+                boss_enemy.can_destroy_self = True
+
+                enemy_is_finished = False
+
+                def on_enemy_boss_scene_exited():
+                    nonlocal enemy_is_finished
+                    enemy_is_finished = True
+
+                boss_enemy.subscribe_to_event(
+                    "scene_exited", main_node, lambda args: on_enemy_boss_scene_exited()
+                )
+                while not enemy_is_finished:
+                    await co_suspend()
 
             # Small delay in case of knock back
             await co_wait_seconds(1.0)

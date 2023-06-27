@@ -93,7 +93,9 @@ class EnemyBoss(Enemy):
         self.move_dir = Vector2.RIGHT
         self.state = EnemyBossState.OLD_MOVE_TASK
         self.physics_update_task = Task(coroutine=self._physics_update_task())
+        self.split_amount = 0.01
         self.do_entrance_stuff = True
+        self.can_destroy_self = False  # Controlled from enemy area manager
         self.health_bar_ui: Optional[BossHealthBarUI] = None
 
     def _start(self) -> None:
@@ -118,12 +120,10 @@ class EnemyBoss(Enemy):
         if self.hp == 0:
             self.is_destroyed = True  # Maybe we want a callback here for enemies?
             self.destroyed_task = Task(coroutine=self._destroyed_task())
-            if self.split_on_death:
-                self.destroyed_split_task = Task(coroutine=self._destroyed_split_task())
             self.broadcast_event("destroyed", self)
         else:
             self.take_damage_task = Task(coroutine=self._take_damage_task())
-        self.anim_sprite.shader_instance.set_float_param("flash_amount", 0.5)
+            self.anim_sprite.shader_instance.set_float_param("flash_amount", 0.5)
 
     def _end(self) -> None:
         if self.health_bar_ui:
@@ -307,5 +307,35 @@ class EnemyBoss(Enemy):
                 await co_suspend()
                 await co_suspend()
 
+        except GeneratorExit:
+            pass
+
+    async def _destroyed_task(self) -> None:
+        try:
+            self.anim_sprite.stop()
+            while not self.can_destroy_self:
+                await co_suspend()
+            if self.knock_back_on_death:
+                player = self._find_player()
+                knock_back_distance = 5
+                if self.position.x > player.position.x:
+                    knock_back_dir = Vector2.RIGHT
+                else:
+                    knock_back_dir = Vector2.LEFT
+                knock_back_velocity = (
+                    Vector2(knock_back_distance, knock_back_distance) * knock_back_dir
+                )
+                for i in range(2):
+                    self.position += knock_back_velocity
+                    await co_wait_until(lambda: World.get_time_dilation() > 0.0)
+            shader_instance = self.anim_sprite.shader_instance
+            shader_instance.set_float_param("flash_amount", 0.75)
+            await co_suspend()
+            self.anim_sprite.modulate = Color(255, 255, 255, 200)
+            shader_instance.set_float_param("flash_amount", 0.5)
+            # Slight delay before splitting
+            await co_wait_seconds(1.0)
+            await Task(coroutine=self._destroyed_split_task())
+            self.queue_deletion()
         except GeneratorExit:
             pass
