@@ -41,7 +41,7 @@ class Task:
             except StopIteration:
                 if self.current_task.parent_task:
                     self.current_task = self.current_task.parent_task
-                    self.current_task.resume()
+                    self.resume()
                 else:
                     self.valid = False
 
