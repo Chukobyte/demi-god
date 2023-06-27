@@ -335,7 +335,12 @@ class EnemyBoss(Enemy):
             shader_instance.set_float_param("flash_amount", 0.5)
             # Slight delay before splitting
             await co_wait_seconds(1.0)
-            await Task(coroutine=self._destroyed_split_task())
+            # TODO: Figure out while co_wait_until_internal doesn't clean up properly when just a task...
+            # await Task(coroutine=self._destroyed_split_task())
+            split_task = Task(coroutine=self._destroyed_split_task())
+            while split_task.valid:
+                split_task.resume()
+                await co_suspend()
             self.queue_deletion()
         except GeneratorExit:
             pass
