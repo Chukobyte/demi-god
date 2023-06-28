@@ -64,7 +64,7 @@ class HealthRestoreItem(Item):
         self.restore_amount = 5
 
     def _start(self):
-        size = Size2D(16, 16)
+        size = Size2D(10, 10)
         # Sprite
         self.sprite = Sprite.new()
         self.sprite.texture = Texture("assets/images/items/item_heart.png")
@@ -75,7 +75,7 @@ class HealthRestoreItem(Item):
         self.collider.extents = size
         self.add_child(self.collider)
 
-        self.position += Vector2(0, -4)
+        # self.position += Vector2(0, -4)
 
 
 class EnergyDrainDecreaseItem(Item):
@@ -84,12 +84,14 @@ class EnergyDrainDecreaseItem(Item):
         self.description = "Lowers energy drain"
 
     def _start(self):
-        size = Size2D(8, 8)
-        # Color Rect
-        self.color_rect = ColorRect.new()
-        self.color_rect.size = size
-        self.color_rect.color = Color.RED
-        self.add_child(self.color_rect)
+        size = Size2D(10, 10)
+        # Sprite
+        self.sprite = Sprite.new()
+        self.sprite.texture = Texture(
+            "assets/images/items/item_energy_drain_decrease.png"
+        )
+        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
+        self.add_child(self.sprite)
         # Collider
         self.collider = Collider2D.new()
         self.collider.extents = size
@@ -102,12 +104,12 @@ class DamageDecreaseItem(Item):
         self.description = "Reduces damage"
 
     def _start(self):
-        size = Size2D(8, 8)
-        # Color Rect
-        self.color_rect = ColorRect.new()
-        self.color_rect.size = size
-        self.color_rect.color = Color.RED
-        self.add_child(self.color_rect)
+        size = Size2D(10, 10)
+        # Sprite
+        self.sprite = Sprite.new()
+        self.sprite.texture = Texture("assets/images/items/item_damage_decrease.png")
+        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
+        self.add_child(self.sprite)
         # Collider
         self.collider = Collider2D.new()
         self.collider.extents = size
@@ -120,12 +122,14 @@ class AttackRangeIncreaseItem(Item):
         self.description = "More attack range"
 
     def _start(self):
-        size = Size2D(8, 8)
-        # Color Rect
-        self.color_rect = ColorRect.new()
-        self.color_rect.size = size
-        self.color_rect.color = Color.RED
-        self.add_child(self.color_rect)
+        size = Size2D(10, 10)
+        # Sprite
+        self.sprite = Sprite.new()
+        self.sprite.texture = Texture(
+            "assets/images/items/item_attack_range_increase.png"
+        )
+        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
+        self.add_child(self.sprite)
         # Collider
         self.collider = Collider2D.new()
         self.collider.extents = size
