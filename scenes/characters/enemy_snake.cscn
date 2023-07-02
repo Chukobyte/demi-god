@@ -22,7 +22,7 @@
                 {
                     "type": "animated_sprite",
                     "current_animation_name": "walk",
-                    "is_playing": false,
+                    "is_playing": true,
                     "origin": {
                         "x": 15.0,
                         "y": 24.0
@@ -31,13 +31,23 @@
                         {
                             "name": "walk",
                             "speed": 300,
-                            "loops": false,
+                            "loops": true,
                             "frames": [
                                 {
                                     "frame": 0,
                                     "texture_path": "assets/images/enemy_snake/enemy_snake_walk.png",
                                     "draw_source": {
                                         "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 32.0,
+                                        "h": 32.0
+                                    }
+                                },
+                                {
+                                    "frame": 1,
+                                    "texture_path": "assets/images/enemy_snake/enemy_snake_walk.png",
+                                    "draw_source": {
+                                        "x": 32.0,
                                         "y": 0.0,
                                         "w": 32.0,
                                         "h": 32.0
