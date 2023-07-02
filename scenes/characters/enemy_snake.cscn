@@ -23,6 +23,7 @@
                     "type": "animated_sprite",
                     "current_animation_name": "walk",
                     "is_playing": true,
+                    "stagger_start_animation_time": true,
                     "origin": {
                         "x": 15.0,
                         "y": 24.0
