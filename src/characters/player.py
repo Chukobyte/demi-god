@@ -796,7 +796,8 @@ class Player(Node2D):
             pass
 
     async def _in_air_stance_task(self):
-        self.play_animation("jump")
+        current_jump_anim = "jump_up"
+        self.play_animation(current_jump_anim)
         attack_task: Optional[Task] = None
         try:
             level_state = LevelState()
@@ -818,14 +819,14 @@ class Player(Node2D):
                     attack_task.resume()
                     if not attack_task.valid:
                         attack_task = None
-                        self.play_animation("jump")
+                        self.play_animation(current_jump_anim)
                 if self.input_enabled:
                     if Input.is_action_pressed("move_left"):
                         if not self._are_enemies_attached():
                             new_position = self.position + Vector2.LEFT * Vector2(
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
-                            )
+                                )
                             new_position.x = clamp(
                                 new_position.x,
                                 level_state.boundary.x,
@@ -840,7 +841,7 @@ class Player(Node2D):
                             new_position = self.position + Vector2.RIGHT * Vector2(
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
-                            )
+                                )
                             new_position.x = clamp(
                                 new_position.x,
                                 level_state.boundary.x,
@@ -854,9 +855,9 @@ class Player(Node2D):
                 if is_ascending:
                     self.position += Vector2.UP * jump_vector
                     skip_ascend_timer = (
-                        self.input_enabled
-                        and Input.is_action_pressed("jump")
-                        and ascent_timer_skips < max_ascend_timer_skips
+                            self.input_enabled
+                            and Input.is_action_pressed("jump")
+                            and ascent_timer_skips < max_ascend_timer_skips
                     )
                     if skip_ascend_timer:
                         ascent_timer_skips += 1
@@ -864,6 +865,9 @@ class Player(Node2D):
                         ascend_timer.tick(delta_time)
                     if ascend_timer.time_remaining <= 0:
                         is_ascending = False
+                        current_jump_anim = "jump_down"
+                        if not attack_task:
+                            self.anim_sprite.play(current_jump_anim)
                 else:
                     self.position += Vector2.DOWN * jump_vector
                     if self.position.y == level_state.floor_y:
