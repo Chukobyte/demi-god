@@ -22,6 +22,7 @@ class EnemyRabbit(Enemy):
     # --- TASKS --- #
     async def _destroy_from_shake_task(self) -> None:
         try:
+            self.anim_sprite.play("death")
             fly_speed = 60
             if self.anim_sprite.flip_h:
                 fly_dir = Vector2(1, -1)
