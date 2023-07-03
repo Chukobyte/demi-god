@@ -85,6 +85,63 @@
                                     }
                                 }
                             ]
+                        },
+                        {
+                            "name": "walk",
+                            "speed": 200,
+                            "loops": true,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/enemy_jester/enemy_jester_walk.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 32.0,
+                                        "h": 32.0
+                                    }
+                                },
+                                {
+                                    "frame": 1,
+                                    "texture_path": "assets/images/enemy_jester/enemy_jester_walk.png",
+                                    "draw_source": {
+                                        "x": 32.0,
+                                        "y": 0.0,
+                                        "w": 32.0,
+                                        "h": 32.0
+                                    }
+                                },
+                                {
+                                    "frame": 2,
+                                    "texture_path": "assets/images/enemy_jester/enemy_jester_walk.png",
+                                    "draw_source": {
+                                        "x": 64.0,
+                                        "y": 0.0,
+                                        "w": 32.0,
+                                        "h": 32.0
+                                    }
+                                },
+                                {
+                                    "frame": 3,
+                                    "texture_path": "assets/images/enemy_jester/enemy_jester_walk.png",
+                                    "draw_source": {
+                                        "x": 96.0,
+                                        "y": 0.0,
+                                        "w": 32.0,
+                                        "h": 32.0
+                                    }
+                                },
+                                {
+                                    "frame": 4,
+                                    "texture_path": "assets/images/enemy_jester/enemy_jester_walk.png",
+                                    "draw_source": {
+                                        "x": 128.0,
+                                        "y": 0.0,
+                                        "w": 32.0,
+                                        "h": 32.0
+                                    }
+                                }
+                            ]
                         }
                     ]
                 }

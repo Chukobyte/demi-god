@@ -33,6 +33,14 @@ class EnemyJesterProjectile(EnemyAttack):
     # --- TASKS --- #
     async def _physics_update_task(self) -> None:
         try:
+            # Go 3 frames at half speed to telegraph projectile
+            full_move_speed = self.move_speed
+            self.move_speed /= 2.0
+            await co_suspend()
+            await co_suspend()
+            await co_suspend()
+            self.move_speed = full_move_speed
+
             life_timer = Timer(15.0)
             while life_timer.time_remaining > 0.0:
                 life_timer.tick(self.get_full_time_dilation_with_physics_delta())
@@ -107,6 +115,7 @@ class EnemyJester(Enemy):
 
     async def _follow_player_task(self) -> None:
         try:
+            self.anim_sprite.play("walk")
             while True:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 self.position += self.move_dir * Vector2(
@@ -119,6 +128,7 @@ class EnemyJester(Enemy):
 
     async def _retreat_from_player_task(self) -> None:
         try:
+            self.anim_sprite.play("walk")
             retreat_speed = self.move_speed - 10
             while True:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
@@ -136,7 +146,7 @@ class EnemyJester(Enemy):
 
     async def _ready_for_attack_task(self) -> None:
         try:
-            # await co_wait_seconds(random.uniform(0.25, 2.5))
+            self.anim_sprite.play("idle")
             has_attacked_once = False
             attack_timer = Timer(random.uniform(0.25, 2.0))
             while True:

@@ -826,7 +826,7 @@ class Player(Node2D):
                             new_position = self.position + Vector2.LEFT * Vector2(
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
-                                )
+                            )
                             new_position.x = clamp(
                                 new_position.x,
                                 level_state.boundary.x,
@@ -841,7 +841,7 @@ class Player(Node2D):
                             new_position = self.position + Vector2.RIGHT * Vector2(
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
-                                )
+                            )
                             new_position.x = clamp(
                                 new_position.x,
                                 level_state.boundary.x,
@@ -855,9 +855,9 @@ class Player(Node2D):
                 if is_ascending:
                     self.position += Vector2.UP * jump_vector
                     skip_ascend_timer = (
-                            self.input_enabled
-                            and Input.is_action_pressed("jump")
-                            and ascent_timer_skips < max_ascend_timer_skips
+                        self.input_enabled
+                        and Input.is_action_pressed("jump")
+                        and ascent_timer_skips < max_ascend_timer_skips
                     )
                     if skip_ascend_timer:
                         ascent_timer_skips += 1

@@ -77,6 +77,14 @@ class EnemyBossProjectile(EnemyAttack):
     # --- TASKS --- #
     async def _physics_update_task(self) -> None:
         try:
+            # Go 3 frames at half speed to telegraph projectile
+            full_move_speed = self.move_speed
+            self.move_speed /= 2.0
+            await co_suspend()
+            await co_suspend()
+            await co_suspend()
+            self.move_speed = full_move_speed
+
             life_timer = Timer(15.0)
             while life_timer.time_remaining > 0.0:
                 life_timer.tick(self.get_full_time_dilation_with_physics_delta())
