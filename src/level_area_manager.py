@@ -103,7 +103,7 @@ class LevelAreaManager:
             level_state.bridge_gate_helper.spawn_bridge_gates()
             bridge_gate = level_state.bridge_gate_helper.next_bridge_gate()
             bridge_gate.position = Vector2(
-                level_state.boundary.w - 10, level_state.floor_y - 31
+                level_state.boundary.w - 10, level_state.floor_y - 52
             )
 
             self._setup_area_type(self._current_area, level_state)
@@ -246,7 +246,7 @@ class LevelAreaManager:
             if not is_last_area:
                 next_bridge_gate.set_closed()
                 next_bridge_gate.position = Vector2(
-                    level_state.boundary.w - 10, level_state.floor_y - 31
+                    level_state.boundary.w - 10, level_state.floor_y - 52
                 )
 
             while True:
