@@ -1,11 +1,10 @@
-import random
-
 from crescent_api import *
 
 from src.characters.player import Player, PlayerStance
 from src.characters.wandering_soul import WanderingSoul
 from src.enemy_area_manager import EnemyAreaManager
-from src.items import ItemUtils, Item, HealthRestoreItem
+from src.environment.bridge_gate import BridgeGate
+from src.items import ItemUtils, Item
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
@@ -87,6 +86,13 @@ class LevelAreaManager:
             wandering_soul.z_index = 10
             SceneTree.get_root().add_child(wandering_soul)
 
+    def _get_next_bridge_gate_position(self) -> Vector2:
+        level_state = LevelState()
+        bridge_gate_size = BridgeGate.get_default_size()
+        return Vector2(
+            level_state.boundary.w - 10, level_state.floor_y - (bridge_gate_size.h - 22)
+        )
+
     # --- TASKS --- #
     async def manage_level_areas(self):
         try:
@@ -102,9 +108,7 @@ class LevelAreaManager:
             # Set initial bridge gate
             level_state.bridge_gate_helper.spawn_bridge_gates()
             bridge_gate = level_state.bridge_gate_helper.next_bridge_gate()
-            bridge_gate.position = Vector2(
-                level_state.boundary.w - 10, level_state.floor_y - 52
-            )
+            bridge_gate.position = self._get_next_bridge_gate_position()
 
             self._setup_area_type(self._current_area, level_state)
 
@@ -245,9 +249,7 @@ class LevelAreaManager:
             next_bridge_gate = level_state.bridge_gate_helper.next_bridge_gate()
             if not is_last_area:
                 next_bridge_gate.set_closed()
-                next_bridge_gate.position = Vector2(
-                    level_state.boundary.w - 10, level_state.floor_y - 52
-                )
+                next_bridge_gate.position = self._get_next_bridge_gate_position()
 
             while True:
                 delta_time = World.get_delta_time()

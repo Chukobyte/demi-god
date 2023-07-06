@@ -5,9 +5,13 @@ class BridgeGate(Sprite):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self._collider: Optional[Collider2D] = None
-        self.size = Size2D(20, 73)
+        self.size = BridgeGate.get_default_size()
         self.is_opened = False
         self.has_player_ever_stepped_through = False
+
+    @staticmethod
+    def get_default_size() -> Size2D:
+        return Size2D(20, 100)
 
     def _start(self) -> None:
         self._collider = Collider2D.new()

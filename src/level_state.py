@@ -1,5 +1,3 @@
-from typing import Optional, List
-
 from crescent_api import *
 
 from src.environment.bridge_gate import BridgeGate
