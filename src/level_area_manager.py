@@ -90,7 +90,8 @@ class LevelAreaManager:
         level_state = LevelState()
         bridge_gate_size = BridgeGate.get_default_size()
         return Vector2(
-            level_state.boundary.w - 10, level_state.floor_y - (bridge_gate_size.h - 22)
+            level_state.boundary.w - (bridge_gate_size.w / 2),
+            level_state.floor_y - (bridge_gate_size.h - 22),
         )
 
     # --- TASKS --- #
