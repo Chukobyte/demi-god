@@ -13,6 +13,8 @@ CLOUD_TEXTURES = [
     Texture(file_path="assets/images/environment/cloud_variation2.png"),
     Texture(file_path="assets/images/environment/cloud_variation3.png"),
     Texture(file_path="assets/images/environment/cloud_variation4.png"),
+    Texture(file_path="assets/images/environment/cloud_variation5.png"),
+    Texture(file_path="assets/images/environment/cloud_variation6.png"),
 ]
 
 

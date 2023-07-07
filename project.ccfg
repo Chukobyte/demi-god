@@ -177,6 +177,18 @@
                 "nearest_neighbor": true
             },
             {
+                "file_path": "assets/images/environment/cloud_variation5.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/environment/cloud_variation6.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
                 "file_path": "assets/images/demi/demi_transformed_crouch.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",
