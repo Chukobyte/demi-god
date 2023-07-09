@@ -13,10 +13,14 @@ class Main(Node2D):
         max_game_width = 9999.0
         bg_color_rect: ColorRect = self.get_child("BGColorRect")
         bg_color_rect.size = Size2D(max_game_width, bg_color_rect.size.h)
+        # Bridge Ground
         bridge_ground: Sprite = self.get_child("BridgeGround")
         bridge_ground_draw_source = bridge_ground.draw_source
         bridge_ground_draw_source.w = max_game_width
         bridge_ground.draw_source = bridge_ground_draw_source
+        bridge_ground_bottom_railings: Sprite = self.get_child("BottomRailings")
+        bridge_ground_bottom_railings.draw_source = bridge_ground_draw_source
+        # Buildings Background
         buildings: Sprite = self.get_child("Parallax").get_child("Buildings")
         buildings_draw_source = buildings.draw_source
         buildings_draw_source.w = max_game_width

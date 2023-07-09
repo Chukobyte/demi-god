@@ -61,6 +61,31 @@
             "children": []
         },
         {
+            "name": "BottomRailings",
+            "type": "Sprite",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": 0.0,
+                        "y": 65.0
+                    },
+                    "z_index": 3
+                },
+                {
+                    "type": "sprite",
+                    "texture_path": "assets/images/environment/bridge_ground_bottom_railings.png",
+                    "draw_source": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "w": 640.0,
+                        "h": 48.0
+                    }
+                }
+            ],
+            "children": []
+        },
+        {
             "name": "BottomUI",
             "type": "Sprite",
             "components": [
