@@ -11,7 +11,7 @@ class BridgeGate(Sprite):
 
     @staticmethod
     def get_default_size() -> Size2D:
-        return Size2D(20, 100)
+        return Size2D(48, 100)
 
     def _start(self) -> None:
         self._collider = Collider2D.new()
