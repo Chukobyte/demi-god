@@ -57,6 +57,12 @@
                 "nearest_neighbor": true
             },
             {
+                "file_path": "assets/images/environment/bridge_gate_foreground.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
                 "file_path": "assets/images/demi/demi_crouch.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",
