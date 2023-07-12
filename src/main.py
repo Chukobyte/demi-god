@@ -27,9 +27,13 @@ class Main(Node2D):
         buildings_draw_source = buildings.draw_source
         buildings_draw_source.w = max_game_width
         buildings.draw_source = buildings_draw_source
-        bg_ground: Sprite = self.get_child("Parallax").get_child("Ground")
+        # Ground
+        bg_ground: Sprite = self.get_child("ParallaxBack").get_child("Ground")
         bg_ground.draw_source = buildings_draw_source
         self.ground_scroll_task = Task(coroutine=self._ground_scroll_task(bg_ground))
+        # Back buildings
+        back_buildings: Sprite = self.get_child("ParallaxBack").get_child("Buildings")
+        back_buildings.draw_source = buildings_draw_source
 
     def _update(self, delta_time: float) -> None:
         if Input.is_action_just_pressed("exit"):

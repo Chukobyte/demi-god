@@ -257,7 +257,7 @@
             "children": []
         },
         {
-            "name": "Parallax",
+            "name": "ParallaxBack",
             "type": "Parallax",
             "components": [
                 {
@@ -266,12 +266,33 @@
                 {
                     "type": "parallax",
                     "scroll_speed": {
-                        "x": -0.3,
+                        "x": -0.6,
                         "y": 0.0
                     }
                 }
             ],
             "children": [
+                {
+                    "name": "Buildings",
+                    "type": "Sprite",
+                    "components": [
+                        {
+                            "type": "transform_2d",
+                            "z_index": 1
+                        },
+                        {
+                            "type": "sprite",
+                            "texture_path": "assets/images/environment/buildings_background_back.png",
+                            "draw_source": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "w": 320.0,
+                                "h": 144.0
+                            }
+                        }
+                    ],
+                    "children": []
+                },
                 {
                     "name": "Ground",
                     "type": "Sprite",
@@ -296,7 +317,25 @@
                         }
                     ],
                     "children": []
+                }
+            ]
+        },
+        {
+            "name": "Parallax",
+            "type": "Parallax",
+            "components": [
+                {
+                    "type": "transform_2d"
                 },
+                {
+                    "type": "parallax",
+                    "scroll_speed": {
+                        "x": -0.3,
+                        "y": 0.0
+                    }
+                }
+            ],
+            "children": [
                 {
                     "name": "Buildings",
                     "type": "Sprite",
