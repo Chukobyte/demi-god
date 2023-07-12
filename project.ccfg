@@ -165,6 +165,12 @@
                 "nearest_neighbor": true
             },
             {
+                "file_path": "assets/images/environment/buildings_background_ground.png",
+                "wrap_s": "repeat",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
                 "file_path": "assets/images/environment/cloud_variation1.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",

@@ -273,6 +273,31 @@
             ],
             "children": [
                 {
+                    "name": "Ground",
+                    "type": "Sprite",
+                    "components": [
+                        {
+                            "type": "transform_2d",
+                            "z_index": 1,
+                            "position": {
+                                "x": -6400.0,
+                                "y": 0.0
+                            }
+                        },
+                        {
+                            "type": "sprite",
+                            "texture_path": "assets/images/environment/buildings_background_ground.png",
+                            "draw_source": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "w": 320.0,
+                                "h": 144.0
+                            }
+                        }
+                    ],
+                    "children": []
+                },
+                {
                     "name": "Buildings",
                     "type": "Sprite",
                     "components": [
