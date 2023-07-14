@@ -23,10 +23,12 @@ class Main(Node2D):
         bridge_ground_bottom_railings: Sprite = self.get_child("BottomRailings")
         bridge_ground_bottom_railings.draw_source = bridge_ground_draw_source
         # Buildings Background
-        buildings: Sprite = self.get_child("Parallax").get_child("Buildings")
-        buildings_draw_source = buildings.draw_source
+        # buildings: AnimatedSprite = self.get_child("Parallax").get_child("Buildings")
+        # buildings_draw_source = buildings.draw_source
+        # buildings_draw_source.w = max_game_width
+        # buildings.draw_source = buildings_draw_source
+        buildings_draw_source = Rect2(0.0, 0.0, 320.0, 144.0)
         buildings_draw_source.w = max_game_width
-        buildings.draw_source = buildings_draw_source
         # Ground
         bg_ground: Sprite = self.get_child("ParallaxBack").get_child("Ground")
         bg_ground.draw_source = buildings_draw_source
