@@ -285,6 +285,12 @@
                 "nearest_neighbor": true
             },
             {
+                "file_path": "assets/images/items/item_scroll.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
                 "file_path": "assets/images/items/item_heart.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",

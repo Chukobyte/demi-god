@@ -7,7 +7,7 @@ from crescent_api import GameProperties
 from src.characters.enemy_definitions import EnemyDefinition
 from src.items import (
     HealthRestoreItem,
-    SignItem,
+    ScrollItem,
     ItemUtils,
 )
 
@@ -85,7 +85,7 @@ class LevelAreaDefinitions:
         1: LevelArea(
             area_type=LevelAreaType.INTRO,
             width=260,
-            item_types=[SignItem],
+            item_types=[ScrollItem],
             spawn_health_restore_for_middle_item=False,
         ),
         2: LevelArea(

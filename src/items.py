@@ -17,19 +17,18 @@ class Item(Node2D):
         self.queue_deletion()
 
 
-class SignItem(Item):
+class ScrollItem(Item):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.description = "Help the souls!"
-        # self.can_be_collected = False
 
     def _start(self):
-        size = Size2D(8, 8)
-        # Color Rect
-        self.color_rect = ColorRect.new()
-        self.color_rect.size = size
-        self.color_rect.color = Color.RED
-        self.add_child(self.color_rect)
+        size = Size2D(10, 10)
+        # Sprite
+        self.sprite = Sprite.new()
+        self.sprite.texture = Texture("assets/images/items/item_scroll.png")
+        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
+        self.add_child(self.sprite)
         # Collider
         self.collider = Collider2D.new()
         self.collider.extents = size
@@ -140,13 +139,13 @@ class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> AttackItem | HealthRestoreItem | SignItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | None:
+    ) -> AttackItem | HealthRestoreItem | ScrollItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | None:
         if issubclass(item_type, AttackItem):
             return AttackItem.new()
         elif issubclass(item_type, HealthRestoreItem):
             return HealthRestoreItem.new()
-        elif issubclass(item_type, SignItem):
-            return SignItem.new()
+        elif issubclass(item_type, ScrollItem):
+            return ScrollItem.new()
         elif issubclass(item_type, EnergyDrainDecreaseItem):
             return EnergyDrainDecreaseItem.new()
         elif issubclass(item_type, DamageDecreaseItem):
