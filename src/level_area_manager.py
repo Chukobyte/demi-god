@@ -79,11 +79,15 @@ class LevelAreaManager:
             level_state.is_paused_from_boss = True
         # Temp wandering soul spawn
         elif area.area_type == LevelAreaType.END:
-            wandering_soul = WanderingSoul.new()
+            wandering_soul_scene = SceneUtil.load_scene(
+                "scenes/characters/wandering_soul.cscn"
+            )
+            wandering_soul: WanderingSoul = wandering_soul_scene.create_instance()
             wandering_soul.position = Vector2(
                 level_state.boundary.w - 32, level_state.floor_y
             )
             wandering_soul.z_index = 10
+            wandering_soul.flip_h = True
             SceneTree.get_root().add_child(wandering_soul)
 
     def _get_next_bridge_gate_position(self) -> Vector2:

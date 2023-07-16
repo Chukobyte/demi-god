@@ -1,0 +1,81 @@
+{
+    "name": "WanderingSoul",
+    "type": "Node2D",
+    "components": [
+        {
+            "type": "transform_2d"
+        },
+        {
+            "type": "script",
+            "class_path": "src.characters.wandering_soul",
+            "class_name": "WanderingSoul"
+        }
+    ],
+    "children": [
+        {
+            "name": "AnimatedSprite",
+            "type": "AnimatedSprite",
+            "components": [
+                {
+                    "type": "transform_2d"
+                },
+                {
+                    "type": "animated_sprite",
+                    "current_animation_name": "idle",
+                    "is_playing": false,
+                    "origin": {
+                        "x": 6.0,
+                        "y": 15.0
+                    },
+                    "animations": [
+                        {
+                            "name": "idle",
+                            "speed": 300,
+                            "loops": true,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/environment/wandering_soul.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 12.0,
+                                        "h": 20.0
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "children": []
+        },
+        {
+            "name": "Collider2D",
+            "type": "Collider2D",
+            "components": [
+                {
+                    "type": "transform_2d",
+                    "position": {
+                        "x": -6.0,
+                        "y": -6.0
+                    }
+                },
+                {
+                    "type": "collider_2d",
+                    "extents": {
+                        "w": 12.0,
+                        "h": 12.0
+                    },
+                    "color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 204,
+                        "a": 204
+                    }
+                }
+            ],
+            "children": []
+        }
+    ]
+}
