@@ -8,7 +8,6 @@ class Main(Node2D):
     def __init__(self, entity_id: int):
         super().__init__(entity_id=entity_id)
         self.game_master = GameMaster(self)
-        self.main_theme_audio_source: Optional[AudioSource] = None
         self.ground_scroll_task: Optional[Task] = None
 
     def _start(self) -> None:

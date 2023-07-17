@@ -495,7 +495,6 @@ class Player(Node2D):
                         subtract_hp_value(hp_damage, normal_hp_bar_color)
                         if self.stats.hp <= 0.0:
                             is_game_over = True
-                            self.input_enabled = False
                             break
                     await co_suspend()
                 else:
@@ -505,9 +504,19 @@ class Player(Node2D):
                         subtract_hp_value(hp_damage, normal_hp_bar_color)
                         if self.stats.hp <= 0.0:
                             is_game_over = True
-                            self.input_enabled = False
                     break
             if is_game_over:
+                self.input_enabled = False
+                # Stop Music
+                main_theme_audio_source = AudioManager.get_audio_source(
+                    "assets/audio/music/main_theme.wav"
+                )
+                AudioManager.stop_sound(source=main_theme_audio_source)
+                boss_theme_audio_source = AudioManager.get_audio_source(
+                    "assets/audio/music/boss_theme.wav"
+                )
+                AudioManager.stop_sound(source=boss_theme_audio_source)
+                # Stop time dilation and beam player up
                 World.set_time_dilation(0.0)
                 await Task(coroutine=self._beam_player_up())
                 await Task(
