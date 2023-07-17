@@ -368,13 +368,6 @@
     },
     "inputs": [
         {
-            "name": "exit",
-            "values": [
-                "esc",
-                "joystick_back"
-            ]
-        },
-        {
             "name": "move_left",
             "values": [
                 "left",

@@ -36,9 +36,6 @@ class EndGameScreen(Node2D):
         level_state.screen_shader_instance = ShaderUtil.get_current_screen_shader()
 
     def _update(self, delta_time: float) -> None:
-        if Input.is_action_just_pressed("exit"):
-            Engine.exit()
-
         if self.can_update_options:
             self.option_box_manager.process_inputs()
             if Input.is_action_just_pressed("start") or Input.is_action_just_pressed(

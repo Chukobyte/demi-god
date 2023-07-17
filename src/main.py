@@ -15,10 +15,6 @@ class Main(Node2D):
         bg_ground: Sprite = self.get_child("ParallaxBack").get_child("Ground")
         self.ground_scroll_task = Task(coroutine=self._ground_scroll_task(bg_ground))
 
-    def _update(self, delta_time: float) -> None:
-        if Input.is_action_just_pressed("exit"):
-            Engine.exit()
-
     def _fixed_update(self, delta_time: float) -> None:
         self.game_master.update()
         if self.ground_scroll_task:
