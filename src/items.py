@@ -29,6 +29,7 @@ class ScrollItem(Item):
         self.sprite.texture = Texture("assets/images/items/item_scroll.png")
         self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
         self.add_child(self.sprite)
+        self.sprite.flip_h = True
         # Collider
         self.collider = Collider2D.new()
         self.collider.extents = size

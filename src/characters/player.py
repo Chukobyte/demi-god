@@ -495,6 +495,7 @@ class Player(Node2D):
                         subtract_hp_value(hp_damage, normal_hp_bar_color)
                         if self.stats.hp <= 0.0:
                             is_game_over = True
+                            self.input_enabled = False
                             break
                     await co_suspend()
                 else:
@@ -504,6 +505,7 @@ class Player(Node2D):
                         subtract_hp_value(hp_damage, normal_hp_bar_color)
                         if self.stats.hp <= 0.0:
                             is_game_over = True
+                            self.input_enabled = False
                     break
             if is_game_over:
                 World.set_time_dilation(0.0)
