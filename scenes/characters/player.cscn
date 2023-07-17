@@ -212,7 +212,7 @@
                             "frames": [
                                 {
                                     "frame": 0,
-                                    "texture_path": "assets/images/demi/demi_transformed_jump.png",
+                                    "texture_path": "assets/images/demi/demi_transformed_jump_up.png",
                                     "draw_source": {
                                         "x": 0.0,
                                         "y": 0.0,
@@ -229,7 +229,7 @@
                             "frames": [
                                 {
                                     "frame": 0,
-                                    "texture_path": "assets/images/demi/demi_transformed_jump.png",
+                                    "texture_path": "assets/images/demi/demi_transformed_jump_down.png",
                                     "draw_source": {
                                         "x": 0.0,
                                         "y": 0.0,

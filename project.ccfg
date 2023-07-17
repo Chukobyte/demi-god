@@ -345,7 +345,13 @@
                 "nearest_neighbor": true
             },
             {
-                "file_path": "assets/images/demi/demi_transformed_jump.png",
+                "file_path": "assets/images/demi/demi_transformed_jump_up.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/demi/demi_transformed_jump_down.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",
                 "nearest_neighbor": true

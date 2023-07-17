@@ -867,7 +867,7 @@ class Player(Node2D):
                         is_ascending = False
                         current_jump_anim = "jump_down"
                         if not attack_task:
-                            self.anim_sprite.play(current_jump_anim)
+                            self.play_animation(current_jump_anim)
                 else:
                     self.position += Vector2.DOWN * jump_vector
                     if self.position.y == level_state.floor_y:
