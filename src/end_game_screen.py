@@ -41,7 +41,9 @@ class EndGameScreen(Node2D):
 
         if self.can_update_options:
             self.option_box_manager.process_inputs()
-            if Input.is_action_just_pressed("start"):
+            if Input.is_action_just_pressed("start") or Input.is_action_just_pressed(
+                "attack"
+            ):
                 self.confirmed_option = self.option_box_manager.get_selected_option()
                 self.option_box_manager.is_enabled = False
 

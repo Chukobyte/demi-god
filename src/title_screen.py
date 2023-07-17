@@ -61,7 +61,9 @@ class TitleScreen(Node2D):
         if Input.is_action_just_pressed("exit"):
             Engine.exit()
 
-        if Input.is_action_just_pressed("start"):
+        if Input.is_action_just_pressed("start") or Input.is_action_just_pressed(
+            "attack"
+        ):
             if self.title_screen_anims_finished:
                 self.confirmed_option = self.option_box_manager.get_selected_option()
                 self.option_box_manager.is_enabled = False

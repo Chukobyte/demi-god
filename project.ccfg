@@ -425,7 +425,8 @@
         {
             "name": "start",
             "values": [
-                "return"
+                "return",
+                "joystick_start"
             ]
         }
     ],

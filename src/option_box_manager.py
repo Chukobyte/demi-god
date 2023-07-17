@@ -39,7 +39,9 @@ class OptionBoxManager:
         if not self.is_enabled:
             return None
         # Confirm
-        if Input.is_action_just_pressed("start"):
+        if Input.is_action_just_pressed("start") or Input.is_action_just_pressed(
+            "attack"
+        ):
             return OptionInputsResponse(
                 selected_option=self.get_selected_option(), confirmed=True
             )
