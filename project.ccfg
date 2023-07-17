@@ -372,7 +372,8 @@
             "values": [
                 "left",
                 "a",
-                "joystick_left_analog_left"
+                "joystick_left_analog_left",
+                "joystick_dpad_left"
             ]
         },
         {
@@ -380,7 +381,8 @@
             "values": [
                 "right",
                 "d",
-                "joystick_left_analog_right"
+                "joystick_left_analog_right",
+                "joystick_dpad_right"
             ]
         },
         {
@@ -388,7 +390,8 @@
             "values": [
                 "down",
                 "s",
-                "joystick_left_analog_down"
+                "joystick_left_analog_down",
+                "joystick_dpad_down"
             ]
         },
         {
@@ -397,7 +400,8 @@
                 "up",
                 "w",
                 "joystick_left_analog_up",
-                "joystick_button_a"
+                "joystick_button_a",
+                "joystick_dpad_up"
             ]
         },
         {
@@ -420,6 +424,33 @@
             "values": [
                 "return",
                 "joystick_start"
+            ]
+        },
+        {
+            "name": "ui_confirm",
+            "values": [
+                "return",
+                "space",
+                "joystick_start",
+                "joystick_button_a"
+            ]
+        },
+        {
+            "name": "ui_up",
+            "values": [
+                "up",
+                "w",
+                "joystick_left_analog_up",
+                "joystick_dpad_up"
+            ]
+        },
+        {
+            "name": "ui_down",
+            "values": [
+                "down",
+                "s",
+                "joystick_left_analog_down",
+                "joystick_dpad_down"
             ]
         }
     ],

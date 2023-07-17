@@ -58,9 +58,7 @@ class TitleScreen(Node2D):
         )
 
     def _update(self, delta_time: float) -> None:
-        if Input.is_action_just_pressed("start") or Input.is_action_just_pressed(
-            "attack"
-        ):
+        if Input.is_action_just_pressed("ui_confirm"):
             if self.title_screen_anims_finished:
                 self.confirmed_option = self.option_box_manager.get_selected_option()
                 self.option_box_manager.is_enabled = False

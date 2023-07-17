@@ -39,14 +39,12 @@ class OptionBoxManager:
         if not self.is_enabled:
             return None
         # Confirm
-        if Input.is_action_just_pressed("start") or Input.is_action_just_pressed(
-            "attack"
-        ):
+        if Input.is_action_just_pressed("ui_confirm"):
             return OptionInputsResponse(
                 selected_option=self.get_selected_option(), confirmed=True
             )
         # Up
-        if Input.is_action_just_pressed("jump"):
+        if Input.is_action_just_pressed("ui_up"):
             self._current_index -= 1
             if self._current_index < 0:
                 self._current_index = len(self.options) - 1
@@ -59,7 +57,7 @@ class OptionBoxManager:
                 selected_option=selected_option, confirmed=False
             )
         # Down
-        elif Input.is_action_just_pressed("crouch"):
+        elif Input.is_action_just_pressed("ui_down"):
             self._current_index += 1
             if self._current_index >= len(self.options):
                 self._current_index = 0
