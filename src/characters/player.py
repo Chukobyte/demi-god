@@ -241,6 +241,9 @@ class Player(Node2D):
         self.attack_hit_audio_source = AudioManager.get_audio_source(
             "assets/audio/sfx/attack_hit.wav"
         )
+        self.collect_item_audio_source = AudioManager.get_audio_source(
+            "assets/audio/sfx/collect_item.wav"
+        )
         self._current_animation_name = ""  # TODO: Add function to engine instead
         self.item_description: Optional[PlayerItemDescription] = None
         self.input_enabled = True
@@ -317,6 +320,8 @@ class Player(Node2D):
         if item.can_be_collected:
             self.item_description.hide_description()
             item.collect()
+            if item.play_collected_sfx:
+                AudioManager.play_sound(self.collect_item_audio_source)
             # Item specific
             if issubclass(type(item), HealthRestoreItem):
                 health_item: HealthRestoreItem = item

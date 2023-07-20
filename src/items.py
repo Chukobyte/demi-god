@@ -11,6 +11,7 @@ class Item(Node2D):
         self.collider: Optional[Collider2D] = None
         self.description: Optional[str] = None
         self.can_be_collected = True
+        self.play_collected_sfx = True
 
     def collect(self) -> None:
         self.broadcast_event("collected", self)

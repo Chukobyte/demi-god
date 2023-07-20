@@ -31,6 +31,9 @@
                 "file_path": "assets/audio/sfx/health_gain.wav"
             },
             {
+                "file_path": "assets/audio/sfx/collect_item.wav"
+            },
+            {
                 "file_path": "assets/audio/sfx/player_hurt.wav"
             }
         ],
