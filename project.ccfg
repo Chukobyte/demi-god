@@ -35,6 +35,9 @@
             },
             {
                 "file_path": "assets/audio/sfx/player_hurt.wav"
+            },
+            {
+                "file_path": "assets/audio/sfx/pause_game_toggle.wav"
             }
         ],
         "textures": [

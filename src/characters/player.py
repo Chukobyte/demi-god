@@ -244,6 +244,9 @@ class Player(Node2D):
         self.collect_item_audio_source = AudioManager.get_audio_source(
             "assets/audio/sfx/collect_item.wav"
         )
+        self.pause_game_toggle_audio_source = AudioManager.get_audio_source(
+            "assets/audio/sfx/pause_game_toggle.wav"
+        )
         self._current_animation_name = ""  # TODO: Add function to engine instead
         self.item_description: Optional[PlayerItemDescription] = None
         self.input_enabled = True
@@ -273,6 +276,7 @@ class Player(Node2D):
             else:
                 World.set_time_dilation(1.0)
             level_state.is_paused = not level_state.is_paused
+            AudioManager.play_sound(self.pause_game_toggle_audio_source)
 
         if not self._are_enemies_attached() and not level_state.is_game_state_paused():
             if Input.is_action_just_pressed("attack"):
