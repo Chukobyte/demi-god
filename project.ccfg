@@ -25,6 +25,9 @@
                 "file_path": "assets/audio/sfx/attack_slash.wav"
             },
             {
+                "file_path": "assets/audio/sfx/attack_hit.wav"
+            },
+            {
                 "file_path": "assets/audio/sfx/health_gain.wav"
             },
             {

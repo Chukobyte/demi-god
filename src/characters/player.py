@@ -238,6 +238,9 @@ class Player(Node2D):
         self.attack_slash_audio_source = AudioManager.get_audio_source(
             "assets/audio/sfx/attack_slash.wav"
         )
+        self.attack_hit_audio_source = AudioManager.get_audio_source(
+            "assets/audio/sfx/attack_hit.wav"
+        )
         self._current_animation_name = ""  # TODO: Add function to engine instead
         self.item_description: Optional[PlayerItemDescription] = None
         self.input_enabled = True
@@ -398,6 +401,7 @@ class Player(Node2D):
             self.enemies_attached_to_left.remove(enemy)
         elif enemy in self.enemies_attached_to_right:
             self.enemies_attached_to_right.remove(enemy)
+        AudioManager.play_sound(source=self.attack_hit_audio_source)
 
     def _set_transformed(self, is_transformed: bool) -> None:
         if self.is_transformed != is_transformed:
