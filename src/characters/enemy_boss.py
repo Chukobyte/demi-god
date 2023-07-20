@@ -77,12 +77,12 @@ class EnemyBossProjectile(EnemyAttack):
     # --- TASKS --- #
     async def _physics_update_task(self) -> None:
         try:
-            # Go 3 frames at half speed to telegraph projectile
+            # Go a certain amount frames at half speed to telegraph projectile
+            frames_to_telegraph_attack = 6
             full_move_speed = self.move_speed
             self.move_speed /= 2.0
-            await co_suspend()
-            await co_suspend()
-            await co_suspend()
+            for i in range(frames_to_telegraph_attack):
+                await co_suspend()
             self.move_speed = full_move_speed
 
             life_timer = Timer(15.0)
