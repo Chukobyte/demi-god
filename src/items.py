@@ -10,8 +10,47 @@ class Item(Node2D):
         self.sprite: Optional[Sprite] = None
         self.collider: Optional[Collider2D] = None
         self.description: Optional[str] = None
+        self._description_split: Optional[List[str]] = None
         self.can_be_collected = True
         self.play_collected_sfx = True
+
+    def _start(self):
+        self._description_split = self._split_description_text()
+
+    def _split_description_text(self, characters_per_line=19) -> List[str]:
+        """
+        Splits the item description text.  Max line is 19 characters long, for a total max of 38 characters.
+        """
+        # Early out if less than 19 characters
+        if len(self.description) <= characters_per_line:
+            return [self.description, ""]
+
+        lines = []
+        current_line = ""
+        words = self.description.split()
+        for word in words:
+            if len(current_line + " " + word) > characters_per_line:
+                lines.append(current_line.strip())
+                current_line = word
+            else:
+                current_line += " " + word
+
+        # Add last line to the array
+        lines.append(current_line.strip())
+
+        return lines
+
+    @property
+    def description_top(self) -> str:
+        if len(self._description_split) == 0:
+            return ""
+        return self._description_split[0]
+
+    @property
+    def description_bottom(self) -> str:
+        if len(self._description_split) <= 1:
+            return ""
+        return self._description_split[1]
 
     def collect(self) -> None:
         self.broadcast_event("collected", self)
@@ -24,6 +63,7 @@ class ScrollItem(Item):
         self.description = "Help the souls!"
 
     def _start(self):
+        super()._start()
         size = Size2D(10, 10)
         # Sprite
         self.sprite = Sprite.new()
@@ -46,6 +86,7 @@ class AttackItem(Item):
         self.description = "Add to attack"
 
     def _start(self):
+        super()._start()
         size = Size2D(8, 8)
         # Color Rect
         self.color_rect = ColorRect.new()
@@ -65,6 +106,7 @@ class HealthRestoreItem(Item):
         self.restore_amount = 5
 
     def _start(self):
+        super()._start()
         size = Size2D(10, 10)
         # Sprite
         self.sprite = Sprite.new()
@@ -82,9 +124,10 @@ class HealthRestoreItem(Item):
 class EnergyDrainDecreaseItem(Item):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self.description = "Lowers energy drain"
+        self.description = "Lowers transform energy drain"
 
     def _start(self):
+        super()._start()
         size = Size2D(10, 10)
         # Sprite
         self.sprite = Sprite.new()
@@ -102,9 +145,10 @@ class EnergyDrainDecreaseItem(Item):
 class DamageDecreaseItem(Item):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self.description = "Reduces damage"
+        self.description = "Reduces damage taken"
 
     def _start(self):
+        super()._start()
         size = Size2D(10, 10)
         # Sprite
         self.sprite = Sprite.new()
@@ -120,9 +164,10 @@ class DamageDecreaseItem(Item):
 class AttackRangeIncreaseItem(Item):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self.description = "More attack range"
+        self.description = "Increases attack range"
 
     def _start(self):
+        super()._start()
         size = Size2D(10, 10)
         # Sprite
         self.sprite = Sprite.new()

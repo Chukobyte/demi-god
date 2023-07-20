@@ -140,14 +140,42 @@
                     ],
                     "children": [
                         {
-                            "name": "WindowText",
+                            "name": "WindowTextTop",
                             "type": "TextLabel",
                             "components": [
                                 {
                                     "type": "transform_2d",
                                     "position": {
                                         "x": 4.0,
-                                        "y": 10.0
+                                        "y": 12.0
+                                    },
+                                    "z_index": 1,
+                                    "z_index_relative_to_parent": true,
+                                    "ignore_camera": true
+                                },
+                                {
+                                    "type": "text_label",
+                                    "uid": "gameboy-8",
+                                    "text": "",
+                                    "color": {
+                                        "r": 2,
+                                        "g": 3,
+                                        "b": 2,
+                                        "a": 255
+                                    }
+                                }
+                            ],
+                            "children": []
+                        },
+                        {
+                            "name": "WindowTextBot",
+                            "type": "TextLabel",
+                            "components": [
+                                {
+                                    "type": "transform_2d",
+                                    "position": {
+                                        "x": 4.0,
+                                        "y": 24.0
                                     },
                                     "z_index": 1,
                                     "z_index_relative_to_parent": true,
