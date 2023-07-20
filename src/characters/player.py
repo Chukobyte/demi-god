@@ -231,6 +231,7 @@ class Player(Node2D):
         # Used when attacking to delay a frame on contact
         self.enemy_collision_invincible = False
         self.in_attack_damage_cooldown = False
+        self.damage_cooldown_time = 2.0
         self.physics_update_task = Task(coroutine=self._physics_update_task())
         self.transformation_task: Optional[Task] = None
         self.health_restore_task: Optional[Task] = None
@@ -455,11 +456,13 @@ class Player(Node2D):
 
     async def _damage_cooldown_task(
         self,
-        cooldown_time: float,
+        cooldown_time: Optional[float] = None,
         gamepad_vibration=True,
         hp_damage=1.0,
         modulate_color=True,
     ):
+        if not cooldown_time:
+            cooldown_time = self.damage_cooldown_time
         take_transform_damage = self.is_transformed
         if take_transform_damage:
             bar_ui = self.stats.energy_bar_ui
@@ -581,7 +584,7 @@ class Player(Node2D):
                             self.in_attack_damage_cooldown = True
                             AudioManager.play_sound(player_hurt_audio_source)
                             damage_cooldown_task = Task(
-                                coroutine=self._damage_cooldown_task(1.0)
+                                coroutine=self._damage_cooldown_task()
                             )
                     # Enemy Attack Collision
                     elif (
@@ -593,7 +596,7 @@ class Player(Node2D):
                         self.in_attack_damage_cooldown = True
                         AudioManager.play_sound(player_hurt_audio_source)
                         damage_cooldown_task = Task(
-                            coroutine=self._damage_cooldown_task(1.0)
+                            coroutine=self._damage_cooldown_task()
                         )
                     # Power Up
                     elif issubclass(collider_parent_type, Item):
