@@ -1,4 +1,4 @@
-from typing import Type, List
+from typing import Type, List, Optional
 
 from src.characters.enemy_boss import EnemyBoss
 from src.characters.enemy_crow import EnemyCrow
@@ -26,13 +26,13 @@ class EnemyDefinition:
         enemy_type: Type,
         max_total_count: int,
         max_spawn_count=1,
-        balance_spawn_sides=False,
+        max_total_on_one_side: Optional[int] = None,
     ):
         self.scene_path = scene_path
         self.enemy_type = enemy_type
         self.max_total_count = max_total_count
         self.max_spawn_count = max_spawn_count
-        self.balance_spawn_sides = balance_spawn_sides
+        self.max_total_on_one_side = max_total_on_one_side
 
     @staticmethod
     def RABBIT() -> "EnemyDefinition":
@@ -59,7 +59,7 @@ class EnemyDefinition:
             enemy_type=EnemyJester,
             max_total_count=2,
             max_spawn_count=1,
-            balance_spawn_sides=True,
+            max_total_on_one_side=1,
         )
 
     @staticmethod

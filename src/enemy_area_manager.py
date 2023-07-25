@@ -62,7 +62,11 @@ class EnemyAreaManager:
         spawn_attempt_finished = False
         player = Player.find_player()
         main_node = SceneTree.get_root()
+        is_in_first_section = section.index == 0
+        is_in_last_section = section.index == total_sections - 1
         while not spawn_attempt_finished:
+            if not enemy_defs:
+                break
             random_enemy_def: EnemyDefinition = random.choice(enemy_defs)
             enemy_defs.remove(random_enemy_def)
             enemies_of_type_in_level = self._get_spawned_enemies_by_type(
@@ -73,18 +77,24 @@ class EnemyAreaManager:
             max_enemies_to_spawn = game_math.clamp(
                 max_enemies_to_spawn, 0, random_enemy_def.max_spawn_count
             )
+            if random_enemy_def.max_total_on_one_side:
+                max_total_on_one_side = random_enemy_def.max_total_on_one_side
+            else:
+                max_total_on_one_side = 99
             if (
                 enemy_count < random_enemy_def.max_total_count
                 and max_enemies_to_spawn > 0
             ):
                 num_of_enemies_to_spawn = random.randint(1, max_enemies_to_spawn)
                 # Adjust base spawn position to fall either on the left or right
-                if section.index == 0:
-                    x_modifier = x_range.max
-                elif section.index == total_sections - 1:
-                    x_modifier = x_range.min
-                elif not random_enemy_def.balance_spawn_sides or enemy_count == 0:
-                    x_modifier = random.choice([x_range.min, x_range.max])
+                if enemy_count == 0:
+                    if is_in_first_section:
+                        x_modifier = x_range.max
+                    elif is_in_last_section:
+                        x_modifier = x_range.min
+                    else:
+                        x_modifier = random.choice([x_range.min, x_range.max])
+                # Enemy count is higher than one, so try to balance the sides of enemies
                 else:
                     left_side_count = 0
                     right_side_count = 0
@@ -94,12 +104,42 @@ class EnemyAreaManager:
                             right_side_count += 1
                         else:
                             left_side_count += 1
-                    if left_side_count > right_side_count:
-                        x_modifier = x_range.max
-                    elif right_side_count > left_side_count:
-                        x_modifier = x_range.min
+                    if is_in_first_section:
+                        if (
+                            right_side_count + num_of_enemies_to_spawn
+                            <= max_total_on_one_side
+                        ):
+                            x_modifier = x_range.max
+                        else:
+                            continue
+                    elif is_in_last_section:
+                        if (
+                            left_side_count + num_of_enemies_to_spawn
+                            <= max_total_on_one_side
+                        ):
+                            x_modifier = x_range.min
+                        else:
+                            continue
                     else:
-                        x_modifier = random.choice([x_range.min, x_range.max])
+                        if left_side_count > right_side_count:
+                            if (
+                                left_side_count + num_of_enemies_to_spawn
+                                <= max_total_on_one_side
+                            ):
+                                x_modifier = x_range.max
+                            else:
+                                continue
+                        elif right_side_count > left_side_count:
+                            if (
+                                right_side_count + num_of_enemies_to_spawn
+                                <= max_total_on_one_side
+                            ):
+                                x_modifier = x_range.min
+                            else:
+                                continue
+                        else:
+                            # We don't check for max total on 'one side at this point', but it's probably fine...
+                            x_modifier = random.choice([x_range.min, x_range.max])
                 base_spawn_pos.x += x_modifier
                 for i in range(num_of_enemies_to_spawn):
                     spawned_enemy = self._spawn_enemy_from_def(random_enemy_def)
@@ -113,8 +153,6 @@ class EnemyAreaManager:
                     )
                     self._spawned_enemies.append(spawned_enemy)
                 spawn_attempt_finished = True
-            if not enemy_defs:
-                break
 
     async def _lightning_flash_task(self, flash_time_range=MinMax(2.0, 8.0)):
         main_node = SceneTree.get_root()
