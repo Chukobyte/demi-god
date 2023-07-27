@@ -256,9 +256,14 @@ class Player(Node2D):
 
     def _start(self) -> None:
         self.anim_sprite = self.get_child("AnimatedSprite")
+        self.anim_sprite.shader_instance = ShaderUtil.compile_shader(
+            "shaders/player.shader"
+        )
+
         self.collider = self.get_child("Collider2D")
         self.stats.refresh_bar_nodes()
         Camera2D.follow_node(self)
+
         # Start with 0 energy
         self.stats.energy = 0
         self.item_description = PlayerItemDescription()
@@ -302,6 +307,7 @@ class Player(Node2D):
                         self.transformation_task = Task(
                             coroutine=self._transformation_task()
                         )
+                    # TODO: Clean up old comments, using them as a reference for now
                     # Transform if at max
                     # if self.stats.energy == self.stats.base_energy:
                     #     self._set_transformed(True)
