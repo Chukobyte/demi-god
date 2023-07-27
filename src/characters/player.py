@@ -119,6 +119,7 @@ class PlayerStats:
         base_energy=0.0,
         base_move_speed=0,
         base_energy_restored_from_attacks=0.0,
+        special_attack_charge_time=0.0,
     ):
         self._hp = base_hp
         self._base_hp = base_hp
@@ -128,6 +129,7 @@ class PlayerStats:
         self._base_move_speed = base_move_speed
         self._energy_restored_from_attacks = base_energy_restored_from_attacks
         self._base_energy_restored_from_attacks = base_energy_restored_from_attacks
+        self.special_attack_charge_time = special_attack_charge_time
         self.health_bar_ui: Optional[ColorRect] = None
         self.energy_bar_ui: Optional[ColorRect] = None
         self.base_health_bar_ui_size = Size2D(52, 9)
@@ -222,9 +224,11 @@ class Player(Node2D):
             base_energy=20,
             base_move_speed=25,
             base_energy_restored_from_attacks=0.5,
+            special_attack_charge_time=3.0,
         )
         self.attack_requested = False
         self.special_attack_requested = False
+        self.reset_special_attack_time = False
         self.energy_attack_cost = 5
         self.is_transformed = False
         self.can_untransform = False
@@ -311,17 +315,6 @@ class Player(Node2D):
                         self.transformation_task = Task(
                             coroutine=self._transformation_task()
                         )
-                    # TODO: Clean up old comments, using them as a reference for now
-                    # Transform if at max
-                    # if self.stats.energy == self.stats.base_energy:
-                    #     self._set_transformed(True)
-                    #     self.transformation_task = Task(
-                    #         coroutine=self._transformation_task()
-                    #     )
-                    # elif self.stats.energy >= self.energy_attack_cost:
-                    #     self.stats.energy -= self.energy_attack_cost
-                    #     self.attack_requested = True
-                    #     self.special_attack_requested = True
 
     def _fixed_update(self, delta_time: float) -> None:
         self.physics_update_task.resume()
@@ -398,6 +391,11 @@ class Player(Node2D):
             special_attack.position = attack_pos
             special_attack.z_index = attack_z_index
             special_attack.direction = attack_dir
+            special_attack.subscribe_to_event(
+                event_id="hit_enemy",
+                scoped_node=self,
+                callback_func=lambda enemy: self._on_attack_hit_enemy(enemy),
+            )
             SceneTree.get_root().add_child(special_attack)
             self.special_attack_requested = False
         else:
@@ -413,6 +411,7 @@ class Player(Node2D):
             if self.is_transformed:
                 melee_attack.damage += 1
             SceneTree.get_root().add_child(melee_attack)
+            self.reset_special_attack_time = True
         AudioManager.play_sound(source=self.attack_slash_audio_source)
 
     def _on_attack_hit_enemy(self, enemy: Enemy) -> None:
@@ -440,6 +439,9 @@ class Player(Node2D):
     async def _physics_update_task(self):
         level_state = LevelState()
         collision_task = Task(coroutine=self._collision_check_task())
+        manage_special_attack_state_task = Task(
+            coroutine=self._manage_special_attack_state_task()
+        )
         prev_stance = None
         current_stance_task: Optional[Task] = None
 
@@ -466,6 +468,8 @@ class Player(Node2D):
                 # Health restore task
                 if self.health_restore_task:
                     self.health_restore_task.resume()
+                # Special attack management task
+                manage_special_attack_state_task.resume()
                 # Change stance if different from last frame
                 if prev_stance != self.stance:
                     if current_stance_task:
@@ -479,6 +483,49 @@ class Player(Node2D):
         except GeneratorExit:
             if current_stance_task:
                 current_stance_task.close()
+
+    async def _manage_special_attack_state_task(self):
+        try:
+            level_state = LevelState()
+            shader_instance = self.anim_sprite.shader_instance
+            charge_timer = Timer(self.stats.special_attack_charge_time)
+            while True:
+                if self.reset_special_attack_time:
+                    charge_timer.time = self.stats.special_attack_charge_time
+                    charge_timer.reset()
+                    self.reset_special_attack_time = False
+                if not level_state.is_currently_transitioning_within_level:
+                    charge_timer.tick(self.get_full_time_dilation_with_physics_delta())
+                if charge_timer.has_stopped():
+                    self.special_attack_requested = True
+                    shader_instance.set_float_param("outline_width", 1.4)
+                    await co_suspend()
+                    shader_instance.set_float_param("outline_width", 1.2)
+                    await co_suspend()
+                    shader_instance.set_float_param("outline_width", 1.0)
+                    await co_suspend()
+                    charged_outline_width = 0.7
+                    while (
+                        self.special_attack_requested
+                        and not self.reset_special_attack_time
+                    ):
+                        shader_instance.set_float_param(
+                            "outline_width", charged_outline_width
+                        )
+                        if charged_outline_width == 0.7:
+                            charged_outline_width = 0.8
+                        elif charged_outline_width == 0.8:
+                            charged_outline_width = 0.9
+                        else:
+                            charged_outline_width = 0.7
+                        await co_suspend()
+                    shader_instance.set_float_param("outline_width", 0.0)
+                    charge_timer.time = self.stats.special_attack_charge_time
+                    charge_timer.reset()
+                    self.reset_special_attack_time = False
+                await co_suspend()
+        except GeneratorExit:
+            pass
 
     async def _damage_cooldown_task(
         self,
@@ -502,6 +549,7 @@ class Player(Node2D):
             else:
                 self.stats.hp -= damage
             bar_ui.color = bar_color
+            self.reset_special_attack_time = True
 
         normal_hp_bar_color = bar_ui.color
         try:
