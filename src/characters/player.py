@@ -259,6 +259,10 @@ class Player(Node2D):
         self.anim_sprite.shader_instance = ShaderUtil.compile_shader(
             "shaders/player.shader"
         )
+        outline_color = Vector4(255.0 / 240.0, 255.0 / 247.0, 255.0 / 243, 1.0)
+        self.anim_sprite.shader_instance.set_float4_param(
+            "outline_color", outline_color
+        )
 
         self.collider = self.get_child("Collider2D")
         self.stats.refresh_bar_nodes()
