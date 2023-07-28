@@ -62,7 +62,6 @@ class PlayerMeleeAttack(PlayerAttack):
 class PlayerSpecialAttack(PlayerAttack):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self.damage = 2
         self.color = Color(240, 247, 243, 255)
 
     def _fixed_update(self, delta_time: float) -> None:
@@ -224,7 +223,7 @@ class Player(Node2D):
             base_energy=20,
             base_move_speed=25,
             base_energy_restored_from_attacks=0.5,
-            special_attack_charge_time=3.0,
+            special_attack_charge_time=5.0,
         )
         self.attack_requested = False
         self.special_attack_requested = False
@@ -509,15 +508,16 @@ class Player(Node2D):
                         self.special_attack_requested
                         and not self.reset_special_attack_time
                     ):
-                        shader_instance.set_float_param(
-                            "outline_width", charged_outline_width
-                        )
-                        if charged_outline_width == 0.7:
-                            charged_outline_width = 0.8
-                        elif charged_outline_width == 0.8:
-                            charged_outline_width = 0.9
-                        else:
-                            charged_outline_width = 0.7
+                        if World.get_time_dilation() > 0.0:
+                            shader_instance.set_float_param(
+                                "outline_width", charged_outline_width
+                            )
+                            if charged_outline_width == 0.7:
+                                charged_outline_width = 0.8
+                            elif charged_outline_width == 0.8:
+                                charged_outline_width = 0.9
+                            else:
+                                charged_outline_width = 0.7
                         await co_suspend()
                     shader_instance.set_float_param("outline_width", 0.0)
                     charge_timer.time = self.stats.special_attack_charge_time
