@@ -30,6 +30,9 @@ class Item(Node2D):
         """
         Splits the item description text.  Max line is 19 characters long, for a total max of 38 characters.
         """
+        if not self.description:
+            return ["", ""]
+
         # Early out if less than 19 characters
         if len(self.description) <= characters_per_line:
             return [self.description, ""]
@@ -56,8 +59,16 @@ class Item(Node2D):
             outline_width = 0.0
         self.sprite.shader_instance.set_float_param("outline_width", outline_width)
 
+    def on_activation(self) -> None:
+        self.active = True
+        self.broadcast_event("activated", self)
+
     def can_be_activated(self, stats: PlayerStats) -> bool:
         return not self.active
+
+    def collect(self) -> None:
+        self.broadcast_event("collected", self)
+        self.queue_deletion()
 
     @property
     def description_top(self) -> str:
@@ -70,10 +81,6 @@ class Item(Node2D):
         if len(self._description_split) <= 1:
             return ""
         return self._description_split[1]
-
-    def collect(self) -> None:
-        self.broadcast_event("collected", self)
-        self.queue_deletion()
 
 
 class ScrollItem(Item):
@@ -95,6 +102,30 @@ class ScrollItem(Item):
         self.add_child(self.collider)
         # Other
         self.position += Vector2(40, 0)
+
+
+class LeverItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.can_be_collected = False
+
+    def _start(self):
+        super()._start()
+        size = Size2D(14, 14)
+        # Sprite
+        self.sprite.texture = Texture("assets/images/items/item_lever.png")
+        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
+        self.add_child(self.sprite)
+        # Collider
+        self.collider = Collider2D.new()
+        self.collider.extents = size
+        self.add_child(self.collider)
+        # Other
+        self.position += Vector2(40, -1)
+
+    def on_activation(self) -> None:
+        super().on_activation()
+        self.sprite.flip_h = True
 
 
 class HealthRestoreItem(Item):
@@ -201,11 +232,13 @@ class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> HealthRestoreItem | ScrollItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | SpecialAttackTimeDecreaseItem | None:
+    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | SpecialAttackTimeDecreaseItem | None:
         if issubclass(item_type, HealthRestoreItem):
             return HealthRestoreItem.new()
         elif issubclass(item_type, ScrollItem):
             return ScrollItem.new()
+        elif issubclass(item_type, LeverItem):
+            return LeverItem.new()
         elif issubclass(item_type, EnergyDrainDecreaseItem):
             return EnergyDrainDecreaseItem.new()
         elif issubclass(item_type, DamageDecreaseItem):

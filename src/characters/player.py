@@ -218,9 +218,9 @@ class Player(Node2D):
             self.anim_sprite.play(anim_name)
 
     def _activate_item(self, item: Item) -> None:
-        item.active = True
+        item.on_activation()
+        self.item_handler.hide_description()
         if item.can_be_collected:
-            self.item_handler.hide_description()
             item.collect()
             if item.play_collected_sfx:
                 AudioManager.play_sound(self.collect_item_audio_source)

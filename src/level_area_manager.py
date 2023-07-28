@@ -28,7 +28,7 @@ class LevelAreaManager:
     def update(self) -> None:
         self._manage_level_areas_task.resume()
 
-    def _on_item_collected(self, item) -> None:
+    def _on_item_activated(self, item) -> None:
         self._current_area.set_completed(True)
         try:
             self._power_up_items.remove(item)
@@ -53,9 +53,9 @@ class LevelAreaManager:
                 power_up_item = ItemUtils.get_item_from_type(item_type)
                 # Only expected to collect one item per power up area, which completes the area
                 power_up_item.subscribe_to_event(
-                    event_id="collected",
+                    event_id="activated",
                     scoped_node=main_node,
-                    callback_func=lambda item: self._on_item_collected(item),
+                    callback_func=lambda item: self._on_item_activated(item),
                 )
                 power_up_item.position = Vector2(
                     level_state.boundary.w - 120 + (i * 40), level_state.floor_y - 1
