@@ -86,7 +86,7 @@ class PlayerItemHandler:
         self.item_shown: Optional[Item] = None
 
     def show_description(self, item: Item) -> None:
-        if not self.item_shown:
+        if not self.item_shown and not item.active:
             item.set_item_highlighted(is_highlighted=True)
             top_description = item.description_top
             bottom_description = item.description_bottom
