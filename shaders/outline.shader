@@ -1,6 +1,6 @@
 shader_type sprite;
 
-uniform vec4 outline_color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+uniform vec4 outline_color = vec4(0.96f, 0.968f, 0.952f, 1.0f);
 uniform float outline_width = 0.0f;
 
 vec4 getOutlineColor(vec4 currentColor, vec4 outlineColor, float outlineWidth, vec2 uv, sampler2D textureSampler, vec2 inTextureSize, vec4 textureDrawSource) {

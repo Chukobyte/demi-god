@@ -58,7 +58,7 @@ class LevelAreaManager:
                     callback_func=lambda item: self._on_item_collected(item),
                 )
                 power_up_item.position = Vector2(
-                    level_state.boundary.w - 120 + (i * 40), level_state.floor_y
+                    level_state.boundary.w - 120 + (i * 40), level_state.floor_y - 1
                 )
                 power_up_item.z_index = 10
                 main_node.add_child(power_up_item)

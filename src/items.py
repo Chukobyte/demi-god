@@ -6,15 +6,20 @@ from crescent_api import *
 class Item(Node2D):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self.color_rect: Optional[ColorRect] = None
         self.sprite: Optional[Sprite] = None
         self.collider: Optional[Collider2D] = None
         self.description: Optional[str] = None
         self._description_split: Optional[List[str]] = None
         self.can_be_collected = True
         self.play_collected_sfx = True
+        self.active = False
 
     def _start(self):
+        self.sprite = Sprite.new()
+        self.sprite.shader_instance = ShaderUtil.compile_shader(
+            "shaders/outline.shader"
+        )
+
         self._description_split = self._split_description_text()
 
     def _split_description_text(self, characters_per_line=19) -> List[str]:
@@ -40,6 +45,13 @@ class Item(Node2D):
 
         return lines
 
+    def set_item_highlighted(self, is_highlighted: bool) -> None:
+        if is_highlighted:
+            outline_width = 0.8
+        else:
+            outline_width = 0.0
+        self.sprite.shader_instance.set_float_param("outline_width", outline_width)
+
     @property
     def description_top(self) -> str:
         if len(self._description_split) == 0:
@@ -64,9 +76,8 @@ class ScrollItem(Item):
 
     def _start(self):
         super()._start()
-        size = Size2D(10, 10)
+        size = Size2D(12, 12)
         # Sprite
-        self.sprite = Sprite.new()
         self.sprite.texture = Texture("assets/images/items/item_scroll.png")
         self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
         self.add_child(self.sprite)
@@ -75,28 +86,8 @@ class ScrollItem(Item):
         self.collider = Collider2D.new()
         self.collider.extents = size
         self.add_child(self.collider)
-        self.z_index = 2
         # Other
         self.position += Vector2(40, 0)
-
-
-class AttackItem(Item):
-    def __init__(self, entity_id: int):
-        super().__init__(entity_id)
-        self.description = "Add to attack"
-
-    def _start(self):
-        super()._start()
-        size = Size2D(8, 8)
-        # Color Rect
-        self.color_rect = ColorRect.new()
-        self.color_rect.size = size
-        self.color_rect.color = Color.RED
-        self.add_child(self.color_rect)
-        # Collider
-        self.collider = Collider2D.new()
-        self.collider.extents = size
-        self.add_child(self.collider)
 
 
 class HealthRestoreItem(Item):
@@ -107,9 +98,8 @@ class HealthRestoreItem(Item):
 
     def _start(self):
         super()._start()
-        size = Size2D(10, 10)
+        size = Size2D(12, 12)
         # Sprite
-        self.sprite = Sprite.new()
         self.sprite.texture = Texture("assets/images/items/item_heart.png")
         self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
         self.add_child(self.sprite)
@@ -128,9 +118,8 @@ class EnergyDrainDecreaseItem(Item):
 
     def _start(self):
         super()._start()
-        size = Size2D(10, 10)
+        size = Size2D(12, 12)
         # Sprite
-        self.sprite = Sprite.new()
         self.sprite.texture = Texture(
             "assets/images/items/item_energy_drain_decrease.png"
         )
@@ -149,9 +138,8 @@ class DamageDecreaseItem(Item):
 
     def _start(self):
         super()._start()
-        size = Size2D(10, 10)
+        size = Size2D(12, 12)
         # Sprite
-        self.sprite = Sprite.new()
         self.sprite.texture = Texture("assets/images/items/item_damage_decrease.png")
         self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
         self.add_child(self.sprite)
@@ -168,9 +156,8 @@ class AttackRangeIncreaseItem(Item):
 
     def _start(self):
         super()._start()
-        size = Size2D(10, 10)
+        size = Size2D(12, 12)
         # Sprite
-        self.sprite = Sprite.new()
         self.sprite.texture = Texture(
             "assets/images/items/item_attack_range_increase.png"
         )
@@ -189,9 +176,8 @@ class SpecialAttackTimeDecreaseItem(Item):
 
     def _start(self):
         super()._start()
-        size = Size2D(10, 10)
+        size = Size2D(12, 12)
         # Sprite
-        self.sprite = Sprite.new()
         self.sprite.texture = Texture(
             "assets/images/items/item_special_attack_time_decrease.png"
         )
@@ -207,10 +193,8 @@ class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> AttackItem | HealthRestoreItem | ScrollItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | SpecialAttackTimeDecreaseItem | None:
-        if issubclass(item_type, AttackItem):
-            return AttackItem.new()
-        elif issubclass(item_type, HealthRestoreItem):
+    ) -> HealthRestoreItem | ScrollItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | SpecialAttackTimeDecreaseItem | None:
+        if issubclass(item_type, HealthRestoreItem):
             return HealthRestoreItem.new()
         elif issubclass(item_type, ScrollItem):
             return ScrollItem.new()

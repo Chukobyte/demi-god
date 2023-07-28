@@ -73,7 +73,7 @@ class PlayerStance:
     IN_AIR = "in_air"
 
 
-class PlayerItemDescription:
+class PlayerItemHandler:
     def __init__(self):
         self.window_bg: ColorRect = (
             SceneTree.get_root().get_child("BottomUI").get_child("TextWindow")
@@ -87,13 +87,18 @@ class PlayerItemDescription:
 
     def show_description(self, item: Item) -> None:
         if not self.item_shown:
-            self.window_bg.color = self.show_color
-            self.text_label_top.text = item.description_top
-            self.text_label_bottom.text = item.description_bottom
+            item.set_item_highlighted(is_highlighted=True)
+            top_description = item.description_top
+            bottom_description = item.description_bottom
+            if top_description or bottom_description:
+                self.window_bg.color = self.show_color
+                self.text_label_top.text = item.description_top
+                self.text_label_bottom.text = item.description_bottom
             self.item_shown = item
 
     def hide_description(self) -> None:
         if self.item_shown:
+            self.item_shown.set_item_highlighted(is_highlighted=False)
             self.window_bg.color = self.hide_color
             self.text_label_top.text = ""
             self.text_label_bottom.text = ""
@@ -246,17 +251,13 @@ class Player(Node2D):
             "assets/audio/sfx/pause_game_toggle.wav"
         )
         self._current_animation_name = ""  # TODO: Add function to engine instead
-        self.item_description: Optional[PlayerItemDescription] = None
+        self.item_handler: Optional[PlayerItemHandler] = None
         self.input_enabled = True
 
     def _start(self) -> None:
         self.anim_sprite = self.get_child("AnimatedSprite")
         self.anim_sprite.shader_instance = ShaderUtil.compile_shader(
-            "shaders/player.shader"
-        )
-        outline_color = Vector4(255.0 / 240.0, 255.0 / 247.0, 255.0 / 243, 1.0)
-        self.anim_sprite.shader_instance.set_float4_param(
-            "outline_color", outline_color
+            "shaders/outline.shader"
         )
 
         self.collider = self.get_child("Collider2D")
@@ -265,7 +266,7 @@ class Player(Node2D):
 
         # Start with 0 energy
         self.stats.energy = 0
-        self.item_description = PlayerItemDescription()
+        self.item_handler = PlayerItemHandler()
 
     @staticmethod
     def find_player() -> Optional["Player"]:
@@ -287,9 +288,9 @@ class Player(Node2D):
 
         if not self._are_enemies_attached() and not level_state.is_game_state_paused():
             if Input.is_action_just_pressed("attack"):
-                hovered_item = self.item_description.get_hovered_item()
-                if hovered_item:
-                    self._collect_item(hovered_item)
+                hovered_item = self.item_handler.get_hovered_item()
+                if hovered_item and not hovered_item.active:
+                    self._activate_item(hovered_item)
                 else:
                     self.attack_requested = True
             elif Input.is_action_just_pressed("special"):
@@ -317,9 +318,10 @@ class Player(Node2D):
         else:
             self.anim_sprite.play(anim_name)
 
-    def _collect_item(self, item: Item) -> None:
+    def _activate_item(self, item: Item) -> None:
+        item.active = True
         if item.can_be_collected:
-            self.item_description.hide_description()
+            self.item_handler.hide_description()
             item.collect()
             if item.play_collected_sfx:
                 AudioManager.play_sound(self.collect_item_audio_source)
@@ -668,7 +670,7 @@ class Player(Node2D):
                         )
                     # Power Up
                     elif issubclass(collider_parent_type, Item):
-                        self.item_description.show_description(collider_parent)
+                        self.item_handler.show_description(collider_parent)
                         show_item_description = True
                     # Temp level finish
                     elif issubclass(collider_parent_type, WanderingSoul):
@@ -719,7 +721,7 @@ class Player(Node2D):
                             attached_damage_cooldown_task.close()
                         attached_damage_cooldown_task = None
                 if not show_item_description:
-                    self.item_description.hide_description()
+                    self.item_handler.hide_description()
                 await co_suspend()
         except GeneratorExit:
             pass
