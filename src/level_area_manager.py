@@ -237,7 +237,7 @@ class LevelAreaManager:
             )
 
             initial_player_pos = player.position
-            player_dest_pos = initial_player_pos + Vector2(30, 0)
+            player_dest_pos = initial_player_pos + Vector2(40, 0)
             player_pos_easer = Easer(
                 initial_player_pos,
                 player_dest_pos,
