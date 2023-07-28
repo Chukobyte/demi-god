@@ -2,6 +2,8 @@ from typing import Type
 
 from crescent_api import *
 
+from src.characters.player_stats import PlayerStats
+
 
 class Item(Node2D):
     def __init__(self, entity_id: int):
@@ -19,6 +21,8 @@ class Item(Node2D):
         self.sprite.shader_instance = ShaderUtil.compile_shader(
             "shaders/outline.shader"
         )
+        outline_color = Vector4(163.0 / 255.0, 163.0 / 255.0, 163.0 / 255.0, 1.0)
+        self.sprite.shader_instance.set_float4_param("outline_color", outline_color)
 
         self._description_split = self._split_description_text()
 
@@ -51,6 +55,9 @@ class Item(Node2D):
         else:
             outline_width = 0.0
         self.sprite.shader_instance.set_float_param("outline_width", outline_width)
+
+    def can_be_activated(self, stats: PlayerStats) -> bool:
+        return not self.active
 
     @property
     def description_top(self) -> str:
@@ -108,7 +115,8 @@ class HealthRestoreItem(Item):
         self.collider.extents = size
         self.add_child(self.collider)
 
-        # self.position += Vector2(0, -4)
+    def can_be_activated(self, stats: PlayerStats) -> bool:
+        return super().can_be_activated(stats) and stats and stats.hp < stats.base_hp
 
 
 class EnergyDrainDecreaseItem(Item):
