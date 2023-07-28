@@ -182,11 +182,32 @@ class AttackRangeIncreaseItem(Item):
         self.add_child(self.collider)
 
 
+class SpecialAttackTimeDecreaseItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.description = "Decrease special attack charge time"
+
+    def _start(self):
+        super()._start()
+        size = Size2D(10, 10)
+        # Sprite
+        self.sprite = Sprite.new()
+        self.sprite.texture = Texture(
+            "assets/images/items/item_special_attack_time_decrease.png"
+        )
+        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
+        self.add_child(self.sprite)
+        # Collider
+        self.collider = Collider2D.new()
+        self.collider.extents = size
+        self.add_child(self.collider)
+
+
 class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> AttackItem | HealthRestoreItem | ScrollItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | None:
+    ) -> AttackItem | HealthRestoreItem | ScrollItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | SpecialAttackTimeDecreaseItem | None:
         if issubclass(item_type, AttackItem):
             return AttackItem.new()
         elif issubclass(item_type, HealthRestoreItem):
@@ -199,9 +220,16 @@ class ItemUtils:
             return DamageDecreaseItem.new()
         elif issubclass(item_type, AttackRangeIncreaseItem):
             return AttackRangeIncreaseItem.new()
+        elif issubclass(item_type, SpecialAttackTimeDecreaseItem):
+            return SpecialAttackTimeDecreaseItem.new()
         print("ERROR: doesn't have item type in 'ItemUtils.get_item_from_type'!")
         return None
 
     @staticmethod
     def get_power_up_area_item_types() -> List[Type]:
-        return [EnergyDrainDecreaseItem, DamageDecreaseItem, AttackRangeIncreaseItem]
+        return [
+            EnergyDrainDecreaseItem,
+            DamageDecreaseItem,
+            AttackRangeIncreaseItem,
+            SpecialAttackTimeDecreaseItem,
+        ]

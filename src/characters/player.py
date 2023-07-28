@@ -1,15 +1,7 @@
-from crescent_api import *
-
 from src.characters.enemy import Enemy, EnemyAttack
 from src.characters.wandering_soul import WanderingSoul
 from src.environment.bridge_gate import BridgeGate
-from src.items import (
-    Item,
-    HealthRestoreItem,
-    EnergyDrainDecreaseItem,
-    DamageDecreaseItem,
-    AttackRangeIncreaseItem,
-)
+from src.items import *
 from src.level_state import LevelState
 from src.utils.game_math import map_to_range, clamp, Easer, Ease
 from src.utils.task import *
@@ -343,6 +335,8 @@ class Player(Node2D):
                 self.stats.damage_taken_from_attacks_multiple -= 0.25
             elif issubclass(type(item), AttackRangeIncreaseItem):
                 self.stats.extra_attack_range += 1
+            elif issubclass(type(item), SpecialAttackTimeDecreaseItem):
+                self.stats.special_attack_charge_time -= 1
 
     def _are_enemies_attached(self) -> bool:
         return (

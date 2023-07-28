@@ -1,12 +1,10 @@
 import random
-from typing import Tuple
 
 from crescent_api import *
 from crescent_api import Vector2
 
 from src.utils.game_math import Ease
 from src.utils.task import co_wait_seconds, Task
-
 
 CLOUD_TEXTURES = [
     Texture(file_path="assets/images/environment/cloud_variation1.png"),

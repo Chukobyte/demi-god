@@ -318,6 +318,12 @@
                 "nearest_neighbor": true
             },
             {
+                "file_path": "assets/images/items/item_special_attack_time_decrease.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
                 "file_path": "assets/images/items/item_damage_decrease.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",
