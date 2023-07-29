@@ -4,12 +4,12 @@ from src.characters.player import Player, PlayerStance
 from src.characters.wandering_soul import WanderingSoul
 from src.enemy_area_manager import EnemyAreaManager
 from src.environment.bridge_gate import BridgeGate
-from src.items import ItemUtils, Item
+from src.items import ItemUtils, Item, LeverItem
 from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
 from src.utils.game_math import Easer, Ease
-from src.utils.task import co_suspend, co_wait_seconds, Task
+from src.utils.task import co_suspend, co_wait_seconds, Task, co_return
 from src.utils.timer import Timer
 
 
@@ -23,6 +23,7 @@ class LevelAreaManager:
         self._current_area: Optional[LevelArea] = None
         self._choose_item_label: Optional[TextLabel] = None
         self._has_processed_current_area_completion = False
+        self._game_ending_requested = False
         self._power_up_items: List[Item] = []
 
     def update(self) -> None:
@@ -38,6 +39,9 @@ class LevelAreaManager:
             item.queue_deletion()
         self._power_up_items.clear()
 
+    def _on_last_area_item_completed(self, item) -> None:
+        self._game_ending_requested = True
+
     def _set_current_area(self, area: LevelArea) -> None:
         self._current_area = area
         self._has_processed_current_area_completion = False
@@ -49,6 +53,7 @@ class LevelAreaManager:
         ):
             main_node = SceneTree.get_root()
             random_item_types = area.get_random_item_types()
+            item_offset = Vector2.ZERO
             for i, item_type in enumerate(random_item_types):
                 power_up_item = ItemUtils.get_item_from_type(item_type)
                 # Only expected to collect one item per power up area, which completes the area
@@ -57,8 +62,11 @@ class LevelAreaManager:
                     scoped_node=main_node,
                     callback_func=lambda item: self._on_item_activated(item),
                 )
-                power_up_item.position = Vector2(
-                    level_state.boundary.w - 120 + (i * 40), level_state.floor_y - 1
+                power_up_item.position = (
+                    Vector2(
+                        level_state.boundary.w - 120 + (i * 40), level_state.floor_y - 1
+                    )
+                    + item_offset
                 )
                 power_up_item.z_index = 10
                 main_node.add_child(power_up_item)
@@ -79,16 +87,18 @@ class LevelAreaManager:
             level_state.is_paused_from_boss = True
         # Temp wandering soul spawn
         elif area.area_type == LevelAreaType.END:
-            wandering_soul_scene = SceneUtil.load_scene(
-                "scenes/characters/wandering_soul.cscn"
+            main_node = SceneTree.get_root()
+            lever_item = LeverItem.new()
+            lever_item.subscribe_to_event(
+                event_id="activated",
+                scoped_node=main_node,
+                callback_func=lambda item: self._on_last_area_item_completed(item),
             )
-            wandering_soul: WanderingSoul = wandering_soul_scene.create_instance()
-            wandering_soul.position = Vector2(
-                level_state.boundary.w - 32, level_state.floor_y
+            lever_item.position = Vector2(
+                level_state.boundary.w - 96, level_state.floor_y - 1
             )
-            wandering_soul.z_index = 10
-            wandering_soul.flip_h = True
-            SceneTree.get_root().add_child(wandering_soul)
+            lever_item.z_index = 10
+            main_node.add_child(lever_item)
 
     def _get_next_bridge_gate_position(self) -> Vector2:
         level_state = LevelState()
@@ -154,6 +164,9 @@ class LevelAreaManager:
                         self._choose_item_label = None
 
                     self._has_processed_current_area_completion = True
+                elif self._game_ending_requested:
+                    await Task(coroutine=self._manage_game_end())
+                    await co_return()
                 await co_suspend()
         except GeneratorExit:
             pass
@@ -213,9 +226,6 @@ class LevelAreaManager:
             player = Player.find_player()
             self.current_area_index += 1
             next_level_area = LevelAreaDefinitions.get_def(self.current_area_index)
-            is_last_area = not LevelAreaDefinitions.is_valid_area_index(
-                self.current_area_index + 1
-            )
             level_state = LevelState()
 
             main_node = SceneTree.get_root()
@@ -252,9 +262,8 @@ class LevelAreaManager:
 
             # Setup next bridge gate
             next_bridge_gate = level_state.bridge_gate_helper.next_bridge_gate()
-            if not is_last_area:
-                next_bridge_gate.set_closed()
-                next_bridge_gate.position = self._get_next_bridge_gate_position()
+            next_bridge_gate.set_closed()
+            next_bridge_gate.position = self._get_next_bridge_gate_position()
 
             while True:
                 delta_time = World.get_delta_time()
@@ -283,5 +292,40 @@ class LevelAreaManager:
             self._manage_enemy_area_task = Task(
                 coroutine=self.enemy_area_manager.manage_area(next_level_area)
             )
+        except GeneratorExit:
+            pass
+
+    async def _manage_game_end(self):
+        try:
+            player = Player.find_player()
+            if player:
+                player.input_enabled = False
+
+            current_bridge_gate = (
+                LevelState().bridge_gate_helper.get_current_bridge_gate()
+            )
+            current_bridge_gate.set_opened()
+
+            # Spawn wandering souls
+            level_state = LevelState()
+            main_node = SceneTree.get_root()
+            base_soul_pos = Vector2(
+                level_state.boundary.w - 16, level_state.floor_y - 1
+            )
+            wandering_soul_scene = SceneUtil.load_scene(
+                "scenes/characters/wandering_soul.cscn"
+            )
+            for i in range(6):
+                wandering_soul: WanderingSoul = wandering_soul_scene.create_instance()
+                wandering_soul.position = base_soul_pos + Vector2(i * 4, 0)
+                wandering_soul.z_index = 10
+                wandering_soul.flip_h = True
+                main_node.add_child(wandering_soul)
+                await co_suspend()
+
+            await co_wait_seconds(3.0)
+
+            await Task(coroutine=LevelState.fade_transition(time=1.0, fade_out=True))
+            SceneTree.change_scene("scenes/end_game_screen.cscn")
         except GeneratorExit:
             pass

@@ -5,7 +5,6 @@ class WanderingSoul(Node2D):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.anim_sprite: Optional[AnimatedSprite] = None
-        self.collider: Optional[Collider2D] = None
         self.flip_h = False
 
     def _start(self) -> None:
@@ -13,18 +12,12 @@ class WanderingSoul(Node2D):
         if self.anim_sprite:
             self.anim_sprite.flip_h = self.flip_h
 
-
-class WanderingSoulCapsule(Node2D):
-    def __init__(self, entity_id: int):
-        super().__init__(entity_id)
-        self.sprite: Optional[Sprite] = None
-
-    def _start(self) -> None:
-        size = Size2D(48, 48)
-        # Sprite
-        self.sprite = Sprite.new()
-        self.sprite.texture = Texture(
-            "assets/images/environment/wandering_soul_capsule.png"
+    def _fixed_update(self, delta_time: float) -> None:
+        move_speed = 20
+        direction = Vector2(-1, -1)
+        self.add_to_position(
+            Vector2(
+                direction.x * move_speed * delta_time,
+                direction.y * move_speed * delta_time,
+            )
         )
-        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
-        self.add_child(self.sprite)

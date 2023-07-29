@@ -1,5 +1,4 @@
 from src.characters.enemy import Enemy, EnemyAttack
-from src.characters.wandering_soul import WanderingSoul
 from src.environment.bridge_gate import BridgeGate
 from src.items import *
 from src.level_state import LevelState
@@ -571,16 +570,6 @@ class Player(Node2D):
                     elif issubclass(collider_parent_type, Item):
                         self.item_handler.show_description(collider_parent)
                         show_item_description = True
-                    # Temp level finish
-                    elif issubclass(collider_parent_type, WanderingSoul):
-                        await Task(
-                            coroutine=LevelState.fade_transition(
-                                time=1.0, fade_out=True
-                            )
-                        )
-                        SceneTree.change_scene("scenes/end_game_screen.cscn")
-                        await co_return()
-                        break
                     elif issubclass(collider_parent_type, BridgeGate):
                         bridge_gate: BridgeGate = collider_parent
                         if (
