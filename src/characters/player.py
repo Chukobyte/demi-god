@@ -328,6 +328,16 @@ class Player(Node2D):
                 self.stats.reset_move_speed()
                 self.stats.reset_energy_restored_from_attacks()
 
+    def _get_clamped_pos(
+        self, position: Vector2, boundary: Rect2, padding=16
+    ) -> Vector2:
+        position.x = clamp(
+            position.x,
+            boundary.x + padding,
+            boundary.w - padding,
+        )
+        return position
+
     # --- TASKS --- #
     async def _physics_update_task(self):
         level_state = LevelState()
@@ -692,10 +702,8 @@ class Player(Node2D):
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
                             )
-                            new_position.x = clamp(
-                                new_position.x,
-                                level_state.boundary.x,
-                                level_state.boundary.w,
+                            new_position = self._get_clamped_pos(
+                                new_position, level_state.boundary
                             )
                             self.play_animation("walk")
                             self.position = new_position
@@ -708,10 +716,8 @@ class Player(Node2D):
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
                             )
-                            new_position.x = clamp(
-                                new_position.x,
-                                level_state.boundary.x,
-                                level_state.boundary.w,
+                            new_position = self._get_clamped_pos(
+                                new_position, level_state.boundary
                             )
                             self.play_animation("walk")
                             self.position = new_position
@@ -799,10 +805,8 @@ class Player(Node2D):
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
                             )
-                            new_position.x = clamp(
-                                new_position.x,
-                                level_state.boundary.x,
-                                level_state.boundary.w,
+                            new_position = self._get_clamped_pos(
+                                new_position, level_state.boundary
                             )
                             self.position = new_position
                         else:
@@ -814,10 +818,8 @@ class Player(Node2D):
                                 delta_time * self.stats.move_speed,
                                 delta_time * self.stats.move_speed,
                             )
-                            new_position.x = clamp(
-                                new_position.x,
-                                level_state.boundary.x,
-                                level_state.boundary.w,
+                            new_position = self._get_clamped_pos(
+                                new_position, level_state.boundary
                             )
                             self.position = new_position
                         else:
