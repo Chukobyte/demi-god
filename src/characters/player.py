@@ -216,6 +216,9 @@ class Player(Node2D):
         else:
             self.anim_sprite.play(anim_name)
 
+    def get_current_animation_name(self) -> str:
+        return self._current_animation_name
+
     def _activate_item(self, item: Item) -> None:
         item.on_activation()
         self.item_handler.hide_description()

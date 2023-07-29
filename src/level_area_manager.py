@@ -300,6 +300,9 @@ class LevelAreaManager:
             player = Player.find_player()
             if player:
                 player.input_enabled = False
+                anim_name = player.get_current_animation_name()
+                if "walk" in anim_name:
+                    player.play_animation("idle")
 
             current_bridge_gate = (
                 LevelState().bridge_gate_helper.get_current_bridge_gate()
@@ -315,18 +318,19 @@ class LevelAreaManager:
             wandering_soul_scene = SceneUtil.load_scene(
                 "scenes/characters/wandering_soul.cscn"
             )
+
+            text_window = main_node.get_child("BottomUI").get_child("TextWindow")
+            text_window.color = Color(255, 255, 255, 255)
+            text_label_top: TextLabel = text_window.get_child("WindowTextTop")
+            text_label_top.text = "You saved us!"
+
             for i in range(6):
                 wandering_soul: WanderingSoul = wandering_soul_scene.create_instance()
                 wandering_soul.position = base_soul_pos + Vector2(i * 4, 0)
                 wandering_soul.z_index = 10
                 wandering_soul.flip_h = True
                 main_node.add_child(wandering_soul)
-                await co_suspend()
-
-            text_window = main_node.get_child("BottomUI").get_child("TextWindow")
-            text_window.color = Color(255, 255, 255, 255)
-            text_label_top: TextLabel = text_window.get_child("WindowTextTop")
-            text_label_top.text = "You saved us!"
+                await co_wait_seconds(0.25)
 
             await co_wait_seconds(3.0)
 
