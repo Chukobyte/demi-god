@@ -5,7 +5,7 @@ from crescent_api import *
 from src.characters.enemy import Enemy, EnemyAttack
 from src.characters.player import Player, PlayerStance
 from src.level_state import LevelState
-from src.utils.game_math import Easer, Ease, map_to_range
+from src.utils.game_math import Easer, Ease, map_to_range, clamp
 from src.utils.task import *
 from src.utils.timer import Timer
 
@@ -151,6 +151,16 @@ class EnemyBoss(Enemy):
         attack.z_index = self.z_index + 1
         return attack
 
+    def _get_clamped_pos(
+        self, position: Vector2, boundary: Rect2, padding=16
+    ) -> Vector2:
+        position.x = clamp(
+            position.x,
+            boundary.x + padding,
+            boundary.w - padding,
+        )
+        return position
+
     # --- TASKS --- #
     async def _physics_update_task(self) -> None:
         try:
@@ -188,6 +198,7 @@ class EnemyBoss(Enemy):
 
     async def _old_move_state_task(self, player: Player) -> None:
         try:
+            level_state = LevelState()
             move_speed = 25
             self._face_player(player)
             move_state_timer = Timer(random.uniform(1.5, 3.0))
@@ -195,9 +206,14 @@ class EnemyBoss(Enemy):
                 if self._is_outside_of_camera_viewport(Vector2.ZERO):
                     self._face_player(player)
                 delta_time = self.get_full_time_dilation_with_physics_delta()
-                self.position += self.move_dir * Vector2(
+                moved_pos = self.position + self.move_dir * Vector2(
                     move_speed * delta_time, move_speed * delta_time
                 )
+                moved_pos = self._get_clamped_pos(moved_pos, level_state.boundary)
+                self.position = moved_pos
+                # self.position += self.move_dir * Vector2(
+                #     move_speed * delta_time, move_speed * delta_time
+                # )
                 move_state_timer.tick(delta_time)
                 if move_state_timer.has_stopped():
                     self.state = EnemyBossState.PROJECTILE_ATTACKS
@@ -220,7 +236,7 @@ class EnemyBoss(Enemy):
                 jump_vector = jump_speed * Vector2(delta_time, delta_time)
                 new_pos = self.position + jump_vector
                 new_pos.y = max(new_pos.y, level_state.floor_y - jump_height)
-                self.position = new_pos
+                self.position = self._get_clamped_pos(new_pos, level_state.boundary)
                 if level_state.floor_y - self.position.y >= jump_height:
                     is_ascending = False
                 await co_suspend()
@@ -240,7 +256,7 @@ class EnemyBoss(Enemy):
                 jump_vector = jump_speed * Vector2(delta_time, delta_time)
                 new_pos = self.position + jump_vector
                 new_pos.y = min(new_pos.y, level_state.floor_y)
-                self.position = new_pos
+                self.position = self._get_clamped_pos(new_pos, level_state.boundary)
                 if self.position.y >= level_state.floor_y:
                     is_descending = False
                 await co_suspend()
