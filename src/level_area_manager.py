@@ -95,7 +95,7 @@ class LevelAreaManager:
                 callback_func=lambda item: self._on_last_area_item_completed(item),
             )
             lever_item.position = Vector2(
-                level_state.boundary.w - 96, level_state.floor_y - 1
+                level_state.boundary.w - 128, level_state.floor_y - 1
             )
             lever_item.z_index = 10
             main_node.add_child(lever_item)
@@ -322,6 +322,11 @@ class LevelAreaManager:
                 wandering_soul.flip_h = True
                 main_node.add_child(wandering_soul)
                 await co_suspend()
+
+            text_window = main_node.get_child("BottomUI").get_child("TextWindow")
+            text_window.color = Color(255, 255, 255, 255)
+            text_label_top: TextLabel = text_window.get_child("WindowTextTop")
+            text_label_top.text = "You saved us!"
 
             await co_wait_seconds(3.0)
 
