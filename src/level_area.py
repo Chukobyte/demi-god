@@ -5,6 +5,7 @@ from typing import Optional, List, Type
 from crescent_api import GameProperties
 
 from src.characters.enemy_definitions import EnemyDefinition
+from src.characters.player_stats import PlayerStats
 from src.items import (
     HealthRestoreItem,
     ItemUtils,
@@ -61,13 +62,20 @@ class LevelArea:
             return self.sections[last_index] == section
         return False
 
-    def get_random_item_types(self, max_item_types=3) -> List[Type]:
+    def get_random_item_types(
+        self, player_stats: Optional[PlayerStats] = None, max_item_types=3
+    ) -> List[Type]:
         random_item_types = []
         item_types_copy = self.item_types[:]
         random.shuffle(item_types_copy)
+        is_player_health_full = player_stats and player_stats.hp >= player_stats.base_hp
         for i in range(max_item_types):
             # Always spawn health restore as the second item (or middle if default is 3)
-            if i == 1 and self.spawn_health_restore_for_middle_item:
+            if (
+                i == 1
+                and self.spawn_health_restore_for_middle_item
+                and not is_player_health_full
+            ):
                 random_item_types.append(HealthRestoreItem)
             else:
                 if item_types_copy:

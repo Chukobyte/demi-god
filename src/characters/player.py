@@ -20,7 +20,8 @@ class PlayerAttack(Sprite):
 
     def _start(self) -> None:
         self.collider = Collider2D.new()
-        self.collider.extents = self.size
+        collider_size = self.size - Size2D(0, 1)
+        self.collider.extents = collider_size
         self.add_child(self.collider)
 
     def _fixed_update(self, delta_time: float) -> None:
@@ -52,7 +53,8 @@ class PlayerMeleeAttack(PlayerAttack):
         self.draw_source = Rect2(0, 0, self.size.w, self.size.h)
 
     def set_attack_range(self, extra_range: int) -> None:
-        self.size += Size2D(extra_range, 0)
+        # self.size += Size2D(extra_range, 0)
+        pass
 
 
 class PlayerSpecialAttack(PlayerAttack):
