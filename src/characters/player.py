@@ -210,34 +210,21 @@ class Player(Node2D):
                 self.last_shake_dir = Vector2.ZERO
 
     def _execute_attack(self) -> None:
-        if self.stance == PlayerStance.CROUCHING:
-            attack_y = 2
-        else:
-            attack_y = -2
-        attack_range = self.stats.extra_attack_range * 5
         flip_h = self.anim_sprite.flip_h
-        attack_dist_from_player = 6
         if flip_h:
-            # left_side_offset = Vector2(-12 + -attack_range, 0)
-            # attack_pos_offset = Vector2(-12, attack_y) + left_side_offset
-            left_side_offset = Vector2(-20, 0)
-            attack_pos_offset = (
-                Vector2(-attack_dist_from_player, attack_y) + left_side_offset
-            )
-            attack_pos_offset.x += attack_dist_from_player / 2.0
             attack_dir = Vector2.LEFT
         else:
-            # attack_pos_offset = Vector2(12, attack_y)
-            attack_pos_offset = Vector2(attack_dist_from_player, attack_y)
             attack_dir = Vector2.RIGHT
-        attack_pos = self.position + attack_pos_offset
         attack_z_index = self.z_index + 1
         if self.special_attack_requested:
             special_attack = PlayerSpecialAttack.new()
-            special_attack.position = attack_pos
             special_attack.z_index = attack_z_index
             special_attack.direction = attack_dir
             special_attack.flip_h = flip_h
+            special_attack.update_attack_offset(
+                is_crouching=self.stance == PlayerStance.CROUCHING,
+                base_pos=self.position,
+            )
             special_attack.subscribe_to_event(
                 event_id="hit_enemy",
                 scoped_node=self,
@@ -247,18 +234,19 @@ class Player(Node2D):
             self.special_attack_requested = False
         else:
             melee_attack = PlayerMeleeAttack.new()
-            melee_attack.set_attack_range(attack_range)
             melee_attack.subscribe_to_event(
                 event_id="hit_enemy",
                 scoped_node=self,
                 callback_func=lambda enemy: self._on_attack_hit_enemy(enemy),
             )
-            melee_attack.position = attack_pos
             melee_attack.z_index = attack_z_index
             melee_attack.flip_h = flip_h
+            melee_attack.update_attack_offset(
+                is_crouching=self.stance == PlayerStance.CROUCHING
+            )
             if self.is_transformed:
                 melee_attack.damage += 1
-            SceneTree.get_root().add_child(melee_attack)
+            self.add_child(melee_attack)
             self.reset_special_attack_time = True
         AudioManager.play_sound(source=self.attack_slash_audio_source)
 

@@ -17,32 +17,35 @@ class PlayerAttack(Node2D):
 
     def _start(self) -> None:
         self.collider = Collider2D.new()
-        collider_size = self.size - Size2D(0, 1)
+        # collider_size = self.size - Size2D(0, 1)
+        collider_size = self.size - Size2D(0, 4)
         self.collider.extents = collider_size
         self.add_child(self.collider)
 
     def _fixed_update(self, delta_time: float) -> None:
+        # Check collision first
+        collisions = CollisionHandler.process_collisions(self.collider)
+        for collider in collisions:
+            collider_parent = collider.get_parent()
+            if (
+                issubclass(type(collider_parent), Enemy)
+                and not collider_parent.is_destroyed
+                and collider_parent not in self.damaged_enemies
+            ):
+                self.broadcast_event("hit_enemy", collider_parent)
+                collider_parent.take_damage(self.damage)
+                self.damaged_enemies.append(collider_parent)
+
         self.life_time -= delta_time
         if self.life_time <= 0.0:
             self.queue_deletion()
-        else:
-            collisions = CollisionHandler.process_collisions(self.collider)
-            for collider in collisions:
-                collider_parent = collider.get_parent()
-                if (
-                    issubclass(type(collider_parent), Enemy)
-                    and not collider_parent.is_destroyed
-                    and collider_parent not in self.damaged_enemies
-                ):
-                    self.broadcast_event("hit_enemy", collider_parent)
-                    collider_parent.take_damage(self.damage)
-                    self.damaged_enemies.append(collider_parent)
 
 
 class PlayerMeleeAttack(PlayerAttack):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self.life_time = 0.25
+        self.life_time = 0.1
+        self.size = Size2D(32, 8)
         self.sprite: Optional[Sprite] = None
 
     def _start(self) -> None:
@@ -56,6 +59,21 @@ class PlayerMeleeAttack(PlayerAttack):
     def set_attack_range(self, extra_range: int) -> None:
         # self.size += Size2D(extra_range, 0)
         pass
+
+    def update_attack_offset(self, is_crouching: bool) -> None:
+        if is_crouching:
+            attack_y = 2
+        else:
+            attack_y = -2
+        attack_dist_from_player = 0
+        if self.flip_h:
+            left_side_offset = Vector2(-30, 0)
+            attack_pos_offset = (
+                Vector2(-attack_dist_from_player, attack_y) + left_side_offset
+            )
+        else:
+            attack_pos_offset = Vector2(attack_dist_from_player, attack_y)
+        self.position = attack_pos_offset
 
 
 class PlayerSpecialAttack(PlayerAttack):
@@ -92,3 +110,38 @@ class PlayerSpecialAttack(PlayerAttack):
             )
         )
         super()._fixed_update(delta_time)
+
+    def update_attack_offset(self, is_crouching: bool, base_pos: Vector2) -> None:
+        if is_crouching:
+            attack_y = 2
+        else:
+            attack_y = -2
+        attack_dist_from_player = 0
+        if self.flip_h:
+            left_side_offset = Vector2(-20, 0)
+            attack_pos_offset = (
+                Vector2(-attack_dist_from_player, attack_y) + left_side_offset
+            )
+        else:
+            attack_pos_offset = Vector2(attack_dist_from_player, attack_y)
+        self.position = base_pos + attack_pos_offset
+
+    # TODO: Delete old as used for a reference
+    # def update_attack_offset(self, is_crouching: bool, base_pos: Vector2) -> None:
+    #     if is_crouching:
+    #         attack_y = 2
+    #     else:
+    #         attack_y = -2
+    #     attack_dist_from_player = 0
+    #     if self.flip_h:
+    #         # left_side_offset = Vector2(-12 + -attack_range, 0)
+    #         # attack_pos_offset = Vector2(-12, attack_y) + left_side_offset
+    #         left_side_offset = Vector2(-20, 0)
+    #         attack_pos_offset = (
+    #             Vector2(-attack_dist_from_player, attack_y) + left_side_offset
+    #         )
+    #         # attack_pos_offset.x += attack_dist_from_player / 2.0
+    #     else:
+    #         # attack_pos_offset = Vector2(12, attack_y)
+    #         attack_pos_offset = Vector2(attack_dist_from_player, attack_y)
+    #     self.position = base_pos + attack_pos_offset
