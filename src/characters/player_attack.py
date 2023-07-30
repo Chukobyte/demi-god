@@ -18,7 +18,7 @@ class PlayerAttack(Node2D):
     def _start(self) -> None:
         self.collider = Collider2D.new()
         # collider_size = self.size - Size2D(0, 1)
-        collider_size = self.size - Size2D(0, 4)
+        collider_size = self.size - Size2D(0, 1)
         self.collider.extents = collider_size
         self.add_child(self.collider)
 
@@ -64,7 +64,7 @@ class PlayerMeleeAttack(PlayerAttack):
         if is_crouching:
             attack_y = 2
         else:
-            attack_y = -2
+            attack_y = -6
         attack_dist_from_player = 0
         if self.flip_h:
             left_side_offset = Vector2(-30, 0)
