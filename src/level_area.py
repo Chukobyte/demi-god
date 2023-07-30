@@ -161,10 +161,29 @@ class LevelAreaDefinitions:
             item_types=ItemUtils.get_power_up_area_item_types(),
         ),
         6: LevelArea(
+            area_type=LevelAreaType.NORMAL,
+            width=896,
+            sections=[
+                LevelSection(
+                    enemy_defs=[
+                        EnemyDefinition.RABBIT(),
+                        EnemyDefinition.JESTER(),
+                        EnemyDefinition.SNAKE(),
+                        EnemyDefinition.CROW(),
+                    ]
+                ),
+            ],
+        ),
+        7: LevelArea(
+            area_type=LevelAreaType.POWER_UP,
+            width=GameProperties().game_resolution.w,
+            item_types=ItemUtils.get_power_up_area_item_types(),
+        ),
+        8: LevelArea(
             area_type=LevelAreaType.BOSS,
             width=GameProperties().game_resolution.w,
         ),
-        7: LevelArea(
+        9: LevelArea(
             area_type=LevelAreaType.END, width=GameProperties().game_resolution.w
         ),
     }

@@ -7,13 +7,13 @@ from src.utils.task import *
 from src.utils.timer import Timer
 
 
-class PlayerAttack(ColorRect):
+class PlayerAttack(Sprite):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.damage = 1
         self.collider: Optional[Collider2D] = None
-        self.color = Color(240, 247, 243, 40)
-        self.size = Size2D(16, 4)
+        # self.color = Color(240, 247, 243, 40)
+        self.size = Size2D(20, 5)
         self.life_time = 1.0
         self.direction: Optional[Vector2] = None
         self.damaged_enemies = []
@@ -46,6 +46,11 @@ class PlayerMeleeAttack(PlayerAttack):
         super().__init__(entity_id)
         self.life_time = 0.25
 
+    def _start(self) -> None:
+        super()._start()
+        self.texture = Texture("assets/images/demi/demi_attack_slash.png")
+        self.draw_source = Rect2(0, 0, self.size.w, self.size.h)
+
     def set_attack_range(self, extra_range: int) -> None:
         self.size += Size2D(extra_range, 0)
 
@@ -53,7 +58,12 @@ class PlayerMeleeAttack(PlayerAttack):
 class PlayerSpecialAttack(PlayerAttack):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self.color = Color(240, 247, 243, 255)
+        # self.color = Color(240, 247, 243, 255)
+
+    def _start(self) -> None:
+        super()._start()
+        self.texture = Texture("assets/images/demi/demi_special_attack.png")
+        self.draw_source = Rect2(0, 0, self.size.w, self.size.h)
 
     def _fixed_update(self, delta_time: float) -> None:
         move_speed = 80
@@ -273,12 +283,20 @@ class Player(Node2D):
         else:
             attack_y = -2
         attack_range = self.stats.extra_attack_range * 5
-        if self.anim_sprite.flip_h:
-            left_side_offset = Vector2(-12 + -attack_range, 0)
-            attack_pos_offset = Vector2(-12, attack_y) + left_side_offset
+        flip_h = self.anim_sprite.flip_h
+        attack_dist_from_player = 6
+        if flip_h:
+            # left_side_offset = Vector2(-12 + -attack_range, 0)
+            # attack_pos_offset = Vector2(-12, attack_y) + left_side_offset
+            left_side_offset = Vector2(-20, 0)
+            attack_pos_offset = (
+                Vector2(-attack_dist_from_player, attack_y) + left_side_offset
+            )
+            attack_pos_offset.x += attack_dist_from_player / 2.0
             attack_dir = Vector2.LEFT
         else:
-            attack_pos_offset = Vector2(12, attack_y)
+            # attack_pos_offset = Vector2(12, attack_y)
+            attack_pos_offset = Vector2(attack_dist_from_player, attack_y)
             attack_dir = Vector2.RIGHT
         attack_pos = self.position + attack_pos_offset
         attack_z_index = self.z_index + 1
@@ -287,6 +305,7 @@ class Player(Node2D):
             special_attack.position = attack_pos
             special_attack.z_index = attack_z_index
             special_attack.direction = attack_dir
+            special_attack.flip_h = flip_h
             special_attack.subscribe_to_event(
                 event_id="hit_enemy",
                 scoped_node=self,
@@ -304,6 +323,7 @@ class Player(Node2D):
             )
             melee_attack.position = attack_pos
             melee_attack.z_index = attack_z_index
+            melee_attack.flip_h = flip_h
             if self.is_transformed:
                 melee_attack.damage += 1
             SceneTree.get_root().add_child(melee_attack)
