@@ -1,81 +1,11 @@
 from src.characters.enemy import Enemy, EnemyAttack
+from src.characters.player_attack import PlayerMeleeAttack, PlayerSpecialAttack
 from src.environment.bridge_gate import BridgeGate
 from src.items import *
 from src.level_state import LevelState
 from src.utils.game_math import clamp, Easer, Ease
 from src.utils.task import *
 from src.utils.timer import Timer
-
-
-class PlayerAttack(Sprite):
-    def __init__(self, entity_id: int):
-        super().__init__(entity_id)
-        self.damage = 1
-        self.collider: Optional[Collider2D] = None
-        # self.color = Color(240, 247, 243, 40)
-        self.size = Size2D(20, 5)
-        self.life_time = 1.0
-        self.direction: Optional[Vector2] = None
-        self.damaged_enemies = []
-
-    def _start(self) -> None:
-        self.collider = Collider2D.new()
-        collider_size = self.size - Size2D(0, 1)
-        self.collider.extents = collider_size
-        self.add_child(self.collider)
-
-    def _fixed_update(self, delta_time: float) -> None:
-        self.life_time -= delta_time
-        if self.life_time <= 0.0:
-            self.queue_deletion()
-        else:
-            collisions = CollisionHandler.process_collisions(self.collider)
-            for collider in collisions:
-                collider_parent = collider.get_parent()
-                if (
-                    issubclass(type(collider_parent), Enemy)
-                    and not collider_parent.is_destroyed
-                    and collider_parent not in self.damaged_enemies
-                ):
-                    self.broadcast_event("hit_enemy", collider_parent)
-                    collider_parent.take_damage(self.damage)
-                    self.damaged_enemies.append(collider_parent)
-
-
-class PlayerMeleeAttack(PlayerAttack):
-    def __init__(self, entity_id: int):
-        super().__init__(entity_id)
-        self.life_time = 0.25
-
-    def _start(self) -> None:
-        super()._start()
-        self.texture = Texture("assets/images/demi/demi_attack_slash.png")
-        self.draw_source = Rect2(0, 0, self.size.w, self.size.h)
-
-    def set_attack_range(self, extra_range: int) -> None:
-        # self.size += Size2D(extra_range, 0)
-        pass
-
-
-class PlayerSpecialAttack(PlayerAttack):
-    def __init__(self, entity_id: int):
-        super().__init__(entity_id)
-        # self.color = Color(240, 247, 243, 255)
-
-    def _start(self) -> None:
-        super()._start()
-        self.texture = Texture("assets/images/demi/demi_special_attack.png")
-        self.draw_source = Rect2(0, 0, self.size.w, self.size.h)
-
-    def _fixed_update(self, delta_time: float) -> None:
-        move_speed = 80
-        self.add_to_position(
-            Vector2(
-                self.direction.x * move_speed * delta_time,
-                self.direction.y * move_speed * delta_time,
-            )
-        )
-        super()._fixed_update(delta_time)
 
 
 class PlayerStance:
