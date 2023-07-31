@@ -45,7 +45,7 @@ class PlayerMeleeAttack(PlayerAttack):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.life_time = 0.1
-        self.size = Size2D(32, 8)
+        self.size = Size2D(24, 24)
         self.sprite: Optional[Sprite] = None
 
     def _start(self) -> None:
@@ -62,18 +62,19 @@ class PlayerMeleeAttack(PlayerAttack):
 
     def update_attack_offset(self, is_crouching: bool) -> None:
         if is_crouching:
-            attack_y = 2
+            attack_y = -2
         else:
             attack_y = -6
         attack_dist_from_player = 0
+        base_offset = Vector2(2, attack_y - 16)
+        offset = base_offset
         if self.flip_h:
-            left_side_offset = Vector2(-30, 0)
-            attack_pos_offset = (
-                Vector2(-attack_dist_from_player, attack_y) + left_side_offset
-            )
+            left_side_offset = Vector2(-26, 0)
+            offset += left_side_offset
         else:
-            attack_pos_offset = Vector2(attack_dist_from_player, attack_y)
-        self.position = attack_pos_offset
+            # attack_pos_offset = Vector2(attack_dist_from_player, attack_y)
+            pass
+        self.position = offset
 
 
 class PlayerSpecialAttack(PlayerAttack):
