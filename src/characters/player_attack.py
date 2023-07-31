@@ -8,7 +8,6 @@ class PlayerAttack(Node2D):
         super().__init__(entity_id)
         self.damage = 1
         self.collider: Optional[Collider2D] = None
-        # self.color = Color(240, 247, 243, 40)
         self.size = Size2D(20, 5)
         self.life_time = 1.0
         self.direction: Optional[Vector2] = None
@@ -17,7 +16,6 @@ class PlayerAttack(Node2D):
 
     def _start(self) -> None:
         self.collider = Collider2D.new()
-        # collider_size = self.size - Size2D(0, 1)
         collider_size = self.size - Size2D(0, 1)
         self.collider.extents = collider_size
         self.add_child(self.collider)
@@ -65,15 +63,11 @@ class PlayerMeleeAttack(PlayerAttack):
             attack_y = -2
         else:
             attack_y = -6
-        attack_dist_from_player = 0
         base_offset = Vector2(2, attack_y - 16)
         offset = base_offset
         if self.flip_h:
             left_side_offset = Vector2(-26, 0)
             offset += left_side_offset
-        else:
-            # attack_pos_offset = Vector2(attack_dist_from_player, attack_y)
-            pass
         self.position = offset
 
 
@@ -81,7 +75,7 @@ class PlayerSpecialAttack(PlayerAttack):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
         self.anim_sprite: Optional[AnimatedSprite] = None
-        # self.color = Color(240, 247, 243, 255)
+        self.size = Size2D(24, 24)
 
     def _start(self) -> None:
         super()._start()
@@ -93,7 +87,7 @@ class PlayerSpecialAttack(PlayerAttack):
             frames=[
                 AnimationFrame(
                     frame=0,
-                    texture_path="assets/images/demi/demi_special_attack.png",
+                    texture_path="assets/images/demi/demi_attack_slash.png",
                     draw_source=Rect2(0, 0, self.size.w, self.size.h),
                 )
             ],
@@ -114,35 +108,12 @@ class PlayerSpecialAttack(PlayerAttack):
 
     def update_attack_offset(self, is_crouching: bool, base_pos: Vector2) -> None:
         if is_crouching:
-            attack_y = 2
-        else:
             attack_y = -2
-        attack_dist_from_player = 0
-        if self.flip_h:
-            left_side_offset = Vector2(-20, 0)
-            attack_pos_offset = (
-                Vector2(-attack_dist_from_player, attack_y) + left_side_offset
-            )
         else:
-            attack_pos_offset = Vector2(attack_dist_from_player, attack_y)
-        self.position = base_pos + attack_pos_offset
-
-    # TODO: Delete old as used for a reference
-    # def update_attack_offset(self, is_crouching: bool, base_pos: Vector2) -> None:
-    #     if is_crouching:
-    #         attack_y = 2
-    #     else:
-    #         attack_y = -2
-    #     attack_dist_from_player = 0
-    #     if self.flip_h:
-    #         # left_side_offset = Vector2(-12 + -attack_range, 0)
-    #         # attack_pos_offset = Vector2(-12, attack_y) + left_side_offset
-    #         left_side_offset = Vector2(-20, 0)
-    #         attack_pos_offset = (
-    #             Vector2(-attack_dist_from_player, attack_y) + left_side_offset
-    #         )
-    #         # attack_pos_offset.x += attack_dist_from_player / 2.0
-    #     else:
-    #         # attack_pos_offset = Vector2(12, attack_y)
-    #         attack_pos_offset = Vector2(attack_dist_from_player, attack_y)
-    #     self.position = base_pos + attack_pos_offset
+            attack_y = -6
+        base_offset = Vector2(2, attack_y - 16)
+        offset = base_offset
+        if self.flip_h:
+            left_side_offset = Vector2(-26, 0)
+            offset += left_side_offset
+        self.position = base_pos + offset
