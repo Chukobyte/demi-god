@@ -172,6 +172,31 @@ class LevelAreaDefinitions:
             area_type=LevelAreaType.NORMAL,
             width=896,
             sections=[
+                LevelSection(enemy_defs=[EnemyDefinition.SNAKE()]),
+                LevelSection(
+                    enemy_defs=[
+                        EnemyDefinition.RABBIT(),
+                        EnemyDefinition.JESTER(),
+                        EnemyDefinition.SNAKE(),
+                        EnemyDefinition.CROW(),
+                    ]
+                ),
+                LevelSection(
+                    enemy_defs=[
+                        EnemyDefinition.RABBIT(),
+                        EnemyDefinition.JESTER(),
+                        EnemyDefinition.SNAKE(),
+                        EnemyDefinition.CROW(),
+                    ]
+                ),
+                LevelSection(
+                    enemy_defs=[
+                        EnemyDefinition.RABBIT(),
+                        EnemyDefinition.JESTER(),
+                        EnemyDefinition.SNAKE(),
+                        EnemyDefinition.CROW(),
+                    ]
+                ),
                 LevelSection(
                     enemy_defs=[
                         EnemyDefinition.RABBIT(),
