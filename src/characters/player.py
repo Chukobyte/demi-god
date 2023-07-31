@@ -1,5 +1,6 @@
 from src.characters.enemy import Enemy, EnemyAttack
 from src.characters.player_attack import PlayerMeleeAttack, PlayerSpecialAttack
+from src.characters.player_item_handler import PlayerItemHandler
 from src.environment.bridge_gate import BridgeGate
 from src.items import *
 from src.level_state import LevelState
@@ -12,41 +13,6 @@ class PlayerStance:
     STANDING = "standing"
     CROUCHING = "crouching"
     IN_AIR = "in_air"
-
-
-class PlayerItemHandler:
-    def __init__(self):
-        self.window_bg: ColorRect = (
-            SceneTree.get_root().get_child("BottomUI").get_child("TextWindow")
-        )
-        self.text_label_top: TextLabel = self.window_bg.get_child("WindowTextTop")
-        self.text_label_bottom: TextLabel = self.window_bg.get_child("WindowTextBot")
-        window_color = self.window_bg.color
-        self.show_color = Color(window_color.r, window_color.g, window_color.b)
-        self.hide_color = window_color
-        self.item_shown: Optional[Item] = None
-
-    def show_description(self, item: Item) -> None:
-        if not self.item_shown and not item.active:
-            item.set_item_highlighted(is_highlighted=True)
-            top_description = item.description_top
-            bottom_description = item.description_bottom
-            if top_description or bottom_description:
-                self.window_bg.color = self.show_color
-                self.text_label_top.text = item.description_top
-                self.text_label_bottom.text = item.description_bottom
-            self.item_shown = item
-
-    def hide_description(self) -> None:
-        if self.item_shown:
-            self.item_shown.set_item_highlighted(is_highlighted=False)
-            self.window_bg.color = self.hide_color
-            self.text_label_top.text = ""
-            self.text_label_bottom.text = ""
-            self.item_shown = None
-
-    def get_hovered_item(self) -> Optional[Item]:
-        return self.item_shown
 
 
 class Player(Node2D):
@@ -63,11 +29,12 @@ class Player(Node2D):
             special_attack_charge_time=5.0,
         )
         self.attack_requested = False
-        self.special_attack_requested = False
+        self.can_do_special_attack = False
         self.reset_special_attack_time = False
         self.energy_attack_cost = 5
         self.is_transformed = False
         self.can_untransform = False
+        self.deflect_damage_when_charged = False
         self.enemies_attached_to_left: List[Enemy] = []
         self.enemies_attached_to_right: List[Enemy] = []
         self.last_shake_dir = Vector2.ZERO
@@ -169,19 +136,25 @@ class Player(Node2D):
             if item.play_collected_sfx:
                 AudioManager.play_sound(self.collect_item_audio_source)
             # Item specific
-            if issubclass(type(item), HealthRestoreItem):
+            item_type = type(item)
+            if issubclass(item_type, HealthRestoreItem):
                 health_item: HealthRestoreItem = item
                 self.health_restore_task = Task(
                     coroutine=self._health_restore_task(health_item.restore_amount)
                 )
-            elif issubclass(type(item), EnergyDrainDecreaseItem):
+            elif issubclass(item_type, EnergyDrainDecreaseItem):
                 self.stats.transformation_energy_drain -= 0.25
-            elif issubclass(type(item), DamageDecreaseItem):
+            elif issubclass(item_type, DamageDecreaseItem):
                 self.stats.damage_taken_from_attacks_multiple -= 0.25
-            elif issubclass(type(item), AttackRangeIncreaseItem):
+            elif issubclass(item_type, AttackRangeIncreaseItem):
                 self.stats.extra_attack_range += 1
-            elif issubclass(type(item), SpecialAttackTimeDecreaseItem):
+            elif issubclass(item_type, SpecialAttackTimeDecreaseItem):
                 self.stats.special_attack_charge_time -= 1
+            elif issubclass(item_type, DamageDeflectWhenChargedItem):
+                self.deflect_damage_when_charged = True
+
+            if item.is_unique:
+                self.item_handler.held_unique_items.append(item_type)
 
     def _are_enemies_attached(self) -> bool:
         return (
@@ -216,7 +189,7 @@ class Player(Node2D):
         else:
             attack_dir = Vector2.RIGHT
         attack_z_index = self.z_index + 1
-        if self.special_attack_requested:
+        if self.can_do_special_attack:
             special_attack = PlayerSpecialAttack.new()
             special_attack.z_index = attack_z_index
             special_attack.direction = attack_dir
@@ -231,7 +204,7 @@ class Player(Node2D):
                 callback_func=lambda enemy: self._on_attack_hit_enemy(enemy),
             )
             SceneTree.get_root().add_child(special_attack)
-            self.special_attack_requested = False
+            self.can_do_special_attack = False
         else:
             melee_attack = PlayerMeleeAttack.new()
             melee_attack.subscribe_to_event(
@@ -343,7 +316,7 @@ class Player(Node2D):
                 if not level_state.is_currently_transitioning_within_level:
                     charge_timer.tick(self.get_full_time_dilation_with_physics_delta())
                 if charge_timer.has_stopped():
-                    self.special_attack_requested = True
+                    self.can_do_special_attack = True
                     shader_instance.set_float_param("outline_width", 1.4)
                     await co_suspend()
                     shader_instance.set_float_param("outline_width", 1.2)
@@ -352,7 +325,7 @@ class Player(Node2D):
                     await co_suspend()
                     charged_outline_width = 0.7
                     while (
-                        self.special_attack_requested
+                        self.can_do_special_attack
                         and not self.reset_special_attack_time
                     ):
                         if World.get_time_dilation() > 0.0:
@@ -390,13 +363,16 @@ class Player(Node2D):
             bar_ui = self.stats.health_bar_ui
 
         def subtract_hp_value(damage: float, bar_color: Color) -> None:
-            damage *= self.stats.damage_taken_from_attacks_multiple
-            if take_transform_damage:
-                self.stats.energy -= damage
-            else:
-                self.stats.hp -= damage
+            if not self.can_do_special_attack or (
+                self.can_do_special_attack and not self.deflect_damage_when_charged
+            ):
+                damage *= self.stats.damage_taken_from_attacks_multiple
+                if take_transform_damage:
+                    self.stats.energy -= damage
+                else:
+                    self.stats.hp -= damage
             bar_ui.color = bar_color
-            self.reset_special_attack_time = True
+            self.can_do_special_attack = False
 
         normal_hp_bar_color = bar_ui.color
         try:

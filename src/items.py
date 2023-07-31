@@ -15,6 +15,7 @@ class Item(Node2D):
         self.can_be_collected = True
         self.play_collected_sfx = True
         self.active = False
+        self.is_unique = False
 
     def _start(self):
         self.sprite = Sprite.new()
@@ -228,11 +229,32 @@ class SpecialAttackTimeDecreaseItem(Item):
         self.add_child(self.collider)
 
 
+class DamageDeflectWhenChargedItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.description = "Will deflect damage when charged"
+        self.is_unique = True
+
+    def _start(self):
+        super()._start()
+        size = Size2D(12, 12)
+        # Sprite
+        self.sprite.texture = Texture(
+            "assets/images/items/item_attack_range_increase.png"
+        )
+        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
+        self.add_child(self.sprite)
+        # Collider
+        self.collider = Collider2D.new()
+        self.collider.extents = size
+        self.add_child(self.collider)
+
+
 class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | SpecialAttackTimeDecreaseItem | None:
+    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | SpecialAttackTimeDecreaseItem | DamageDeflectWhenChargedItem | None:
         if issubclass(item_type, HealthRestoreItem):
             return HealthRestoreItem.new()
         elif issubclass(item_type, ScrollItem):
@@ -247,6 +269,8 @@ class ItemUtils:
             return AttackRangeIncreaseItem.new()
         elif issubclass(item_type, SpecialAttackTimeDecreaseItem):
             return SpecialAttackTimeDecreaseItem.new()
+        elif issubclass(item_type, DamageDeflectWhenChargedItem):
+            return DamageDeflectWhenChargedItem.new()
         print("ERROR: doesn't have item type in 'ItemUtils.get_item_from_type'!")
         return None
 
@@ -255,6 +279,7 @@ class ItemUtils:
         return [
             EnergyDrainDecreaseItem,
             DamageDecreaseItem,
-            AttackRangeIncreaseItem,
+            # AttackRangeIncreaseItem,
             SpecialAttackTimeDecreaseItem,
+            DamageDeflectWhenChargedItem,
         ]

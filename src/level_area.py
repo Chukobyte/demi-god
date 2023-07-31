@@ -5,6 +5,7 @@ from typing import Optional, List, Type
 from crescent_api import GameProperties
 
 from src.characters.enemy_definitions import EnemyDefinition
+from src.characters.player_item_handler import PlayerItemHandler
 from src.characters.player_stats import PlayerStats
 from src.items import (
     HealthRestoreItem,
@@ -63,7 +64,10 @@ class LevelArea:
         return False
 
     def get_random_item_types(
-        self, player_stats: Optional[PlayerStats] = None, max_item_types=3
+        self,
+        player_stats: Optional[PlayerStats] = None,
+        player_item_handler: Optional[PlayerItemHandler] = None,
+        max_item_types=3,
     ) -> List[Type]:
         random_item_types = []
         item_types_copy = self.item_types[:]
@@ -79,7 +83,13 @@ class LevelArea:
                 random_item_types.append(HealthRestoreItem)
             else:
                 if item_types_copy:
-                    random_item_types.append(item_types_copy.pop())
+                    potential_item_type = item_types_copy.pop()
+                    if (
+                        player_item_handler
+                        and potential_item_type in player_item_handler.held_unique_items
+                    ):
+                        continue
+                    random_item_types.append(potential_item_type)
                 else:
                     break
         return random_item_types

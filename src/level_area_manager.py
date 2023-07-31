@@ -54,9 +54,13 @@ class LevelAreaManager:
             main_node = SceneTree.get_root()
             player = Player.find_player()
             player_stats = None
+            player_item_handler = None
             if player:
                 player_stats = player.stats
-            random_item_types = area.get_random_item_types(player_stats)
+                player_item_handler = player.item_handler
+            random_item_types = area.get_random_item_types(
+                player_stats, player_item_handler
+            )
             item_offset = Vector2.ZERO
             for i, item_type in enumerate(random_item_types):
                 power_up_item = ItemUtils.get_item_from_type(item_type)
