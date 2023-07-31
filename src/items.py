@@ -240,7 +240,7 @@ class DamageDeflectWhenChargedItem(Item):
         size = Size2D(12, 12)
         # Sprite
         self.sprite.texture = Texture(
-            "assets/images/items/item_attack_range_increase.png"
+            "assets/images/items/item_damage_deflect_when_charged.png"
         )
         self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
         self.add_child(self.sprite)
