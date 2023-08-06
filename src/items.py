@@ -17,8 +17,20 @@ class Item(Node2D):
         self.active = False
         self.is_unique = False
 
-    def _start(self):
+    def _default_initialize(self, sprite_texture_path: str, size: Size2D) -> None:
         self.sprite = Sprite.new()
+
+        # Sprite
+        self.sprite.texture = Texture(sprite_texture_path)
+        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
+        self.add_child(self.sprite)
+        self.sprite.flip_h = True
+        # Collider
+        self.collider = Collider2D.new()
+        self.collider.extents = size
+        self.add_child(self.collider)
+
+        # Item outline
         self.sprite.shader_instance = ShaderUtil.compile_shader(
             "shaders/outline.shader"
         )
@@ -90,18 +102,10 @@ class ScrollItem(Item):
         self.description = "Help the souls!"
 
     def _start(self):
-        super()._start()
-        size = Size2D(12, 12)
-        # Sprite
-        self.sprite.texture = Texture("assets/images/items/item_scroll.png")
-        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
-        self.add_child(self.sprite)
-        self.sprite.flip_h = True
-        # Collider
-        self.collider = Collider2D.new()
-        self.collider.extents = size
-        self.add_child(self.collider)
-        # Other
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_scroll.png",
+            size=Size2D(12, 12),
+        )
         self.position += Vector2(40, 0)
 
 
@@ -111,17 +115,10 @@ class LeverItem(Item):
         self.can_be_collected = False
 
     def _start(self):
-        super()._start()
-        size = Size2D(14, 14)
-        # Sprite
-        self.sprite.texture = Texture("assets/images/items/item_lever.png")
-        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
-        self.add_child(self.sprite)
-        # Collider
-        self.collider = Collider2D.new()
-        self.collider.extents = size
-        self.add_child(self.collider)
-        # Other
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_lever.png",
+            size=Size2D(14, 14),
+        )
         self.position += Vector2(40, -1)
 
     def on_activation(self) -> None:
@@ -136,16 +133,10 @@ class HealthRestoreItem(Item):
         self.restore_amount = 5
 
     def _start(self):
-        super()._start()
-        size = Size2D(12, 12)
-        # Sprite
-        self.sprite.texture = Texture("assets/images/items/item_heart.png")
-        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
-        self.add_child(self.sprite)
-        # Collider
-        self.collider = Collider2D.new()
-        self.collider.extents = size
-        self.add_child(self.collider)
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_heart.png",
+            size=Size2D(12, 12),
+        )
 
     def can_be_activated(self, stats: PlayerStats) -> bool:
         return super().can_be_activated(stats) and stats and stats.hp < stats.base_hp
@@ -157,18 +148,10 @@ class EnergyDrainDecreaseItem(Item):
         self.description = "Lowers transform energy drain"
 
     def _start(self):
-        super()._start()
-        size = Size2D(12, 12)
-        # Sprite
-        self.sprite.texture = Texture(
-            "assets/images/items/item_energy_drain_decrease.png"
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_energy_drain_decrease.png",
+            size=Size2D(12, 12),
         )
-        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
-        self.add_child(self.sprite)
-        # Collider
-        self.collider = Collider2D.new()
-        self.collider.extents = size
-        self.add_child(self.collider)
 
 
 class DamageDecreaseItem(Item):
@@ -177,16 +160,10 @@ class DamageDecreaseItem(Item):
         self.description = "Reduces damage taken"
 
     def _start(self):
-        super()._start()
-        size = Size2D(12, 12)
-        # Sprite
-        self.sprite.texture = Texture("assets/images/items/item_damage_decrease.png")
-        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
-        self.add_child(self.sprite)
-        # Collider
-        self.collider = Collider2D.new()
-        self.collider.extents = size
-        self.add_child(self.collider)
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_damage_decrease.png",
+            size=Size2D(12, 12),
+        )
 
 
 class SpecialAttackDoubledItem(Item):
@@ -195,18 +172,10 @@ class SpecialAttackDoubledItem(Item):
         self.description = "Chance to double special attack"
 
     def _start(self):
-        super()._start()
-        size = Size2D(12, 12)
-        # Sprite
-        self.sprite.texture = Texture(
-            "assets/images/items/item_special_attack_double.png"
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_special_attack_double.png",
+            size=Size2D(12, 12),
         )
-        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
-        self.add_child(self.sprite)
-        # Collider
-        self.collider = Collider2D.new()
-        self.collider.extents = size
-        self.add_child(self.collider)
 
 
 class SpecialAttackTimeDecreaseItem(Item):
@@ -215,18 +184,10 @@ class SpecialAttackTimeDecreaseItem(Item):
         self.description = "Decrease special attack charge time"
 
     def _start(self):
-        super()._start()
-        size = Size2D(12, 12)
-        # Sprite
-        self.sprite.texture = Texture(
-            "assets/images/items/item_special_attack_time_decrease.png"
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_special_attack_time_decrease.png",
+            size=Size2D(12, 12),
         )
-        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
-        self.add_child(self.sprite)
-        # Collider
-        self.collider = Collider2D.new()
-        self.collider.extents = size
-        self.add_child(self.collider)
 
 
 class DamageDeflectWhenChargedItem(Item):
@@ -236,18 +197,10 @@ class DamageDeflectWhenChargedItem(Item):
         self.is_unique = True
 
     def _start(self):
-        super()._start()
-        size = Size2D(12, 12)
-        # Sprite
-        self.sprite.texture = Texture(
-            "assets/images/items/item_damage_deflect_when_charged.png"
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_damage_deflect_when_charged.png",
+            size=Size2D(12, 12),
         )
-        self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
-        self.add_child(self.sprite)
-        # Collider
-        self.collider = Collider2D.new()
-        self.collider.extents = size
-        self.add_child(self.collider)
 
 
 class ItemUtils:
