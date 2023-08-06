@@ -37,6 +37,9 @@
                 "file_path": "assets/audio/sfx/collect_item.wav"
             },
             {
+                "file_path": "assets/audio/sfx/lever_pull_item.wav"
+            },
+            {
                 "file_path": "assets/audio/sfx/player_jump.wav"
             },
             {

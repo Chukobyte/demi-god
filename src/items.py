@@ -77,6 +77,12 @@ class Item(Node2D):
 
     def on_activation(self) -> None:
         self.active = True
+
+        lever_pull_audio_source = AudioManager.get_audio_source(
+            path="assets/audio/sfx/lever_pull_item.wav"
+        )
+        AudioManager.play_sound(lever_pull_audio_source)
+
         self.broadcast_event("activated", self)
 
     def can_be_activated(self, stats: PlayerStats) -> bool:
