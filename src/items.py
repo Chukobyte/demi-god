@@ -279,7 +279,7 @@ class ItemUtils:
         return [
             EnergyDrainDecreaseItem,
             DamageDecreaseItem,
-            # AttackRangeIncreaseItem,
+            SpecialAttackDoubledItem,
             SpecialAttackTimeDecreaseItem,
             DamageDeflectWhenChargedItem,
         ]
