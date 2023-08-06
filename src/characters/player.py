@@ -825,20 +825,50 @@ class Player(Node2D):
             # Hard code animation that delays 2 frames each
             beam_draw_source = Rect2(0, 0, 48, 48)
             draw_sources: List[Rect2] = [
-                Rect2(0, 0, beam_draw_source.w, beam_draw_source.h),
-                Rect2(beam_draw_source.w, 0, beam_draw_source.w, beam_draw_source.h),
                 Rect2(
-                    beam_draw_source.w * 2.0, 0, beam_draw_source.w, beam_draw_source.h
-                ),
-                Rect2(beam_draw_source.w, 0, beam_draw_source.w, beam_draw_source.h),
-                Rect2(
-                    beam_draw_source.w * 2.0, 0, beam_draw_source.w, beam_draw_source.h
+                    beam_draw_source.w * 4.0,
+                    0,
+                    beam_draw_source.w,
+                    beam_draw_source.h,
                 ),
                 Rect2(
-                    beam_draw_source.w * 3.0, 0, beam_draw_source.w, beam_draw_source.h
+                    beam_draw_source.w * 3.0,
+                    0,
+                    beam_draw_source.w,
+                    beam_draw_source.h,
+                ),
+                Rect2(
+                    beam_draw_source.w * 2.0,
+                    0,
+                    beam_draw_source.w,
+                    beam_draw_source.h,
+                ),
+                Rect2(
+                    beam_draw_source.w,
+                    0,
+                    beam_draw_source.w,
+                    beam_draw_source.h,
+                ),
+                Rect2(
+                    0,
+                    0,
+                    beam_draw_source.w,
+                    beam_draw_source.h,
+                ),
+                Rect2(
+                    beam_draw_source.w,
+                    0,
+                    beam_draw_source.w,
+                    beam_draw_source.h,
+                ),
+                Rect2(
+                    0,
+                    0,
+                    beam_draw_source.w,
+                    beam_draw_source.h,
                 ),
             ]
-            for draw_source in reversed(draw_sources):
+            for draw_source in draw_sources:
                 player_teleport_beam.draw_source = draw_source
                 await co_suspend()
                 await co_suspend()

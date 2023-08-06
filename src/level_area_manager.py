@@ -214,13 +214,6 @@ class LevelAreaManager:
                             beam_draw_source.w,
                             beam_draw_source.h,
                         ),
-                        Rect2(0, 0, beam_draw_source.w, beam_draw_source.h),
-                        Rect2(
-                            beam_draw_source.w,
-                            0,
-                            beam_draw_source.w,
-                            beam_draw_source.h,
-                        ),
                         Rect2(
                             beam_draw_source.w * 2.0,
                             0,
@@ -241,6 +234,12 @@ class LevelAreaManager:
                         ),
                         Rect2(
                             beam_draw_source.w * 3.0,
+                            0,
+                            beam_draw_source.w,
+                            beam_draw_source.h,
+                        ),
+                        Rect2(
+                            beam_draw_source.w * 4.0,
                             0,
                             beam_draw_source.w,
                             beam_draw_source.h,
