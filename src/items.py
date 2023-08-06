@@ -28,7 +28,6 @@ class Item(Node2D):
         self.sprite.texture = Texture(sprite_texture_path)
         self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
         self.add_child(self.sprite)
-        self.sprite.flip_h = True
         # Collider
         self.collider = Collider2D.new()
         self.collider.extents = size
