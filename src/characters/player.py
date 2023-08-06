@@ -268,6 +268,8 @@ class Player(Node2D):
             self.enemies_attached_to_left.remove(enemy)
         elif enemy in self.enemies_attached_to_right:
             self.enemies_attached_to_right.remove(enemy)
+
+        self.attack_hit_audio_source.pitch = random.choice([0.9, 1.0, 1.1])
         AudioManager.play_sound(source=self.attack_hit_audio_source)
 
     def _set_transformed(self, is_transformed: bool) -> None:
