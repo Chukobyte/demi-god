@@ -23,6 +23,7 @@ class PlayerStats:
         self._energy_restored_from_attacks = base_energy_restored_from_attacks
         self._base_energy_restored_from_attacks = base_energy_restored_from_attacks
         self.special_attack_charge_time = special_attack_charge_time
+        self.save_charge_chance = 0
         self.double_special_attack_chance = 0
         self.health_bar_ui: Optional[ColorRect] = None
         self.energy_bar_ui: Optional[ColorRect] = None

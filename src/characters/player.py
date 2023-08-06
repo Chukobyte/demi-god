@@ -153,6 +153,8 @@ class Player(Node2D):
                 self.stats.double_special_attack_chance += 25
             elif issubclass(item_type, SpecialAttackTimeDecreaseItem):
                 self.stats.special_attack_charge_time -= 1
+            elif issubclass(item_type, SaveChargeItem):
+                self.stats.save_charge_chance += 25
             elif issubclass(item_type, DamageDeflectWhenChargedItem):
                 self.deflect_damage_when_charged = True
 
@@ -225,7 +227,11 @@ class Player(Node2D):
                     callback_func=lambda enemy: self._on_attack_hit_enemy(enemy),
                 )
                 main_node.add_child(second_special_attack)
-            self.can_do_special_attack = False
+
+            # Save charge chance
+            can_save_charge = random.randint(1, 100) <= self.stats.save_charge_chance
+            if not can_save_charge:
+                self.can_do_special_attack = False
         else:
             melee_attack = PlayerMeleeAttack.new()
             melee_attack.subscribe_to_event(

@@ -18,6 +18,10 @@ class Item(Node2D):
         self.is_unique = False
 
     def _default_initialize(self, sprite_texture_path: str, size: Size2D) -> None:
+        """
+        Default initialization for all item objects.  If not used will need to manually create sprite and
+        collider attached to the item.
+        """
         self.sprite = Sprite.new()
 
         # Sprite
@@ -190,6 +194,18 @@ class SpecialAttackTimeDecreaseItem(Item):
         )
 
 
+class SaveChargeItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.description = "Increase keep charge chance"
+
+    def _start(self):
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_save_charge.png",
+            size=Size2D(12, 12),
+        )
+
+
 class DamageDeflectWhenChargedItem(Item):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
@@ -207,7 +223,7 @@ class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyDrainDecreaseItem | DamageDecreaseItem | SpecialAttackDoubledItem | SpecialAttackTimeDecreaseItem | DamageDeflectWhenChargedItem | None:
+    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyDrainDecreaseItem | DamageDecreaseItem | SpecialAttackDoubledItem | SpecialAttackTimeDecreaseItem | SaveChargeItem | DamageDeflectWhenChargedItem | None:
         if issubclass(item_type, HealthRestoreItem):
             return HealthRestoreItem.new()
         elif issubclass(item_type, ScrollItem):
@@ -222,6 +238,8 @@ class ItemUtils:
             return SpecialAttackDoubledItem.new()
         elif issubclass(item_type, SpecialAttackTimeDecreaseItem):
             return SpecialAttackTimeDecreaseItem.new()
+        elif issubclass(item_type, SaveChargeItem):
+            return SaveChargeItem.new()
         elif issubclass(item_type, DamageDeflectWhenChargedItem):
             return DamageDeflectWhenChargedItem.new()
         print("ERROR: doesn't have item type in 'ItemUtils.get_item_from_type'!")
@@ -234,5 +252,6 @@ class ItemUtils:
             DamageDecreaseItem,
             SpecialAttackDoubledItem,
             SpecialAttackTimeDecreaseItem,
+            SaveChargeItem,
             DamageDeflectWhenChargedItem,
         ]
