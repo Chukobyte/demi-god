@@ -51,8 +51,14 @@ class Player(Node2D):
         self.attack_slash_audio_source = AudioManager.get_audio_source(
             "assets/audio/sfx/attack_slash.wav"
         )
+        self.special_attack_slash_audio_source = AudioManager.get_audio_source(
+            "assets/audio/sfx/special_attack_slash.wav"
+        )
         self.attack_hit_audio_source = AudioManager.get_audio_source(
             "assets/audio/sfx/attack_hit.wav"
+        )
+        self.jump_audio_source = AudioManager.get_audio_source(
+            "assets/audio/sfx/player_jump.wav"
         )
         self.collect_item_audio_source = AudioManager.get_audio_source(
             "assets/audio/sfx/collect_item.wav"
@@ -232,6 +238,8 @@ class Player(Node2D):
             can_save_charge = random.randint(1, 100) <= self.stats.save_charge_chance
             if not can_save_charge:
                 self.can_do_special_attack = False
+
+            AudioManager.play_sound(source=self.special_attack_slash_audio_source)
         else:
             melee_attack = PlayerMeleeAttack.new()
             melee_attack.subscribe_to_event(
@@ -248,7 +256,9 @@ class Player(Node2D):
                 melee_attack.damage += 1
             self.add_child(melee_attack)
             self.reset_special_attack_time = True
-        AudioManager.play_sound(source=self.attack_slash_audio_source)
+
+            self.attack_slash_audio_source.pitch = random.choice([0.8, 1.0, 1.2])
+            AudioManager.play_sound(source=self.attack_slash_audio_source)
 
     def _on_attack_hit_enemy(self, enemy: Enemy) -> None:
         self.stats.set_energy(
@@ -724,6 +734,9 @@ class Player(Node2D):
         self.play_animation(current_jump_anim)
         attack_task: Optional[Task] = None
         try:
+            # Play sfx first
+            AudioManager.play_sound(self.jump_audio_source)
+
             level_state = LevelState()
             jump_speed = 30
             jump_time = 0.5

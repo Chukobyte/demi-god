@@ -25,6 +25,9 @@
                 "file_path": "assets/audio/sfx/attack_slash.wav"
             },
             {
+                "file_path": "assets/audio/sfx/special_attack_slash.wav"
+            },
+            {
                 "file_path": "assets/audio/sfx/attack_hit.wav"
             },
             {
@@ -32,6 +35,9 @@
             },
             {
                 "file_path": "assets/audio/sfx/collect_item.wav"
+            },
+            {
+                "file_path": "assets/audio/sfx/player_jump.wav"
             },
             {
                 "file_path": "assets/audio/sfx/player_hurt.wav"
