@@ -735,6 +735,7 @@ class Player(Node2D):
         attack_task: Optional[Task] = None
         try:
             # Play sfx first
+            self.jump_audio_source.pitch = random.choice([0.95, 1.0, 1.05])
             AudioManager.play_sound(self.jump_audio_source)
 
             level_state = LevelState()
