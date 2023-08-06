@@ -189,17 +189,17 @@ class DamageDecreaseItem(Item):
         self.add_child(self.collider)
 
 
-class AttackRangeIncreaseItem(Item):
+class SpecialAttackDoubledItem(Item):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self.description = "Increases attack range"
+        self.description = "Chance to double special attack"
 
     def _start(self):
         super()._start()
         size = Size2D(12, 12)
         # Sprite
         self.sprite.texture = Texture(
-            "assets/images/items/item_attack_range_increase.png"
+            "assets/images/items/item_special_attack_double.png"
         )
         self.sprite.draw_source = Rect2(0, 0, size.w, size.h)
         self.add_child(self.sprite)
@@ -254,7 +254,7 @@ class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyDrainDecreaseItem | DamageDecreaseItem | AttackRangeIncreaseItem | SpecialAttackTimeDecreaseItem | DamageDeflectWhenChargedItem | None:
+    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyDrainDecreaseItem | DamageDecreaseItem | SpecialAttackDoubledItem | SpecialAttackTimeDecreaseItem | DamageDeflectWhenChargedItem | None:
         if issubclass(item_type, HealthRestoreItem):
             return HealthRestoreItem.new()
         elif issubclass(item_type, ScrollItem):
@@ -265,8 +265,8 @@ class ItemUtils:
             return EnergyDrainDecreaseItem.new()
         elif issubclass(item_type, DamageDecreaseItem):
             return DamageDecreaseItem.new()
-        elif issubclass(item_type, AttackRangeIncreaseItem):
-            return AttackRangeIncreaseItem.new()
+        elif issubclass(item_type, SpecialAttackDoubledItem):
+            return SpecialAttackDoubledItem.new()
         elif issubclass(item_type, SpecialAttackTimeDecreaseItem):
             return SpecialAttackTimeDecreaseItem.new()
         elif issubclass(item_type, DamageDeflectWhenChargedItem):

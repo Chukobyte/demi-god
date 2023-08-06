@@ -23,6 +23,7 @@ class PlayerStats:
         self._energy_restored_from_attacks = base_energy_restored_from_attacks
         self._base_energy_restored_from_attacks = base_energy_restored_from_attacks
         self.special_attack_charge_time = special_attack_charge_time
+        self.double_special_attack_chance = 0
         self.health_bar_ui: Optional[ColorRect] = None
         self.energy_bar_ui: Optional[ColorRect] = None
         self.base_health_bar_ui_size = Size2D(52, 9)
@@ -30,7 +31,6 @@ class PlayerStats:
         # Stats that will only be touched by items
         self.transformation_energy_drain = 1
         self.damage_taken_from_attacks_multiple = 1.0
-        self.extra_attack_range = 0
 
     def refresh_bar_nodes(self) -> None:
         main_node = SceneTree.get_root()

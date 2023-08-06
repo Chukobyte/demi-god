@@ -1,3 +1,5 @@
+import random
+
 from src.characters.enemy import Enemy, EnemyAttack
 from src.characters.player_attack import PlayerMeleeAttack, PlayerSpecialAttack
 from src.characters.player_item_handler import PlayerItemHandler
@@ -35,6 +37,7 @@ class Player(Node2D):
         self.is_transformed = False
         self.can_untransform = False
         self.deflect_damage_when_charged = False
+        self.double_special_attack_chance = 0
         self.enemies_attached_to_left: List[Enemy] = []
         self.enemies_attached_to_right: List[Enemy] = []
         self.last_shake_dir = Vector2.ZERO
@@ -146,8 +149,8 @@ class Player(Node2D):
                 self.stats.transformation_energy_drain -= 0.25
             elif issubclass(item_type, DamageDecreaseItem):
                 self.stats.damage_taken_from_attacks_multiple -= 0.25
-            elif issubclass(item_type, AttackRangeIncreaseItem):
-                self.stats.extra_attack_range += 1
+            elif issubclass(item_type, SpecialAttackDoubledItem):
+                self.stats.double_special_attack_chance += 25
             elif issubclass(item_type, SpecialAttackTimeDecreaseItem):
                 self.stats.special_attack_charge_time -= 1
             elif issubclass(item_type, DamageDeflectWhenChargedItem):
@@ -190,6 +193,8 @@ class Player(Node2D):
             attack_dir = Vector2.RIGHT
         attack_z_index = self.z_index + 1
         if self.can_do_special_attack:
+            base_attack_pos = self.position
+            main_node = SceneTree.get_root()
             special_attack = PlayerSpecialAttack.new()
             special_attack.z_index = attack_z_index
             special_attack.direction = attack_dir
@@ -203,7 +208,23 @@ class Player(Node2D):
                 scoped_node=self,
                 callback_func=lambda enemy: self._on_attack_hit_enemy(enemy),
             )
-            SceneTree.get_root().add_child(special_attack)
+            main_node.add_child(special_attack)
+            # Check to see if we can double the special attack
+            if random.randint(1, 100) <= self.stats.double_special_attack_chance:
+                second_special_attack = PlayerSpecialAttack.new()
+                second_special_attack.z_index = attack_z_index
+                second_special_attack.direction = attack_dir
+                second_special_attack.flip_h = flip_h
+                second_special_attack.update_attack_offset(
+                    is_crouching=self.stance == PlayerStance.CROUCHING,
+                    base_pos=self.position + (attack_dir * Vector2(20, 0)),
+                )
+                second_special_attack.subscribe_to_event(
+                    event_id="hit_enemy",
+                    scoped_node=self,
+                    callback_func=lambda enemy: self._on_attack_hit_enemy(enemy),
+                )
+                main_node.add_child(second_special_attack)
             self.can_do_special_attack = False
         else:
             melee_attack = PlayerMeleeAttack.new()
