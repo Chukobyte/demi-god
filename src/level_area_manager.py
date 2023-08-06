@@ -180,6 +180,7 @@ class LevelAreaManager:
             pass
 
     async def beam_player_down(self, player_start_pos: Vector2):
+        player_teleport_beam: Optional[Sprite] = None
         try:
             player_teleport_beam = Sprite.new()
             player_teleport_beam.texture = Texture(
@@ -205,26 +206,58 @@ class LevelAreaManager:
                     player_teleport_beam.position = new_beam_pos
                     await co_suspend()
                 else:
+                    beam_draw_source = Rect2(0, 0, 48, 48)
+                    draw_sources: List[Rect2] = [
+                        Rect2(
+                            beam_draw_source.w,
+                            0,
+                            beam_draw_source.w,
+                            beam_draw_source.h,
+                        ),
+                        Rect2(0, 0, beam_draw_source.w, beam_draw_source.h),
+                        Rect2(
+                            beam_draw_source.w,
+                            0,
+                            beam_draw_source.w,
+                            beam_draw_source.h,
+                        ),
+                        Rect2(
+                            beam_draw_source.w * 2.0,
+                            0,
+                            beam_draw_source.w,
+                            beam_draw_source.h,
+                        ),
+                        Rect2(
+                            beam_draw_source.w,
+                            0,
+                            beam_draw_source.w,
+                            beam_draw_source.h,
+                        ),
+                        Rect2(
+                            beam_draw_source.w * 2.0,
+                            0,
+                            beam_draw_source.w,
+                            beam_draw_source.h,
+                        ),
+                        Rect2(
+                            beam_draw_source.w * 3.0,
+                            0,
+                            beam_draw_source.w,
+                            beam_draw_source.h,
+                        ),
+                    ]
                     # Hard code animation that delays 2 frames each
-                    player_teleport_beam.draw_source = Rect2(48, 0, 48, 48)
-                    await co_suspend()
-                    await co_suspend()
-                    player_teleport_beam.draw_source = Rect2(0, 0, 48, 48)
-                    await co_suspend()
-                    await co_suspend()
-                    player_teleport_beam.draw_source = Rect2(48, 0, 48, 48)
-                    await co_suspend()
-                    await co_suspend()
-                    player_teleport_beam.draw_source = Rect2(0, 0, 48, 48)
-                    await co_suspend()
-                    await co_suspend()
-                    player_teleport_beam.draw_source = Rect2(48, 0, 48, 48)
-                    await co_suspend()
-                    await co_suspend()
+                    for draw_source in draw_sources:
+                        player_teleport_beam.draw_source = draw_source
+                        await co_suspend()
+                        await co_suspend()
                     player_teleport_beam.queue_deletion()
+                    player_teleport_beam = None
+
                     break
         except GeneratorExit:
-            pass
+            if player_teleport_beam:
+                player_teleport_beam.queue_deletion()
 
     async def _manage_bridge_transition_task(self):
         try:
