@@ -40,7 +40,6 @@ class Player(Node2D):
         self.double_special_attack_chance = 0
         self.enemies_attached_to_left: List[Enemy] = []
         self.enemies_attached_to_right: List[Enemy] = []
-        self.last_shake_dir = Vector2.ZERO
         # Used when attacking to delay a frame on contact
         self.enemy_collision_invincible = False
         self.in_attack_damage_cooldown = False
@@ -102,27 +101,38 @@ class Player(Node2D):
             level_state.is_paused = not level_state.is_paused
             AudioManager.play_sound(self.pause_game_toggle_audio_source)
 
-        if not self._are_enemies_attached() and not level_state.is_game_state_paused():
-            if Input.is_action_just_pressed("attack"):
-                hovered_item = self.item_handler.get_hovered_item()
-                if hovered_item and hovered_item.can_be_activated(self.stats):
-                    self._activate_item(hovered_item)
-                else:
-                    self.attack_requested = True
-            elif Input.is_action_just_pressed("special"):
-                if self.is_transformed:
-                    if self.can_untransform:
-                        self._set_transformed(False)
-                        if self.transformation_task:
-                            self.transformation_task.close()
-                            self.transformation_task = None
-                else:
-                    min_transform_amount = 2
-                    if self.stats.energy >= min_transform_amount:
-                        self._set_transformed(True)
-                        self.transformation_task = Task(
-                            coroutine=self._transformation_task()
-                        )
+        if not level_state.is_game_state_paused():
+            if not self._are_enemies_attached():
+                if Input.is_action_just_pressed("attack"):
+                    hovered_item = self.item_handler.get_hovered_item()
+                    if hovered_item and hovered_item.can_be_activated(self.stats):
+                        self._activate_item(hovered_item)
+                    else:
+                        self.attack_requested = True
+                elif Input.is_action_just_pressed("special"):
+                    if self.is_transformed:
+                        if self.can_untransform:
+                            self._set_transformed(False)
+                            if self.transformation_task:
+                                self.transformation_task.close()
+                                self.transformation_task = None
+                    else:
+                        min_transform_amount = 2
+                        if self.stats.energy >= min_transform_amount:
+                            self._set_transformed(True)
+                            self.transformation_task = Task(
+                                coroutine=self._transformation_task()
+                            )
+            else:
+                if (
+                    Input.is_action_just_pressed("attack")
+                    or Input.is_action_pressed("special")
+                    or Input.is_action_just_pressed("move_left")
+                    or Input.is_action_just_pressed("move_right")
+                    or Input.is_action_just_pressed("jump")
+                    or Input.is_action_just_pressed("crouch")
+                ):
+                    self._shake_attached_enemies()
 
     def _fixed_update(self, delta_time: float) -> None:
         self.physics_update_task.resume()
@@ -176,22 +186,17 @@ class Player(Node2D):
     def _get_attached_count(self) -> int:
         return len(self.enemies_attached_to_left) + len(self.enemies_attached_to_right)
 
-    def _handle_attached_shake(self, new_shake_dir: Vector2) -> None:
-        if self.last_shake_dir != new_shake_dir:
-            for enemy in self.enemies_attached_to_left[:]:
-                enemy.current_attached_shakes += 1
-                if enemy.current_attached_shakes >= enemy.shakes_required_for_detach:
-                    self.enemies_attached_to_left.remove(enemy)
-                    enemy.destroy_from_shake()
-            for enemy in self.enemies_attached_to_right[:]:
-                enemy.current_attached_shakes += 1
-                if enemy.current_attached_shakes >= enemy.shakes_required_for_detach:
-                    self.enemies_attached_to_right.remove(enemy)
-                    enemy.destroy_from_shake()
-            if self._are_enemies_attached():
-                self.last_shake_dir = new_shake_dir
-            else:
-                self.last_shake_dir = Vector2.ZERO
+    def _shake_attached_enemies(self) -> None:
+        for enemy in self.enemies_attached_to_left[:]:
+            enemy.current_attached_shakes += 1
+            if enemy.current_attached_shakes >= enemy.shakes_required_for_detach:
+                self.enemies_attached_to_left.remove(enemy)
+                enemy.destroy_from_shake()
+        for enemy in self.enemies_attached_to_right[:]:
+            enemy.current_attached_shakes += 1
+            if enemy.current_attached_shakes >= enemy.shakes_required_for_detach:
+                self.enemies_attached_to_right.remove(enemy)
+                enemy.destroy_from_shake()
 
     def _execute_attack(self) -> None:
         flip_h = self.anim_sprite.flip_h
@@ -665,8 +670,6 @@ class Player(Node2D):
                             )
                             self.play_animation("walk")
                             self.position = new_position
-                        else:
-                            self._handle_attached_shake(Vector2.LEFT)
                         self.anim_sprite.flip_h = True
                     elif Input.is_action_pressed("move_right"):
                         if not self._are_enemies_attached():
@@ -679,8 +682,6 @@ class Player(Node2D):
                             )
                             self.play_animation("walk")
                             self.position = new_position
-                        else:
-                            self._handle_attached_shake(Vector2.RIGHT)
                         self.anim_sprite.flip_h = False
                     else:
                         self.play_animation("idle")
@@ -714,12 +715,8 @@ class Player(Node2D):
                     continue
                 elif self.input_enabled:
                     if Input.is_action_pressed("move_left"):
-                        if self._are_enemies_attached():
-                            self._handle_attached_shake(Vector2.LEFT)
                         self.anim_sprite.flip_h = True
                     elif Input.is_action_pressed("move_right"):
-                        if self._are_enemies_attached():
-                            self._handle_attached_shake(Vector2.RIGHT)
                         self.anim_sprite.flip_h = False
                     if Input.is_action_pressed("jump"):
                         self.stance = PlayerStance.IN_AIR
@@ -771,8 +768,6 @@ class Player(Node2D):
                                 new_position, level_state.boundary
                             )
                             self.position = new_position
-                        else:
-                            self._handle_attached_shake(Vector2.LEFT)
                         self.anim_sprite.flip_h = True
                     elif Input.is_action_pressed("move_right"):
                         if not self._are_enemies_attached():
@@ -784,8 +779,6 @@ class Player(Node2D):
                                 new_position, level_state.boundary
                             )
                             self.position = new_position
-                        else:
-                            self._handle_attached_shake(Vector2.RIGHT)
                         self.anim_sprite.flip_h = False
                 jump_vector = Vector2(delta_time * jump_speed, delta_time * jump_speed)
                 if is_ascending:
