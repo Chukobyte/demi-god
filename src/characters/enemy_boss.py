@@ -147,6 +147,7 @@ class EnemyBoss(Enemy):
 
     def _spawn_projectile(self) -> EnemyBossProjectile:
         attack = EnemyBossProjectile.new()
+        attack.set_owner(self)
         attack.direction = self.move_dir
         attack.z_index = self.z_index + 1
         return attack

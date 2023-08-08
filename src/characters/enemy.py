@@ -10,11 +10,15 @@ class EnemyAttack(Node2D):
         self.damage = 0
         self.move_speed = 0
         self.direction = Vector2.ZERO
+        self._owner: Optional["Enemy"] = None
         self.physics_update_task: Optional[Task] = None
         self.collider: Optional[Collider2D] = None
         self.destroy_on_touch = True
+        self.destroy_when_owner_is = True
 
     def _fixed_update(self, delta_time: float) -> None:
+        if self._owner:
+            self.time_dilation = self._owner.time_dilation
         if self.physics_update_task:
             self.physics_update_task.resume()
         if self.direction == Vector2.ZERO:
@@ -25,6 +29,17 @@ class EnemyAttack(Node2D):
                 self.direction.y * self.move_speed * delta_time,
             )
         )
+
+    def set_owner(self, enemy: "Enemy") -> None:
+        self._owner = enemy
+        if self.destroy_when_owner_is:
+            self._owner.subscribe_to_event(
+                "destroyed", self, lambda args: self._on_owner_destroyed()
+            )
+
+    def _on_owner_destroyed(self) -> None:
+        self._owner = None
+        self.queue_deletion()
 
 
 class Enemy(Node2D):

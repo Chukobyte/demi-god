@@ -64,6 +64,7 @@ class EnemyJester(Enemy):
 
     def _spawn_projectile_attack(self) -> None:
         attack = EnemyJesterProjectile.new()
+        attack.set_owner(self)
         y_offset = random.choice([2, -10])  # 2 = low, -10 = high
         attack.position = self.position + Vector2(0, y_offset)
         attack.direction = self.move_dir
