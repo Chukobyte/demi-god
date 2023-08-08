@@ -17,6 +17,12 @@ class PlayerStance:
     IN_AIR = "in_air"
 
 
+class PlayerAbility:
+    FREEZE_TIME = "freeze_time"
+    DUAL_SPECIAL = "dual_special"
+    HOOD_FORM = "hood_form"
+
+
 class Player(Node2D):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
@@ -30,6 +36,9 @@ class Player(Node2D):
             base_energy_restored_from_attacks=0.5,
             special_attack_charge_time=5.0,
         )
+        self._ability: Optional[
+            str
+        ] = PlayerAbility.HOOD_FORM  # TODO: Set to none once everything is implemented
         self.attack_requested = False
         self.can_do_special_attack = False
         self.reset_special_attack_time = False
@@ -110,19 +119,30 @@ class Player(Node2D):
                     else:
                         self.attack_requested = True
                 elif Input.is_action_just_pressed("special"):
-                    if self.is_transformed:
-                        if self.can_untransform:
-                            self._set_transformed(False)
-                            if self.transformation_task:
-                                self.transformation_task.close()
-                                self.transformation_task = None
-                    else:
-                        min_transform_amount = 2
-                        if self.stats.energy >= min_transform_amount:
+                    if self.stats.energy >= self.stats.base_energy:
+                        if self._ability == PlayerAbility.FREEZE_TIME:
+                            pass
+                        elif self._ability == PlayerAbility.DUAL_SPECIAL:
+                            pass
+                        elif self._ability == PlayerAbility.HOOD_FORM:
                             self._set_transformed(True)
                             self.transformation_task = Task(
                                 coroutine=self._transformation_task()
                             )
+
+                    # if self.is_transformed:
+                    #     if self.can_untransform:
+                    #         self._set_transformed(False)
+                    #         if self.transformation_task:
+                    #             self.transformation_task.close()
+                    #             self.transformation_task = None
+                    # else:
+                    #     min_transform_amount = 2
+                    #     if self.stats.energy >= min_transform_amount:
+                    #         self._set_transformed(True)
+                    #         self.transformation_task = Task(
+                    #             coroutine=self._transformation_task()
+                    #         )
             else:
                 if (
                     Input.is_action_just_pressed("attack")
@@ -143,6 +163,9 @@ class Player(Node2D):
             self.anim_sprite.play(f"{anim_name}_t")
         else:
             self.anim_sprite.play(anim_name)
+
+    def set_ability(self, ability: str) -> None:
+        self._ability = ability
 
     def get_current_animation_name(self) -> str:
         return self._current_animation_name
@@ -257,8 +280,8 @@ class Player(Node2D):
             melee_attack.update_attack_offset(
                 is_crouching=self.stance == PlayerStance.CROUCHING
             )
-            if self.is_transformed:
-                melee_attack.damage += 1
+            # if self.is_transformed:
+            #     melee_attack.damage += 1
             self.add_child(melee_attack)
             self.reset_special_attack_time = True
 
@@ -281,12 +304,12 @@ class Player(Node2D):
         if self.is_transformed != is_transformed:
             self.is_transformed = is_transformed
             if self.is_transformed:
-                self.stats.move_speed += 5
-                self.stats.energy_restored_from_attacks = 0.25
+                # self.stats.move_speed += 5
+                # self.stats.energy_restored_from_attacks = 0.25
                 self.can_untransform = False
-            else:
-                self.stats.reset_move_speed()
-                self.stats.reset_energy_restored_from_attacks()
+            # else:
+            #     self.stats.reset_move_speed()
+            #     self.stats.reset_energy_restored_from_attacks()
 
     def _get_clamped_pos(
         self, position: Vector2, boundary: Rect2, padding=16
@@ -742,8 +765,8 @@ class Player(Node2D):
             jump_time = 0.5
             ascend_timer = Timer(jump_time)
             max_ascend_timer_skips = 2
-            if self.is_transformed:
-                max_ascend_timer_skips += 2
+            # if self.is_transformed:
+            #     max_ascend_timer_skips += 2
             ascent_timer_skips = 0
             is_ascending = True
             while True:
