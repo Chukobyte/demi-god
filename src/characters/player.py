@@ -36,9 +36,7 @@ class Player(Node2D):
             base_energy_restored_from_attacks=0.5,
             special_attack_charge_time=5.0,
         )
-        self._ability: Optional[
-            str
-        ] = PlayerAbility.HOOD_FORM  # TODO: Set to none once everything is implemented
+        self._ability: Optional[str] = None
         self.attack_requested = False
         self.can_do_special_attack = False
         self.reset_special_attack_time = False
@@ -165,7 +163,19 @@ class Player(Node2D):
             self.anim_sprite.play(anim_name)
 
     def set_ability(self, ability: str) -> None:
-        self._ability = ability
+        if ability != self._ability:
+            self._ability = ability
+            bottom_ui: Optional[Sprite] = SceneTree.get_root().get_child("BottomUI")
+            print(f"bottom_ui = {bottom_ui}")
+            if bottom_ui:
+                new_draw_source = Rect2(0.0, 0.0, 160.0, 32.0)
+                if ability == PlayerAbility.SLOW_TIME:
+                    new_draw_source.x = new_draw_source.w
+                elif ability == PlayerAbility.DUAL_SPECIAL:
+                    new_draw_source.x = new_draw_source.w * 2.0
+                elif ability == PlayerAbility.HOOD_FORM:
+                    new_draw_source.x = new_draw_source.w * 3.0
+                bottom_ui.draw_source = new_draw_source
 
     def get_current_animation_name(self) -> str:
         return self._current_animation_name
