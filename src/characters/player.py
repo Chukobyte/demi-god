@@ -166,16 +166,15 @@ class Player(Node2D):
         if ability != self._ability:
             self._ability = ability
             bottom_ui: Optional[Sprite] = SceneTree.get_root().get_child("BottomUI")
-            print(f"bottom_ui = {bottom_ui}")
             if bottom_ui:
-                new_draw_source = Rect2(0.0, 0.0, 160.0, 32.0)
                 if ability == PlayerAbility.SLOW_TIME:
-                    new_draw_source.x = new_draw_source.w
+                    bottom_ui.texture = Texture(file_path="assets/images/ui/bottom_ui_slow_time.png")
                 elif ability == PlayerAbility.DUAL_SPECIAL:
-                    new_draw_source.x = new_draw_source.w * 2.0
+                    bottom_ui.texture = Texture(file_path="assets/images/ui/bottom_ui_dual_special.png")
                 elif ability == PlayerAbility.HOOD_FORM:
-                    new_draw_source.x = new_draw_source.w * 3.0
-                bottom_ui.draw_source = new_draw_source
+                    bottom_ui.texture = Texture(file_path="assets/images/ui/bottom_ui_hood_form.png")
+                else:
+                    bottom_ui.texture = Texture(file_path="assets/images/ui/bottom_ui.png")
 
     def get_current_animation_name(self) -> str:
         return self._current_animation_name

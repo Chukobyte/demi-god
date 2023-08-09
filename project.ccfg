@@ -165,6 +165,24 @@
                 "nearest_neighbor": true
             },
             {
+                "file_path": "assets/images/ui/bottom_ui_slow_time.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/ui/bottom_ui_dual_special.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/ui/bottom_ui_hood_form.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
                 "file_path": "assets/images/ui/health_bar_ui.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",
