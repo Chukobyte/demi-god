@@ -151,14 +151,14 @@ class HealthRestoreItem(Item):
         return super().can_be_activated(stats) and stats and stats.hp < stats.base_hp
 
 
-class EnergyDrainDecreaseItem(Item):
+class EnergyRestoredFromAttacksIncreaseItem(Item):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
-        self.description = "Lowers transform energy drain"
+        self.description = "Increase energy from attacks"
 
     def _start(self):
         self._default_initialize(
-            sprite_texture_path="assets/images/items/item_energy_drain_decrease.png",
+            sprite_texture_path="assets/images/items/item_energy_restored_from_attacks_increase.png",
             size=Size2D(12, 12),
         )
 
@@ -267,15 +267,15 @@ class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyDrainDecreaseItem | DamageDecreaseItem | SpecialAttackDoubledItem | SpecialAttackTimeDecreaseItem | SaveChargeItem | DamageDeflectWhenChargedItem | AbilitySlowTimeItem | AbilityDualSpecialItem | AbilityHoodFormItem | None:
+    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyRestoredFromAttacksIncreaseItem | DamageDecreaseItem | SpecialAttackDoubledItem | SpecialAttackTimeDecreaseItem | SaveChargeItem | DamageDeflectWhenChargedItem | AbilitySlowTimeItem | AbilityDualSpecialItem | AbilityHoodFormItem | None:
         if issubclass(item_type, HealthRestoreItem):
             return HealthRestoreItem.new()
         elif issubclass(item_type, ScrollItem):
             return ScrollItem.new()
         elif issubclass(item_type, LeverItem):
             return LeverItem.new()
-        elif issubclass(item_type, EnergyDrainDecreaseItem):
-            return EnergyDrainDecreaseItem.new()
+        elif issubclass(item_type, EnergyRestoredFromAttacksIncreaseItem):
+            return EnergyRestoredFromAttacksIncreaseItem.new()
         elif issubclass(item_type, DamageDecreaseItem):
             return DamageDecreaseItem.new()
         elif issubclass(item_type, SpecialAttackDoubledItem):
@@ -298,7 +298,7 @@ class ItemUtils:
     @staticmethod
     def get_power_up_area_item_types() -> List[Type]:
         return [
-            # EnergyDrainDecreaseItem,
+            EnergyRestoredFromAttacksIncreaseItem,
             DamageDecreaseItem,
             SpecialAttackDoubledItem,
             SpecialAttackTimeDecreaseItem,

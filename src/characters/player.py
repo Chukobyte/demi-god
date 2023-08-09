@@ -166,15 +166,24 @@ class Player(Node2D):
         if ability != self._ability:
             self._ability = ability
             bottom_ui: Optional[Sprite] = SceneTree.get_root().get_child("BottomUI")
+            # FIXME: Should probably use a single image, engine has issues with tex coords so had to do this instead.
             if bottom_ui:
                 if ability == PlayerAbility.SLOW_TIME:
-                    bottom_ui.texture = Texture(file_path="assets/images/ui/bottom_ui_slow_time.png")
+                    bottom_ui.texture = Texture(
+                        file_path="assets/images/ui/bottom_ui_slow_time.png"
+                    )
                 elif ability == PlayerAbility.DUAL_SPECIAL:
-                    bottom_ui.texture = Texture(file_path="assets/images/ui/bottom_ui_dual_special.png")
+                    bottom_ui.texture = Texture(
+                        file_path="assets/images/ui/bottom_ui_dual_special.png"
+                    )
                 elif ability == PlayerAbility.HOOD_FORM:
-                    bottom_ui.texture = Texture(file_path="assets/images/ui/bottom_ui_hood_form.png")
+                    bottom_ui.texture = Texture(
+                        file_path="assets/images/ui/bottom_ui_hood_form.png"
+                    )
                 else:
-                    bottom_ui.texture = Texture(file_path="assets/images/ui/bottom_ui.png")
+                    bottom_ui.texture = Texture(
+                        file_path="assets/images/ui/bottom_ui.png"
+                    )
 
     def get_current_animation_name(self) -> str:
         return self._current_animation_name
@@ -193,8 +202,8 @@ class Player(Node2D):
                 self.health_restore_task = Task(
                     coroutine=self._health_restore_task(health_item.restore_amount)
                 )
-            elif issubclass(item_type, EnergyDrainDecreaseItem):
-                self.stats.transformation_energy_drain -= 0.25
+            elif issubclass(item_type, EnergyRestoredFromAttacksIncreaseItem):
+                self.stats.energy_restored_from_attacks += 0.25
             elif issubclass(item_type, DamageDecreaseItem):
                 self.stats.damage_taken_from_attacks_multiple -= 0.25
             elif issubclass(item_type, SpecialAttackDoubledItem):
