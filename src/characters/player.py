@@ -18,7 +18,7 @@ class PlayerStance:
 
 
 class PlayerAbility:
-    FREEZE_TIME = "freeze_time"
+    SLOW_TIME = "slow_time"
     DUAL_SPECIAL = "dual_special"
     HOOD_FORM = "hood_form"
 
@@ -120,7 +120,7 @@ class Player(Node2D):
                         self.attack_requested = True
                 elif Input.is_action_just_pressed("special"):
                     if self.stats.energy >= self.stats.base_energy:
-                        if self._ability == PlayerAbility.FREEZE_TIME:
+                        if self._ability == PlayerAbility.SLOW_TIME:
                             pass
                         elif self._ability == PlayerAbility.DUAL_SPECIAL:
                             pass
@@ -196,6 +196,12 @@ class Player(Node2D):
                 self.stats.save_charge_chance += 25
             elif issubclass(item_type, DamageDeflectWhenChargedItem):
                 self.deflect_damage_when_charged = True
+            elif issubclass(item_type, AbilitySlowTimeItem):
+                self.set_ability(PlayerAbility.SLOW_TIME)
+            elif issubclass(item_type, AbilityDualSpecialItem):
+                self.set_ability(PlayerAbility.DUAL_SPECIAL)
+            elif issubclass(item_type, AbilityHoodFormItem):
+                self.set_ability(PlayerAbility.HOOD_FORM)
 
             if item.is_unique:
                 self.item_handler.held_unique_items.append(item_type)

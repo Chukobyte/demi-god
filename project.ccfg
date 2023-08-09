@@ -369,6 +369,24 @@
                 "nearest_neighbor": true
             },
             {
+                "file_path": "assets/images/items/item_slow_time.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/items/item_dual_special.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/items/item_hood_form.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
                 "file_path": "assets/images/demi/demi_transformed_walk.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",

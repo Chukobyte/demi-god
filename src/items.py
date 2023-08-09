@@ -224,11 +224,50 @@ class DamageDeflectWhenChargedItem(Item):
         )
 
 
+class AbilitySlowTimeItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.description = "Will slow down time"
+        self.is_unique = True
+
+    def _start(self):
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_slow_time.png",
+            size=Size2D(12, 12),
+        )
+
+
+class AbilityDualSpecialItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.description = "Will spawn projectiles"
+        self.is_unique = True
+
+    def _start(self):
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_dual_special.png",
+            size=Size2D(12, 12),
+        )
+
+
+class AbilityHoodFormItem(Item):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.description = "Won't take hp damage when active"
+        self.is_unique = True
+
+    def _start(self):
+        self._default_initialize(
+            sprite_texture_path="assets/images/items/item_hood_form.png",
+            size=Size2D(12, 12),
+        )
+
+
 class ItemUtils:
     @staticmethod
     def get_item_from_type(
         item_type: Type,
-    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyDrainDecreaseItem | DamageDecreaseItem | SpecialAttackDoubledItem | SpecialAttackTimeDecreaseItem | SaveChargeItem | DamageDeflectWhenChargedItem | None:
+    ) -> HealthRestoreItem | ScrollItem | LeverItem | EnergyDrainDecreaseItem | DamageDecreaseItem | SpecialAttackDoubledItem | SpecialAttackTimeDecreaseItem | SaveChargeItem | DamageDeflectWhenChargedItem | AbilitySlowTimeItem | AbilityDualSpecialItem | AbilityHoodFormItem | None:
         if issubclass(item_type, HealthRestoreItem):
             return HealthRestoreItem.new()
         elif issubclass(item_type, ScrollItem):
@@ -247,13 +286,19 @@ class ItemUtils:
             return SaveChargeItem.new()
         elif issubclass(item_type, DamageDeflectWhenChargedItem):
             return DamageDeflectWhenChargedItem.new()
+        elif issubclass(item_type, AbilitySlowTimeItem):
+            return AbilitySlowTimeItem.new()
+        elif issubclass(item_type, AbilityDualSpecialItem):
+            return AbilityDualSpecialItem.new()
+        elif issubclass(item_type, AbilityHoodFormItem):
+            return AbilityHoodFormItem.new()
         print("ERROR: doesn't have item type in 'ItemUtils.get_item_from_type'!")
         return None
 
     @staticmethod
     def get_power_up_area_item_types() -> List[Type]:
         return [
-            EnergyDrainDecreaseItem,
+            # EnergyDrainDecreaseItem,
             DamageDecreaseItem,
             SpecialAttackDoubledItem,
             SpecialAttackTimeDecreaseItem,
