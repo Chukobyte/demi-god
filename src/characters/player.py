@@ -681,7 +681,7 @@ class Player(Node2D):
         try:
             main_node = SceneTree.get_root()
             attack_z_index = self.z_index + 1
-            base_attack_pos = self.position
+            base_attack_pos = self.position + Vector2(0, 2)
             # Right
             right_special_attack = PlayerDualSpecialAttack.new()
             right_special_attack.z_index = attack_z_index
