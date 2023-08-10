@@ -437,7 +437,9 @@ class Player(Node2D):
             ):
                 damage *= self.stats.damage_taken_from_attacks_multiple
                 if take_transform_damage:
-                    self.stats.energy -= damage
+                    self.stats.energy -= (
+                        damage * self.stats.energy_damage_taken_from_attacks_multiple
+                    )
                 else:
                     self.stats.hp -= damage
             bar_ui.color = bar_color

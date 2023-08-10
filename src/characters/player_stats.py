@@ -29,10 +29,12 @@ class PlayerStats:
         self.energy_bar_ui: Optional[ColorRect] = None
         self.base_health_bar_ui_size = Size2D(52, 9)
         self.base_energy_bar_ui_size = Size2D(52, 9)
-        # Stats that will only be touched by items
+
         self.slow_time_energy_drain = 1
         self.hood_form_energy_drain = 1
         self.damage_taken_from_attacks_multiple = 1.0
+        # Applied after 'damage_taken_from_attacks_multiple' is
+        self.energy_damage_taken_from_attacks_multiple = 0.5
 
     def refresh_bar_nodes(self) -> None:
         main_node = SceneTree.get_root()
