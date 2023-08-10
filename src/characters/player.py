@@ -165,6 +165,7 @@ class Player(Node2D):
                         file_path="assets/images/ui/bottom_ui_slow_time.png"
                     )
                 elif ability == PlayerAbility.DUAL_SPECIAL:
+                    self.stats.energy_restored_from_attacks *= 1.5
                     bottom_ui.texture = Texture(
                         file_path="assets/images/ui/bottom_ui_dual_special.png"
                     )
@@ -195,7 +196,9 @@ class Player(Node2D):
                     coroutine=self._health_restore_task(health_item.restore_amount)
                 )
             elif issubclass(item_type, EnergyRestoredFromAttacksIncreaseItem):
-                self.stats.energy_restored_from_attacks += 0.25
+                self.stats.energy_restored_from_attacks += (
+                    self.stats.energy_restored_from_attacks * 0.33
+                )
             elif issubclass(item_type, DamageDecreaseItem):
                 self.stats.damage_taken_from_attacks_multiple -= 0.25
             elif issubclass(item_type, SpecialAttackDoubledItem):
