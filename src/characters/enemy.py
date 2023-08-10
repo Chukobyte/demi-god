@@ -17,7 +17,7 @@ class EnemyAttack(Node2D):
         self.destroy_when_owner_is = True
 
     def _fixed_update(self, delta_time: float) -> None:
-        if self._owner:
+        if self._owner and not self._owner.is_destroyed:
             self.time_dilation = self._owner.time_dilation
         if self.physics_update_task:
             self.physics_update_task.resume()

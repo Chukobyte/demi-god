@@ -33,7 +33,7 @@ class Player(Node2D):
             base_hp=10,
             base_energy=20,
             base_move_speed=25,
-            base_energy_restored_from_attacks=0.5,
+            base_energy_restored_from_attacks=1.0,
             special_attack_charge_time=5.0,
         )
         self._ability: Optional[str] = None
