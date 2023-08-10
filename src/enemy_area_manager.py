@@ -21,6 +21,9 @@ class EnemyAreaManager:
             self._enemy_scene_cache[enemy_def.scene_path] = SceneUtil.load_scene(
                 enemy_def.scene_path
             )
+        LevelState().subscribe_to_enemy_time_dilation_change(
+            self._on_level_state_enemy_time_dilation_changed
+        )
 
     def _get_spawned_enemies_by_type(self, enemy_type: Type) -> list:
         enemies = []
@@ -34,6 +37,12 @@ class EnemyAreaManager:
             self._spawned_enemies.remove(enemy)
         except ValueError as e:
             pass
+
+    def _on_level_state_enemy_time_dilation_changed(
+        self, new_time_dilation: float
+    ) -> None:
+        for enemy in self._spawned_enemies:
+            enemy.time_dilation = new_time_dilation
 
     def _get_section_by_position(
         self, position: Vector2, area: LevelArea
@@ -64,6 +73,7 @@ class EnemyAreaManager:
         main_node = SceneTree.get_root()
         is_in_first_section = section.index == 0
         is_in_last_section = section.index == total_sections - 1
+        level_state = LevelState()
         while not spawn_attempt_finished:
             if not enemy_defs:
                 break
@@ -147,6 +157,7 @@ class EnemyAreaManager:
                         i * (x_modifier / 4), 0.0
                     )
                     spawned_enemy.z_index = player.z_index
+                    spawned_enemy.time_dilation = level_state.get_enemy_time_dilation()
                     main_node.add_child(spawned_enemy)
                     spawned_enemy.subscribe_to_event(
                         "destroyed", main_node, self._on_enemy_destroyed
@@ -242,6 +253,7 @@ class EnemyAreaManager:
                 boss_enemy = self._spawn_enemy_from_def(boss_enemy_def)
                 boss_enemy.position = boss_spawn_pos
                 boss_enemy.z_index = player.z_index
+                boss_enemy.time_dilation = level_state.get_enemy_time_dilation()
                 main_node.add_child(boss_enemy)
                 boss_enemy.subscribe_to_event(
                     "destroyed", main_node, self._on_enemy_destroyed

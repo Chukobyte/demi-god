@@ -95,6 +95,9 @@ class LevelState:
             cls.screen_shader_instance: Optional[ShaderInstance] = None
             cls.bridge_gate_helper = BridgeGateHelper()
             cls.game_timer: Optional[GameTimer] = None
+            cls.queued_new_enemy_time_dilation: Optional[float] = None
+            cls._enemy_time_dilation = 1.0
+            cls._time_dilation_change_subscribers: List[Callable] = []
         return cls._instance
 
     def is_game_state_paused(self) -> bool:
@@ -103,6 +106,18 @@ class LevelState:
             or self.is_currently_transitioning_within_level
             or self.is_paused_from_boss
         )
+
+    def set_enemy_time_dilation(self, time_dilation: float) -> None:
+        if self._enemy_time_dilation != time_dilation:
+            self._enemy_time_dilation = time_dilation
+            for subscriber_func in self._time_dilation_change_subscribers:
+                subscriber_func(self._enemy_time_dilation)
+
+    def get_enemy_time_dilation(self) -> float:
+        return self._enemy_time_dilation
+
+    def subscribe_to_enemy_time_dilation_change(self, func: Callable) -> None:
+        self._time_dilation_change_subscribers.append(func)
 
     @classmethod
     def reset_instance(cls) -> None:

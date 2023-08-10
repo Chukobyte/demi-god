@@ -1,12 +1,8 @@
 import copy
 import random
-from typing import Optional, List, Type
-
-from crescent_api import GameProperties
 
 from src.characters.enemy_definitions import EnemyDefinition
 from src.characters.player_item_handler import PlayerItemHandler
-from src.characters.player_stats import PlayerStats
 from src.items import *
 
 

@@ -30,7 +30,8 @@ class PlayerStats:
         self.base_health_bar_ui_size = Size2D(52, 9)
         self.base_energy_bar_ui_size = Size2D(52, 9)
         # Stats that will only be touched by items
-        self.transformation_energy_drain = 1
+        self.slow_time_energy_drain = 1
+        self.hood_form_energy_drain = 1
         self.damage_taken_from_attacks_multiple = 1.0
 
     def refresh_bar_nodes(self) -> None:

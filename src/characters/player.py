@@ -42,7 +42,6 @@ class Player(Node2D):
         self.reset_special_attack_time = False
         self.energy_attack_cost = 5
         self.is_transformed = False
-        self.can_untransform = False
         self.deflect_damage_when_charged = False
         self.double_special_attack_chance = 0
         self.enemies_attached_to_left: List[Enemy] = []
@@ -52,7 +51,7 @@ class Player(Node2D):
         self.in_attack_damage_cooldown = False
         self.damage_cooldown_time = 2.0
         self.physics_update_task = Task(coroutine=self._physics_update_task())
-        self.transformation_task: Optional[Task] = None
+        self.ability_task: Optional[Task] = None
         self.health_restore_task: Optional[Task] = None
         self.attack_slash_audio_source = AudioManager.get_audio_source(
             "assets/audio/sfx/attack_slash.wav"
@@ -119,28 +118,17 @@ class Player(Node2D):
                 elif Input.is_action_just_pressed("special"):
                     if self.stats.energy >= self.stats.base_energy:
                         if self._ability == PlayerAbility.SLOW_TIME:
-                            pass
-                        elif self._ability == PlayerAbility.DUAL_SPECIAL:
-                            pass
-                        elif self._ability == PlayerAbility.HOOD_FORM:
-                            self._set_transformed(True)
-                            self.transformation_task = Task(
-                                coroutine=self._transformation_task()
+                            self.ability_task = Task(
+                                coroutine=self._ability_slow_time_task()
                             )
-
-                    # if self.is_transformed:
-                    #     if self.can_untransform:
-                    #         self._set_transformed(False)
-                    #         if self.transformation_task:
-                    #             self.transformation_task.close()
-                    #             self.transformation_task = None
-                    # else:
-                    #     min_transform_amount = 2
-                    #     if self.stats.energy >= min_transform_amount:
-                    #         self._set_transformed(True)
-                    #         self.transformation_task = Task(
-                    #             coroutine=self._transformation_task()
-                    #         )
+                        elif self._ability == PlayerAbility.DUAL_SPECIAL:
+                            self.ability_task = Task(
+                                coroutine=self._ability_dual_special_task()
+                            )
+                        elif self._ability == PlayerAbility.HOOD_FORM:
+                            self.ability_task = Task(
+                                coroutine=self._ability_hood_form_task()
+                            )
             else:
                 if (
                     Input.is_action_just_pressed("attack")
@@ -253,7 +241,6 @@ class Player(Node2D):
             attack_dir = Vector2.RIGHT
         attack_z_index = self.z_index + 1
         if self.can_do_special_attack:
-            base_attack_pos = self.position
             main_node = SceneTree.get_root()
             special_attack = PlayerSpecialAttack.new()
             special_attack.z_index = attack_z_index
@@ -304,8 +291,6 @@ class Player(Node2D):
             melee_attack.update_attack_offset(
                 is_crouching=self.stance == PlayerStance.CROUCHING
             )
-            # if self.is_transformed:
-            #     melee_attack.damage += 1
             self.add_child(melee_attack)
             self.reset_special_attack_time = True
 
@@ -327,13 +312,6 @@ class Player(Node2D):
     def _set_transformed(self, is_transformed: bool) -> None:
         if self.is_transformed != is_transformed:
             self.is_transformed = is_transformed
-            if self.is_transformed:
-                # self.stats.move_speed += 5
-                # self.stats.energy_restored_from_attacks = 0.25
-                self.can_untransform = False
-            # else:
-            #     self.stats.reset_move_speed()
-            #     self.stats.reset_energy_restored_from_attacks()
 
     def _get_clamped_pos(
         self, position: Vector2, boundary: Rect2, padding=16
@@ -369,12 +347,12 @@ class Player(Node2D):
                 # Run take damage (collision) task first
                 collision_task.resume()
                 # Transformation task
-                if self.transformation_task:
-                    self.transformation_task.resume()
+                if self.ability_task:
+                    self.ability_task.resume()
                     if self.stats.energy == 0:
                         self._set_transformed(False)
-                        self.transformation_task.close()
-                        self.transformation_task = None
+                        self.ability_task.close()
+                        self.ability_task = None
                 # Health restore task
                 if self.health_restore_task:
                     self.health_restore_task.resume()
@@ -652,25 +630,79 @@ class Player(Node2D):
         except GeneratorExit:
             self.enemy_collision_invincible = False
 
-    async def _transformation_task(self):
+    async def _ability_slow_time_task(self):
+        level_state = LevelState()
         try:
-            level_state = LevelState()
+            level_state.set_enemy_time_dilation(0.5)
             transformation_tick_rate = 0.25
-            energy_drain_per_tick = self.stats.transformation_energy_drain
-            # Update animation to transformed
-            self.play_animation(self._current_animation_name)
-            times_ticked = 0
+            energy_drain_per_tick = self.stats.slow_time_energy_drain
             while True:
                 await co_wait_seconds(transformation_tick_rate)
                 if not level_state.is_currently_transitioning_within_level:
                     self.stats.energy -= energy_drain_per_tick
-                    times_ticked += 1
-                    if times_ticked == 2:
-                        self.can_untransform = True
                 await co_suspend()
         except GeneratorExit:
             self.play_animation(self._current_animation_name)
-            self.can_untransform = True
+            level_state.set_enemy_time_dilation(1.0)
+
+    async def _ability_dual_special_task(self):
+        try:
+            main_node = SceneTree.get_root()
+            attack_z_index = self.z_index + 1
+            base_attack_pos = self.position + Vector2(0, 2)
+            # Right
+            right_special_attack = PlayerSpecialAttack.new()
+            right_special_attack.z_index = attack_z_index
+            right_special_attack.direction = Vector2.RIGHT.copy()
+            right_special_attack.flip_h = False
+            right_special_attack.update_attack_offset(
+                is_crouching=False,
+                base_pos=base_attack_pos,
+            )
+            right_special_attack.subscribe_to_event(
+                event_id="hit_enemy",
+                scoped_node=self,
+                callback_func=lambda enemy: self._on_attack_hit_enemy(enemy),
+            )
+            main_node.add_child(right_special_attack)
+            # Left
+            left_special_attack = PlayerSpecialAttack.new()
+            left_special_attack.z_index = attack_z_index
+            left_special_attack.direction = Vector2.LEFT.copy()
+            left_special_attack.flip_h = True
+            left_special_attack.update_attack_offset(
+                is_crouching=False,
+                base_pos=base_attack_pos,
+            )
+            left_special_attack.subscribe_to_event(
+                event_id="hit_enemy",
+                scoped_node=self,
+                callback_func=lambda enemy: self._on_attack_hit_enemy(enemy),
+            )
+            main_node.add_child(left_special_attack)
+
+            self.stats.energy = 0
+
+            AudioManager.play_sound(source=self.special_attack_slash_audio_source)
+        except GeneratorExit:
+            pass
+
+    async def _ability_hood_form_task(self):
+        try:
+            self._set_transformed(True)
+            level_state = LevelState()
+            transformation_tick_rate = 0.25
+            energy_drain_per_tick = self.stats.hood_form_energy_drain
+            # Update animation to transformed
+            self.play_animation(self._current_animation_name)
+            while True:
+                await co_wait_seconds(transformation_tick_rate)
+                if not level_state.is_currently_transitioning_within_level:
+                    self.stats.energy -= energy_drain_per_tick
+                await co_suspend()
+        except GeneratorExit:
+            self._set_transformed(False)
+            self.play_animation(self._current_animation_name)
 
     async def _health_restore_task(self, restore_amount: int):
         try:
@@ -789,8 +821,6 @@ class Player(Node2D):
             jump_time = 0.5
             ascend_timer = Timer(jump_time)
             max_ascend_timer_skips = 2
-            # if self.is_transformed:
-            #     max_ascend_timer_skips += 2
             ascent_timer_skips = 0
             is_ascending = True
             while True:
