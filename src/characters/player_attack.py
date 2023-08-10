@@ -76,6 +76,7 @@ class PlayerSpecialAttack(PlayerAttack):
         super().__init__(entity_id)
         self.anim_sprite: Optional[AnimatedSprite] = None
         self.size = Size2D(24, 24)
+        self.texture_path = "assets/images/demi/demi_attack_slash.png"
 
     def _start(self) -> None:
         super()._start()
@@ -87,7 +88,7 @@ class PlayerSpecialAttack(PlayerAttack):
             frames=[
                 AnimationFrame(
                     frame=0,
-                    texture_path="assets/images/demi/demi_attack_slash.png",
+                    texture_path=self.texture_path,
                     draw_source=Rect2(0, 0, self.size.w, self.size.h),
                 )
             ],
@@ -117,3 +118,11 @@ class PlayerSpecialAttack(PlayerAttack):
             left_side_offset = Vector2(-26, 0)
             offset += left_side_offset
         self.position = base_pos + offset
+
+
+class PlayerDualSpecialAttack(PlayerSpecialAttack):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.damage = 2
+        self.size = Size2D(24, 28)
+        self.texture_path = "assets/images/demi/demi_ability_dual_special_slash.png"

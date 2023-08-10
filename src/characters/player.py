@@ -1,7 +1,11 @@
 import random
 
 from src.characters.enemy import Enemy, EnemyAttack
-from src.characters.player_attack import PlayerMeleeAttack, PlayerSpecialAttack
+from src.characters.player_attack import (
+    PlayerMeleeAttack,
+    PlayerSpecialAttack,
+    PlayerDualSpecialAttack,
+)
 from src.characters.player_item_handler import PlayerItemHandler
 from src.environment.bridge_gate import BridgeGate
 from src.items import *
@@ -677,9 +681,9 @@ class Player(Node2D):
         try:
             main_node = SceneTree.get_root()
             attack_z_index = self.z_index + 1
-            base_attack_pos = self.position + Vector2(0, 2)
+            base_attack_pos = self.position
             # Right
-            right_special_attack = PlayerSpecialAttack.new()
+            right_special_attack = PlayerDualSpecialAttack.new()
             right_special_attack.z_index = attack_z_index
             right_special_attack.direction = Vector2.RIGHT.copy()
             right_special_attack.flip_h = False
@@ -694,7 +698,7 @@ class Player(Node2D):
             )
             main_node.add_child(right_special_attack)
             # Left
-            left_special_attack = PlayerSpecialAttack.new()
+            left_special_attack = PlayerDualSpecialAttack.new()
             left_special_attack.z_index = attack_z_index
             left_special_attack.direction = Vector2.LEFT.copy()
             left_special_attack.flip_h = True
