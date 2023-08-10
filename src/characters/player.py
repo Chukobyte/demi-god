@@ -330,6 +330,7 @@ class Player(Node2D):
         manage_special_attack_state_task = Task(
             coroutine=self._manage_special_attack_state_task()
         )
+        manage_ability_ui_task = Task(coroutine=self._manage_ability_ui_task())
         prev_stance = None
         current_stance_task: Optional[Task] = None
 
@@ -358,6 +359,8 @@ class Player(Node2D):
                     self.health_restore_task.resume()
                 # Special attack management task
                 manage_special_attack_state_task.resume()
+                # Will flash ability bar if full
+                manage_ability_ui_task.resume()
                 # Change stance if different from last frame
                 if prev_stance != self.stance:
                     if current_stance_task:
@@ -412,6 +415,29 @@ class Player(Node2D):
                     charge_timer.time = self.stats.special_attack_charge_time
                     charge_timer.reset()
                     self.reset_special_attack_time = False
+                await co_suspend()
+        except GeneratorExit:
+            pass
+
+    async def _manage_ability_ui_task(self):
+        try:
+            default_color = self.stats.energy_bar_ui.color
+            fully_charged_color = Color(240, 247, 243)
+            current_color = default_color
+            while True:
+                await co_wait_until(lambda: self.stats.energy >= self.stats.base_energy)
+                toggle_timer = Timer(0.5)
+                while self.stats.energy >= self.stats.base_energy:
+                    toggle_timer.tick(self.get_full_time_dilation_with_physics_delta())
+                    if toggle_timer.has_stopped():
+                        if current_color == default_color:
+                            current_color = fully_charged_color
+                        else:
+                            current_color = default_color
+                        self.stats.energy_bar_ui.color = current_color
+                        toggle_timer.reset()
+                    await co_suspend()
+                self.stats.energy_bar_ui.color = default_color
                 await co_suspend()
         except GeneratorExit:
             pass
