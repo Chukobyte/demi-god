@@ -7,9 +7,9 @@ A work in progress game demo.  Made with [Crescent](https://github.com/Chukobyte
 ## How to Run in Editor
 
 1. Clone the source code from this repo.
-2. Download a version of crescent that matches the os that will run the game from the [releases page](https://github.com/Chukobyte/crescent/releases).  Should be v0.12.0 or higher.
+2. Download crescent [v0.14.0](https://github.com/Chukobyte/crescent/releases/tag/v0.14.0) from the releases page that matches the os that will run the game.  Future versions of Crescent may be used, but backwards compatibility is not guaranteed at the moment.
 3. Open the project within the folder that the repo was downloaded in.
 
 ## How to run the game standalone
 
-Coming soon, will post on itch.io once version v1.0.0 has been released.
+Go to the game's [itch.io page](https://chukobyte.itch.io/demi-god-remake) and download a build.
