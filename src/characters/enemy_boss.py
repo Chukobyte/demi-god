@@ -64,13 +64,30 @@ class EnemyBossProjectile(EnemyAttack):
         self.collider = Collider2D.new()
         self.collider.extents = size
         self.add_child(self.collider)
-        self.sprite = Sprite.new()
-        self.sprite.position = Vector2(-2, -2)
-        self.sprite.texture = Texture(
-            file_path="assets/images/enemy_boss/enemy_boss_projectile_attack.png"
+
+        self.anim_sprite = AnimatedSprite.new()
+        animation = Animation(
+            name="main",
+            speed=200,
+            loops=True,
+            frames=[
+                AnimationFrame(
+                    frame=0,
+                    texture_path="assets/images/enemy_boss/enemy_boss_projectile_attack.png",
+                    draw_source=Rect2(0, 0, 8, 8),
+                ),
+                AnimationFrame(
+                    frame=1,
+                    texture_path="assets/images/enemy_boss/enemy_boss_projectile_attack.png",
+                    draw_source=Rect2(8, 0, 8, 8),
+                ),
+            ],
         )
-        self.sprite.draw_source = Rect2(0, 0, 8, 8)
-        self.add_child(self.sprite)
+        self.anim_sprite.add_animation(animation)
+        self.anim_sprite.position = Vector2(-2, -2)
+        self.add_child(self.anim_sprite)
+        self.anim_sprite.play("main")
+
         self.physics_update_task = Task(coroutine=self._physics_update_task())
 
     # --- TASKS --- #
