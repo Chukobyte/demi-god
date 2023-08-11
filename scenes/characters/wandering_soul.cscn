@@ -22,7 +22,7 @@
                 {
                     "type": "animated_sprite",
                     "current_animation_name": "idle",
-                    "is_playing": false,
+                    "is_playing": true,
                     "origin": {
                         "x": 6.0,
                         "y": 15.0
@@ -30,7 +30,7 @@
                     "animations": [
                         {
                             "name": "idle",
-                            "speed": 300,
+                            "speed": 100,
                             "loops": true,
                             "frames": [
                                 {
@@ -38,6 +38,46 @@
                                     "texture_path": "assets/images/environment/wandering_soul.png",
                                     "draw_source": {
                                         "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 12.0,
+                                        "h": 20.0
+                                    }
+                                },
+                                {
+                                    "frame": 1,
+                                    "texture_path": "assets/images/environment/wandering_soul.png",
+                                    "draw_source": {
+                                        "x": 12.0,
+                                        "y": 0.0,
+                                        "w": 12.0,
+                                        "h": 20.0
+                                    }
+                                },
+                                {
+                                    "frame": 2,
+                                    "texture_path": "assets/images/environment/wandering_soul.png",
+                                    "draw_source": {
+                                        "x": 24.0,
+                                        "y": 0.0,
+                                        "w": 12.0,
+                                        "h": 20.0
+                                    }
+                                },
+                                {
+                                    "frame": 3,
+                                    "texture_path": "assets/images/environment/wandering_soul.png",
+                                    "draw_source": {
+                                        "x": 36.0,
+                                        "y": 0.0,
+                                        "w": 12.0,
+                                        "h": 20.0
+                                    }
+                                },
+                                {
+                                    "frame": 4,
+                                    "texture_path": "assets/images/environment/wandering_soul.png",
+                                    "draw_source": {
+                                        "x": 48.0,
                                         "y": 0.0,
                                         "w": 12.0,
                                         "h": 20.0

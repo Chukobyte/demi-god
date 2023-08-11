@@ -364,11 +364,20 @@ class LevelAreaManager:
             text_label_top: TextLabel = text_window.get_child("WindowTextTop")
             text_label_top.text = "You saved us!"
 
+            dir_overrides = [
+                Vector2(-0.95, -0.95),
+                Vector2(-0.9, -1),
+                Vector2(-1, -0.9),
+                Vector2(-0.8, -1),
+                Vector2(-1, -0.8),
+                Vector2(-0.9, -0.9),
+            ]
             for i in range(6):
                 wandering_soul: WanderingSoul = wandering_soul_scene.create_instance()
                 wandering_soul.position = base_soul_pos + Vector2(i * 4, 0)
                 wandering_soul.z_index = 10
                 wandering_soul.flip_h = True
+                wandering_soul.move_dir = dir_overrides[i]
                 main_node.add_child(wandering_soul)
                 await co_wait_seconds(0.25)
 
