@@ -141,6 +141,36 @@
                 "nearest_neighbor": true
             },
             {
+                "file_path": "assets/images/enemy_boss/enemy_boss_fly_up.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/enemy_boss/enemy_boss_fly_down.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/enemy_boss/enemy_boss_move.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/enemy_boss/enemy_boss_attack.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
+                "file_path": "assets/images/enemy_boss/enemy_boss_projectile_attack.png",
+                "wrap_s": "clamp_to_border",
+                "wrap_t": "clamp_to_border",
+                "nearest_neighbor": true
+            },
+            {
                 "file_path": "assets/images/demi/demi_crouch_attack.png",
                 "wrap_s": "clamp_to_border",
                 "wrap_t": "clamp_to_border",

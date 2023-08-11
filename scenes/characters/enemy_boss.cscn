@@ -44,6 +44,74 @@
                                     }
                                 }
                             ]
+                        },
+                        {
+                            "name": "fly_up",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/enemy_boss/enemy_boss_fly_up.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "fly_down",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/enemy_boss/enemy_boss_fly_down.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "move",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/enemy_boss/enemy_boss_move.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "attack",
+                            "speed": 100,
+                            "loops": false,
+                            "frames": [
+                                {
+                                    "frame": 0,
+                                    "texture_path": "assets/images/enemy_boss/enemy_boss_attack.png",
+                                    "draw_source": {
+                                        "x": 0.0,
+                                        "y": 0.0,
+                                        "w": 48.0,
+                                        "h": 48.0
+                                    }
+                                }
+                            ]
                         }
                     ]
                 }

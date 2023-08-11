@@ -66,9 +66,8 @@ class EnemyBossProjectile(EnemyAttack):
         self.add_child(self.collider)
         self.sprite = Sprite.new()
         self.sprite.position = Vector2(-2, -2)
-        # TODO: Use boss projectile sprite
         self.sprite.texture = Texture(
-            file_path="assets/images/enemy_jester/enemy_jester_ball_attack.png"
+            file_path="assets/images/enemy_boss/enemy_boss_projectile_attack.png"
         )
         self.sprite.draw_source = Rect2(0, 0, 8, 8)
         self.add_child(self.sprite)
@@ -203,6 +202,7 @@ class EnemyBoss(Enemy):
             move_speed = 25
             self._face_player(player)
             move_state_timer = Timer(random.uniform(1.5, 3.0))
+            self.anim_sprite.play("move")
             while True:
                 if self._is_outside_of_camera_viewport(Vector2.ZERO):
                     self._face_player(player)
@@ -232,6 +232,7 @@ class EnemyBoss(Enemy):
             if self.move_dir == Vector2.LEFT:
                 jump_speed.x *= -1
             # ASCEND
+            self.anim_sprite.play("fly_up")
             while is_ascending:
                 delta_time = self.get_full_time_dilation_with_physics_delta()
                 jump_vector = jump_speed * Vector2(delta_time, delta_time)
@@ -242,6 +243,7 @@ class EnemyBoss(Enemy):
                     is_ascending = False
                 await co_suspend()
             # ATTACK
+            self.anim_sprite.play("attack")
             await co_wait_seconds(0.25)
             attack = self._spawn_projectile()
             attack.position = self.position
@@ -250,6 +252,7 @@ class EnemyBoss(Enemy):
             SceneTree.get_root().add_child(attack)
             await co_wait_seconds(0.1)
             # DESCENT
+            self.anim_sprite.play("fly_down")
             is_descending = True
             jump_speed.y *= -1
             while is_descending:
@@ -269,7 +272,10 @@ class EnemyBoss(Enemy):
     async def _projectile_attacks_state_task(self, player: Player) -> None:
         try:
             self._face_player(player)
-            await co_wait_seconds(1.0)
+            self.anim_sprite.play("idle")
+            await co_wait_seconds(0.75)
+            self.anim_sprite.play("attack")
+            await co_wait_seconds(0.25)
 
             # Random offsets either starting attack high or low (2 = low, -10 = high)
             y_offsets = random.choice([[2, -10, 2], [-10, 2, -10]])
@@ -298,6 +304,7 @@ class EnemyBoss(Enemy):
                 level_state.is_paused_from_boss = True
 
             # Fall from the sky and land
+            self.anim_sprite.play("fly_down")
             landing_time = 5.0
             landing_timer = Timer(landing_time)
             enemy_landing_easer = Easer(
@@ -315,7 +322,9 @@ class EnemyBoss(Enemy):
                 else:
                     self.position = enemy_landing_easer.ease(delta_time)
                 await co_suspend()
-            # TODO: Do anything else after landing, like an animation
+
+            self.anim_sprite.play("idle")
+
             await co_suspend()
             await co_suspend()
             await co_suspend()
