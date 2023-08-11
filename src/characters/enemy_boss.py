@@ -350,8 +350,11 @@ class EnemyBoss(Enemy):
                 knock_back_velocity = (
                     Vector2(knock_back_distance, knock_back_distance) * knock_back_dir
                 )
+                level_state = LevelState()
                 for i in range(2):
                     self.position += knock_back_velocity
+                    new_pos = self.position + knock_back_velocity
+                    self._get_clamped_pos(new_pos, level_state.boundary)
                     await co_wait_until(lambda: World.get_time_dilation() > 0.0)
             shader_instance = self.anim_sprite.shader_instance
             shader_instance.set_float_param("flash_amount", 0.75)
