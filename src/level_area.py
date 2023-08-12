@@ -4,14 +4,7 @@ import random
 from src.characters.enemy_definitions import EnemyDefinition
 from src.characters.player_item_handler import PlayerItemHandler
 from src.items import *
-
-
-class LevelAreaType:
-    INTRO = "intro"
-    NORMAL = "normal"
-    POWER_UP = "power_up"
-    BOSS = "boss"
-    END = "end"
+from src.level_area_type import LevelAreaType
 
 
 class LevelSection:

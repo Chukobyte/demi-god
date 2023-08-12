@@ -96,6 +96,7 @@ class LevelState:
             cls.bridge_gate_helper = BridgeGateHelper()
             cls.game_timer: Optional[GameTimer] = None
             cls.queued_new_enemy_time_dilation: Optional[float] = None
+            cls.current_level_area_type: Optional[str] = None
             cls._enemy_time_dilation = 1.0
             cls._time_dilation_change_subscribers: List[Callable] = []
         return cls._instance

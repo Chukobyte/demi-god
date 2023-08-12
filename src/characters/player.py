@@ -9,6 +9,7 @@ from src.characters.player_attack import (
 from src.characters.player_item_handler import PlayerItemHandler
 from src.environment.bridge_gate import BridgeGate
 from src.items import *
+from src.level_area_type import LevelAreaType
 from src.level_state import LevelState
 from src.utils.game_math import clamp, Easer, Ease
 from src.utils.task import *
@@ -54,6 +55,7 @@ class Player(Node2D):
         self.enemy_collision_invincible = False
         self.in_attack_damage_cooldown = False
         self.damage_cooldown_time = 2.0
+        self.block_energy_gain_from_attacks = False
         self.physics_update_task = Task(coroutine=self._physics_update_task())
         self.ability_task: Optional[Task] = None
         self.health_restore_task: Optional[Task] = None
@@ -305,9 +307,10 @@ class Player(Node2D):
             AudioManager.play_sound(source=self.attack_slash_audio_source)
 
     def _on_attack_hit_enemy(self, enemy: Enemy) -> None:
-        self.stats.set_energy(
-            self.stats.energy + self.stats.energy_restored_from_attacks
-        )
+        if not self.block_energy_gain_from_attacks:
+            self.stats.set_energy(
+                self.stats.energy + self.stats.energy_restored_from_attacks
+            )
         if enemy in self.enemies_attached_to_left:
             self.enemies_attached_to_left.remove(enemy)
         elif enemy in self.enemies_attached_to_right:
@@ -667,6 +670,8 @@ class Player(Node2D):
 
     async def _ability_slow_time_task(self):
         level_state = LevelState()
+        if level_state.current_level_area_type == LevelAreaType.BOSS:
+            self.block_energy_gain_from_attacks = True
         try:
             level_state.set_enemy_time_dilation(0.5)
             transformation_tick_rate = 0.25
@@ -679,6 +684,8 @@ class Player(Node2D):
         except GeneratorExit:
             self.play_animation(self._current_animation_name)
             level_state.set_enemy_time_dilation(1.0)
+            if level_state.current_level_area_type == LevelAreaType.BOSS:
+                self.block_energy_gain_from_attacks = False
 
     async def _ability_dual_special_task(self):
         try:

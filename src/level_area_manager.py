@@ -5,7 +5,8 @@ from src.characters.wandering_soul import WanderingSoul
 from src.enemy_area_manager import EnemyAreaManager
 from src.environment.bridge_gate import BridgeGate
 from src.items import ItemUtils, Item, LeverItem
-from src.level_area import LevelAreaDefinitions, LevelArea, LevelAreaType
+from src.level_area import LevelAreaDefinitions, LevelArea
+from src.level_area_type import LevelAreaType
 from src.level_clouds import LevelCloudManager
 from src.level_state import LevelState
 from src.utils.game_math import Easer, Ease
@@ -47,6 +48,7 @@ class LevelAreaManager:
         self._has_processed_current_area_completion = False
 
     def _setup_area_type(self, area: LevelArea, level_state: LevelState) -> None:
+        level_state.current_level_area_type = area.area_type
         if (
             area.area_type == LevelAreaType.POWER_UP
             or area.area_type == LevelAreaType.INTRO
