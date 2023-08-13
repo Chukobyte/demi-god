@@ -2,7 +2,7 @@ import random
 
 from crescent_api import *
 
-from src.characters.enemy import Enemy, EnemyAttack
+from src.characters.enemy import Enemy, EnemyAttack, EnemyAttackOwnerDeletionMode
 from src.level_state import LevelState
 from src.utils.task import *
 from src.utils.timer import Timer
@@ -16,6 +16,7 @@ class EnemyJesterState:
 
 class EnemyJesterProjectile(EnemyAttack):
     def _start(self) -> None:
+        self.owner_deletion_mode = EnemyAttackOwnerDeletionMode.DELETE_WHEN_OWNER_IS_DELETED
         self.move_speed = 40
         size = Size2D(4, 4)
         self.collider = Collider2D.new()

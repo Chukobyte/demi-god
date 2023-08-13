@@ -2,7 +2,7 @@ import random
 
 from crescent_api import *
 
-from src.characters.enemy import Enemy, EnemyAttack
+from src.characters.enemy import Enemy, EnemyAttack, EnemyAttackOwnerDeletionMode
 from src.characters.player import Player, PlayerStance
 from src.level_state import LevelState
 from src.utils.game_math import Easer, Ease, map_to_range, clamp
@@ -59,6 +59,7 @@ class EnemyBossState:
 
 class EnemyBossProjectile(EnemyAttack):
     def _start(self) -> None:
+        self.owner_deletion_mode = EnemyAttackOwnerDeletionMode.DELETE_WHEN_OWNER_IS_DESTROYED
         self.move_speed = 40
         size = Size2D(4, 4)
         self.collider = Collider2D.new()

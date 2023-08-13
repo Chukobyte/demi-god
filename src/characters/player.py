@@ -54,7 +54,7 @@ class Player(Node2D):
         # Used when attacking to delay a frame on contact
         self.enemy_collision_invincible = False
         self.in_attack_damage_cooldown = False
-        self.damage_cooldown_time = 2.0
+        self.damage_cooldown_time = 1.5
         self.block_energy_gain_from_attacks = False
         self.physics_update_task = Task(coroutine=self._physics_update_task())
         self.ability_task: Optional[Task] = None

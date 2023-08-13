@@ -4,6 +4,12 @@ from src.level_state import LevelState
 from src.utils.task import Task, co_suspend, co_wait_seconds, co_wait_until
 
 
+class EnemyAttackOwnerDeletionMode:
+    NONE = "none"
+    DELETE_WHEN_OWNER_IS_DESTROYED = "destroyed"
+    DELETE_WHEN_OWNER_IS_DELETED = "deleted"
+
+
 class EnemyAttack(Node2D):
     def __init__(self, entity_id: int):
         super().__init__(entity_id)
@@ -14,7 +20,7 @@ class EnemyAttack(Node2D):
         self.physics_update_task: Optional[Task] = None
         self.collider: Optional[Collider2D] = None
         self.destroy_on_touch = True
-        self.destroy_when_owner_is = True
+        self.owner_deletion_mode = EnemyAttackOwnerDeletionMode.NONE
 
     def _fixed_update(self, delta_time: float) -> None:
         if self._owner and not self._owner.is_destroyed:
@@ -32,14 +38,21 @@ class EnemyAttack(Node2D):
 
     def set_owner(self, enemy: "Enemy") -> None:
         self._owner = enemy
-        if self.destroy_when_owner_is:
-            self._owner.subscribe_to_event(
-                "destroyed", self, lambda args: self._on_owner_destroyed()
-            )
+        if (
+            self.owner_deletion_mode
+            == EnemyAttackOwnerDeletionMode.DELETE_WHEN_OWNER_IS_DESTROYED
+        ):
+            deletion_event = "destroyed"
+        else:
+            deletion_event = "scene_exited"
+        self._owner.subscribe_to_event(
+            deletion_event, self, lambda args: self._on_owner_destroyed()
+        )
 
     def _on_owner_destroyed(self) -> None:
         self._owner = None
-        self.queue_deletion()
+        if self.owner_deletion_mode != EnemyAttackOwnerDeletionMode.NONE:
+            self.queue_deletion()
 
 
 class Enemy(Node2D):
