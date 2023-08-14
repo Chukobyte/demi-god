@@ -15,8 +15,13 @@ class EnemyJesterState:
 
 
 class EnemyJesterProjectile(EnemyAttack):
+    def __init__(self, entity_id: int):
+        super().__init__(entity_id)
+        self.owner_deletion_mode = (
+            EnemyAttackOwnerDeletionMode.DELETE_WHEN_OWNER_IS_DELETED
+        )
+
     def _start(self) -> None:
-        self.owner_deletion_mode = EnemyAttackOwnerDeletionMode.DELETE_WHEN_OWNER_IS_DELETED
         self.move_speed = 40
         size = Size2D(4, 4)
         self.collider = Collider2D.new()
